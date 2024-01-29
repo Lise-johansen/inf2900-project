@@ -1,5 +1,3 @@
 .DS_Store
 /appenv
 /app_project/app_project/__pycache__/
-/app_project/cert.crt/
-/app_project/cert.key/
