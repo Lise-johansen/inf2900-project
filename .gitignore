@@ -1,3 +1,4 @@
 .DS_Store
 /appenv
 /app_project/app_project/__pycache__/
+/app_project/airfinn/__pycache__/
