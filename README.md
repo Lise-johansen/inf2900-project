@@ -5,10 +5,10 @@
     -$ python3 -m venv environment-name
 
 # 2. Start virtual environment
-    -$ source appenv/bin/activate
+    -$ source environment-name/bin/activate
 
 # 2.1 How to stop virtual environment
-    -$ deactivate appenv
+    -$ deactivate environment-name
 
 # 3. Install requirements
     -$ pip3 install -r requirements.txt
