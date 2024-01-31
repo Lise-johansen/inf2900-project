@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'airfinn.apps.AirfinnConfig',
+    'airfinn',
     
     # Django SSL extension
     'django_extensions',
@@ -80,6 +81,7 @@ WSGI_APPLICATION = 'app_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / '../db.sqlite3',
     }
 }
 
