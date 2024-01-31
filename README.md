@@ -15,7 +15,6 @@
 
 # 4. Start django app locally, be in the inner app_project folder
     -$ python3 manage.py runserver
-    -$ python3 manage.py runserver_plus --cert-file cert.pem --key-file key.pem
 
 # 4.1 Start django on server (if not running) !! HAS TO BE IN VIRTUAL ENVIRONMENT and in the project folder
     -$ python3 manage.py runserver 10.0.0.194:8000
