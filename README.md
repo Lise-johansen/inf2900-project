@@ -18,3 +18,12 @@
 
 # 4.1 Start django on server (if not running) !! HAS TO BE IN VIRTUAL ENVIRONMENT and in the project folder
     -$ python3 manage.py runserver 10.0.0.194:8000
+
+# 5. Download vue-cli
+    -$ npm install -g @vue/cli
+
+# 5.1 Start vue server (MUST be done inside vue-app folder) also use a different window for this as you need to run both simultaniously
+    -$ npm run serve
+
+# 5.2 Build app for development
+    -$ npm run build
