@@ -9,22 +9,14 @@
 
 <template>
   <div id="app">
-    <router-view></router-view> <!-- This renders the matched route component -->
+    <router-view/> <!-- This will render the currently active route component (login or register) -->
   </div>
 </template>
 
 
 <script>
-import redirectToLogin from '@/components/IndexPath.vue'; // Adjust the path based on your project structure
-
-
 export default {
   name: 'App',
-  components: {
-    // eslint-disable-next-line vue/no-unused-components
-    redirectToLogin,
-    
-  }
 };
 </script>
 
@@ -38,4 +30,3 @@ export default {
   margin-top: 60px;
 }
 </style>
-

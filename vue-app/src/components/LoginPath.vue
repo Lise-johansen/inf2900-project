@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-- <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
@@ -47,11 +48,14 @@ export default {
  * Template block of the Login component. 
  * Is a simple form that contains two input fields for the username and password and a button to submit the form.
  * */
+=======
+>>>>>>> localtest_adrian
 <template>
   <div>
     <input type="text" v-model="username" placeholder="Username">
     <input type="password" v-model="password" placeholder="Password">
     <button @click="login">Login</button>
+    <router-link to="/register" class="button-link">Don't have an account? Register</router-link>
     <p v-if="errorMessage">{{ errorMessage }}</p>
   </div>
 </template>
@@ -76,7 +80,7 @@ export default {
    *  */
   methods: {
     login() {
-      axios.post('http://localhost:8080/login', {
+      axios.post('http://localhost:8000/api/login', {
           username: this.username,
           password: this.password
         })
@@ -88,10 +92,20 @@ export default {
           this.errorMessage = 'Invalid username or password';
           console.error('There was an error!', error);
         });
-    }
-  },
-  mounted() {
-    console.log("Login component mounted");
+    },
+
+    register() {
+            axios.get('http://localhost:8000/api/register', {
+            })
+            .then(response => {
+                this.errorMessage = '';
+                console.log(response);
+            })
+            .catch(error => {
+                this.errorMessage = 'Invalid Page';
+                console.error('There was an error!', error);
+            });
+        }
   }
 }
 </script>
@@ -111,5 +125,18 @@ li {
 }
 a {
   color: #42b983;
+}
+.button-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #ffffff;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.button-link:hover {
+    background-color: #0056b3;
 }
 </style> 

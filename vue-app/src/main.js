@@ -1,5 +1,11 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import router from './router.js'; // Import the router instance from router.js so the app redirects to other pages.
+import VueRouter from 'vue-router'
 
-createApp(App).use(router).mount('#app');
+import router from './router'
+
+const app = createApp(App);
+
+app.use(VueRouter);
+
+app.use(router).mount('#app');

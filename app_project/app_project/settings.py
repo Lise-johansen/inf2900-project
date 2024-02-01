@@ -18,8 +18,9 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Add the directory containing Vue.js static files to STATICFILES_DIRS
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "../../Team11/vue-app/dist"),
+    os.path.join(BASE_DIR, "../../Team11/vue-app/dist"),  # Adjust the path as needed
 ]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
