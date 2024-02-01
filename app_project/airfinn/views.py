@@ -3,8 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.db import models
-
+from django.http import HttpResponseNotAllowed
 
 
 # Create your views here.
@@ -23,18 +22,34 @@ def login(request):
         user = authenticate(username=username, password=password)
         
         if user is not None:
-            # Authentication successfull
+            # Authentication successful
             return JsonResponse({'success': True})
         else:
             # Authentication failed
             return JsonResponse({'success': False, 'error': 'Invalid Credentials'}, status=401)
+    else:
+        # Return an error response for GET requests
+        return HttpResponseNotAllowed(['POST'], 'Only POST requests are allowed for login.')
+
+#     if request.method == 'POST':
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+        
+#         # Authenticate user
+#         user = authenticate(username=username, password=password)
+        
+#         if user is not None:
+#             # Authentication successfull
+#             return JsonResponse({'success': True})
+#         else:
+#             # Authentication failed
+#             return JsonResponse({'success': False, 'error': 'Invalid Credentials'}, status=401)
 
 def register(request):
     if request.method == 'POST':
-        username = request.data('username')
-        password = request.data('password')
-        email = request.data('email')
-
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
         
         # Check if the username or email is already in use
         if User.objects.filter(username=username).exists():
