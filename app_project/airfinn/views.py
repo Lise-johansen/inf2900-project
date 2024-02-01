@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.http import HttpResponseNotAllowed
+from django.http import StreamingHttpResponse
 
 
 # Create your views here.
@@ -20,6 +21,8 @@ def login(request):
         
         # Authenticate user
         user = authenticate(username=username, password=password)
+
+        print(StreamingHttpResponse(user))
         
         if user is not None:
             # Authentication successful
@@ -51,6 +54,12 @@ def register(request):
         password = request.POST.get('password')
         email = request.POST.get('email')
         
+        data = {
+            'username': username,
+            'password': password,
+            'email': email
+        }
+
         # Check if the username or email is already in use
         if User.objects.filter(username=username).exists():
             return JsonResponse({'error': 'Username already exists'}, status=400)
@@ -63,6 +72,6 @@ def register(request):
 
         # Optionally, you can perform additional actions like sending a confirmation email
         
-        return JsonResponse({'message': 'User registered successfully'}, status=201)
+        return JsonResponse({'message': 'User registered successfully'}, status=201), data
     else:
-        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405), data

@@ -30,30 +30,21 @@ export default {
     login() {
       axios.post('http://localhost:8000/api/login/', {
           username: this.username,
-          password: this.password
+          password: this.password,
         })
         .then(response => {
+          console.log(this.username);
+          console.log(this.password);
           this.$router.push('/dashboard');
           console.log(response);
         })
         .catch(error => {
+          console.log("error:",this.username);
+          console.log("error:",this.password);
           this.errorMessage = 'Invalid username or password';
           console.error('There was an error!', error);
         });
     },
-
-    register() {
-            axios.get('http://localhost:8000/api/register/', {
-            })
-            .then(response => {
-                this.$router.push('/dashboard');
-                console.log(response);
-            })
-            .catch(error => {
-                this.errorMessage = 'Invalid Page';
-                console.error('There was an error!', error);
-            });
-        }
   }
 }
 </script>

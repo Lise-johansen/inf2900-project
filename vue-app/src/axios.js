@@ -5,6 +5,7 @@ import axios from 'axios';
 // Create Axios instance
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8000', // Replace with your Django backend URL
+  withCredentials: true, // Make sure this option is set to true
 });
 
 // Add a request interceptor to dynamically add CSRF token to outgoing requests

@@ -45,8 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'airfinn.apps.AirfinnConfig',
     'corsheaders',
-    
-    
     # Django SSL extension
     'django_extensions',
 ]
@@ -113,6 +111,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 
 
 # Internationalization
