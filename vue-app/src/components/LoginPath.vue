@@ -43,7 +43,10 @@ export default {
 
 
 
-
+/** 
+ * Template block of the Login component. 
+ * Is a simple form that contains two input fields for the username and password and a button to submit the form.
+ * */
 <template>
   <div>
     <input type="text" v-model="username" placeholder="Username">
@@ -64,9 +67,16 @@ export default {
       errorMessage: ''
     };
   },
+  /*
+   * Methods block of the Login component.
+   * it contains the login method that sends a POST request to the /login endpoint of the backend.
+   * The login method is called when the user clicks the Login button.
+   * The login method sends the username and password to the backend.
+   * If the username and password are correct, the backend returns a 200 OK response.
+   *  */
   methods: {
     login() {
-      axios.post('http://localhost:8080/', {
+      axios.post('http://localhost:8080/login', {
           username: this.username,
           password: this.password
         })
@@ -79,10 +89,12 @@ export default {
           console.error('There was an error!', error);
         });
     }
+  },
+  mounted() {
+    console.log("Login component mounted");
   }
 }
 </script>
-
 
 
 <style scoped>
