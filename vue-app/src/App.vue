@@ -1,17 +1,12 @@
 <template>
   <div id="app">
-    <login/>
+    <router-view/> <!-- This will render the currently active route component (login or register) -->
   </div>
 </template>
 
 <script>
-import login from '@/components/LoginPath.vue'; // Adjust the path based on your project structure
-
 export default {
   name: 'App',
-  components: {
-    login
-  }
 };
 </script>
 
@@ -25,4 +20,3 @@ export default {
   margin-top: 60px;
 }
 </style>
-
