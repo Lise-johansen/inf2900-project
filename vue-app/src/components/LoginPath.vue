@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from '@/axios';
 
 export default {
   data() {
@@ -21,7 +21,7 @@ export default {
   },
   methods: {
     login() {
-      axios.post('http://localhost:8000/api/login', {
+      axios.post('http://localhost:8000/api/login/', {
           username: this.username,
           password: this.password
         })
@@ -34,19 +34,6 @@ export default {
           console.error('There was an error!', error);
         });
     },
-
-    register() {
-            axios.get('http://localhost:8000/api/register', {
-            })
-            .then(response => {
-                this.errorMessage = '';
-                console.log(response);
-            })
-            .catch(error => {
-                this.errorMessage = 'Invalid Page';
-                console.error('There was an error!', error);
-            });
-        }
   }
 }
 </script>

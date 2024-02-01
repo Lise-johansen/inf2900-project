@@ -11,14 +11,9 @@
 
 
 <script>
-import axios from 'axios';
-import { routerLink } from 'vue-router'
+import axios from '@/axios';
 
 export default {
-    components: {
-        routerLink,
-    },
-
     data() {
         return {
         username: '',
@@ -30,7 +25,7 @@ export default {
 
     methods: {
         register() {
-        axios.post('http://localhost:8000/api/register', {
+        axios.post('http://localhost:8000/api/register/', {
             username: this.username,
             email: this.email,
             password: this.password
@@ -44,24 +39,9 @@ export default {
             console.error('Registration failed:', error.response.data.error);
             });
         },
-
-        login() {
-            axios.get('http://localhost:8000/api/login', {
-            })
-            .then(response => {
-                this.errorMessage = '';
-                console.log(response);
-            })
-            .catch(error => {
-                this.errorMessage = 'Invalid Page';
-                console.error('There was an error!', error);
-            });
-        }
     }
 }
 </script>
-
-
 
 <style scoped>
 h3 {
