@@ -3,16 +3,21 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.http import JsonResponse
+from django.db import models
+
 
 
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
 
+def dashboard(request):
+    return render(request, 'dashboard.html')
+
 def login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        password = request.GET.get('password')
         
         # Authenticate user
         user = authenticate(username=username, password=password)
@@ -26,9 +31,10 @@ def login(request):
 
 def register(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        email = request.POST.get('email')
+        username = request.data('username')
+        password = request.data('password')
+        email = request.data('email')
+
         
         # Check if the username or email is already in use
         if User.objects.filter(username=username).exists():
@@ -38,7 +44,8 @@ def register(request):
         
         # Create a new user
         user = User.objects.create_user(username, email, password)
-        
+        user.save()
+
         # Optionally, you can perform additional actions like sending a confirmation email
         
         return JsonResponse({'message': 'User registered successfully'}, status=201)

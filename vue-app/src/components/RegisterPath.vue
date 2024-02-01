@@ -30,13 +30,13 @@ export default {
 
     methods: {
         register() {
-        axios.post('http://localhost:8000/api/register', {
+        axios.post('http://localhost:8000/api/register/', {
             username: this.username,
             email: this.email,
             password: this.password
             })
             .then(response => {
-            this.errorMessage = '';
+              this.$router.push('/dashboard');
             console.log(response);
             })
             .catch(error => {
@@ -46,10 +46,10 @@ export default {
         },
 
         login() {
-            axios.get('http://localhost:8000/api/login', {
+            axios.get('http://localhost:8000/api/login/', {
             })
             .then(response => {
-                this.errorMessage = '';
+                this.$router.push('/dashboard');
                 console.log(response);
             })
             .catch(error => {
