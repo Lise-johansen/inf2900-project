@@ -19,6 +19,7 @@ from airfinn import views
 
 from django.urls import path, include  # Ensure include is imported
 
+print("Register view URL pattern:", path('api/register/', views.register, name='register'))
 
 appname = 'app_project'
 urlpatterns = [

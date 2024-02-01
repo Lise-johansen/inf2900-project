@@ -11,10 +11,9 @@
 
 
 <script>
-import axios from 'axios';
+import axios from '@/axios';
 
 export default {
-
     data() {
         return {
         username: '',
@@ -27,7 +26,6 @@ export default {
     methods: {
         register() {
         axios.post('http://localhost:8000/api/register/', {
-            
             username: this.username,
             email: this.email,
             password: this.password
@@ -44,8 +42,6 @@ export default {
     }
 }
 </script>
-
-
 
 <style scoped>
 h3 {
