@@ -10,7 +10,10 @@ def index(request):
     return render(request, 'index.html')
 
 def dashboard(request):
-    return render(request, 'dashboard.html')
+
+    if request.user.is_authenticated:
+        return JsonResponse({'message': 'You are authenticated'}, status=200)
+
 
 def login(request):
     if request.method != 'POST':

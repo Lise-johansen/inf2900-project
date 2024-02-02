@@ -28,7 +28,7 @@ const routes = [
     path: '/dashboard',
     name: 'UserDashboard',
     component: UserDashboard,
-    meta: { requiresAuth: true }, // Add this if authentication is required
+    meta: { requiresAuth: false }, // Add this if authentication is required
   },
   // Other routes
 ];

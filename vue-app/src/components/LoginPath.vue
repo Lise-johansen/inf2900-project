@@ -11,6 +11,7 @@
 <script>
 import axios from '@/axios';
 
+
 export default {
   data() {
     return {
@@ -33,14 +34,15 @@ export default {
           password: this.password,
         })
         .then(response => {
-          console.log(this.username);
-          console.log(this.password);
-          this.$router.push('/dashboard');
           console.log(response);
+          axios.get('http://localhost:8000/api/dashboard/', {
+            headers: {
+              Authorization: `Bearer ${response.data.access}`
+            }
+          })
+          this.$router.push('/dashboard');
         })
         .catch(error => {
-          console.log("error:",this.username);
-          console.log("error:",this.password);
           this.errorMessage = 'Invalid username or password';
           console.error('There was an error!', error);
         });

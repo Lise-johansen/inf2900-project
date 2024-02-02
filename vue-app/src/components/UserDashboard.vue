@@ -1,18 +1,68 @@
 <!-- UserDashboard.vue -->
 <template>
     <div>
-      <h1>Welcome to Your Dashboard, {{ username }}</h1>
-      <!-- Add dashboard content here -->
+        <input type="text" v-model="username" placeholder="Username">
+        <input type="text" v-model="email" placeholder="Email">
+        <router-link to="/" class="button-link">Go to Home</router-link>
     </div>
   </template>
   
-  <script>
-  export default {
+<script>
+import axios from '@/axios';
+
+export default {
     data() {
-      return {
-        username: '', // You can retrieve the username from the user's authentication information
-      };
+        return {
+        username: '',
+        email: '',
+        };
     },
-  };
-  </script>
+
+    methods: {
+        editProfile() {
+        axios.put('http://localhost:8000/api/profile/', {
+            username: this.username,
+            email: this.email,
+            })
+            .then(response => {
+            console.log(response);
+            })
+            .catch(error =>  {
+            console.error('Profile update failed:', error.response.data.error);
+            });
+        },
+    }
+}
+
+</script>
   
+
+  <style scoped>
+h3 {
+  margin: 40px 0 0;
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+a {
+  color: #42b983;
+}
+.button-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #ffffff;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.button-link:hover {
+    background-color: #0056b3;
+}
+</style> 
