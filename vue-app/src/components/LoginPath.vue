@@ -35,11 +35,7 @@ export default {
         })
         .then(response => {
           console.log(response);
-          axios.get('http://localhost:8000/api/dashboard/', {
-            headers: {
-              Authorization: `Bearer ${response.data.access}`
-            }
-          })
+          axios.get('http://localhost:8000/api/dashboard/')
           this.$router.push('/dashboard');
         })
         .catch(error => {
