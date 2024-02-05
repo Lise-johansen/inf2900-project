@@ -16,20 +16,31 @@ const routes = [
     path: '/login',
     name: 'login',
     component: Login,
+    children:[
+      {
+        path: '/dashboard',
+        name: 'UserDashboard',
+        component: UserDashboard,
+        meta: { requiresAuth: false }, // Add this if authentication is required
+      },
+    ]
   },
 
   {
     path: '/register',
     name: 'register',
     component: Register,
+    children:[
+      {
+        path: '/dashboard',
+        name: 'UserDashboard',
+        component: UserDashboard,
+        meta: { requiresAuth: false }, // Add this if authentication is required
+      },
+    ]
   },
 
-  {
-    path: '/dashboard',
-    name: 'UserDashboard',
-    component: UserDashboard,
-    meta: { requiresAuth: false }, // Add this if authentication is required
-  },
+  
   // Other routes
 ];
 

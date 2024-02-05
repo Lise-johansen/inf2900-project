@@ -8,31 +8,7 @@
   </template>
   
 <script>
-import axios from '@/axios';
 
-export default {
-    data() {
-        return {
-        username: '',
-        email: '',
-        };
-    },
-
-    methods: {
-        editProfile() {
-        axios.put('http://localhost:8000/api/profile/', {
-            username: this.username,
-            email: this.email,
-            })
-            .then(response => {
-            console.log(response);
-            })
-            .catch(error =>  {
-            console.error('Profile update failed:', error.response.data.error);
-            });
-        },
-    }
-}
 
 </script>
   
