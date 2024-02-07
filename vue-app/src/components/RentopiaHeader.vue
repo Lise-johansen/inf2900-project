@@ -1,19 +1,25 @@
 <template>
-    <div class="header-container">
-        <h1 class="logo" @click="redirectToHomepage">Rentopia</h1>
-        <div class="company-logo" @click="redirectToHomepage">
-            <img src="@/assets/logo.png" alt="Company Logo">
+    <header class="header-container">
+        <div class='logo-container'>
+            <h1 class="logo" @click="redirectToHomepage">Rentopia</h1>
+            <div class="company-logo" @click="redirectToHomepage">
+                <img src="@/assets/logo.png" alt="Company Logo">
+            </div>
         </div>
-        <div class="inbox-icon">
-            <img src="@/assets/inbox.png" alt="Inbox Icon">
+
+            <div class="tagline">
+                <p>Own less, explore more. Rent your next adventure with Rentopia.</p>
+            </div>
+
+        <div class='icon-container'>
+            <div class="inbox-icon">
+                <img src="@/assets/inbox.png" alt="Inbox Icon">
+            </div>
+            <div class="login-icon" @click="redirectToLogin">
+                <img src="@/assets/login.png" alt="Login Icon">
+            </div>
         </div>
-        <div class="login-icon" @click="redirectToLogin">
-            <img src="@/assets/login.png" alt="Login Icon">
-        </div>
-        <div class="tagline">
-            <p>Own less, explore more. Rent your next adventure with Rentopia.</p>
-        </div>
-    </div>
+    </header>
 </template> 
 
 <script>
@@ -44,52 +50,46 @@
         .header-container {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container,
+        .icon-container {
+            display: flex;
+            align-items: center;
+            width: 200px;
         }
 
         .company-logo {
-            display: inline-block; /* Ensure the icon is treated as a block element */
-            margin: 0 5px;
+            display: block; /* Ensure the icon is treated as a block element */
             cursor: pointer;
         }
         
         .company-logo img {
             max-width: 50px; /* Set a maximum width for the image */
             height: auto; /* Allow the height to adjust proportionally */
-            margin-right: 200px;
         }
 
         .tagline p {
             font-family: 'louis_george_cafe', sans-serif;
             font-size: 21px;
             font-weight: bold;
-            color: #2e468e;
-            text-align: center;
             background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
             -webkit-text-fill-color: transparent;
             -webkit-background-clip: text;
         }
-
-        .login-icon {
-            display: inline-block; /* Ensure the icon is treated as a block element */
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
+        
+        .icon-container {
+            justify-content: flex-end;
         }
 
-        .login-icon img {
-            max-width: 50px; /* Set a maximum width for the image */
-            height: auto; /* Allow the height to adjust proportionally */
-        }
-
+        .login-icon,
         .inbox-icon {
-            display: inline-block; /* Ensure the icon is treated as a block element */
-            position: fixed;
-            top: 10px;
-            right: 70px;
+            display: block; /* Ensure the icon is treated as a block element */
             cursor: pointer;
         }
 
+        .login-icon img,
         .inbox-icon img {
             max-width: 50px; /* Set a maximum width for the image */
             height: auto; /* Allow the height to adjust proportionally */

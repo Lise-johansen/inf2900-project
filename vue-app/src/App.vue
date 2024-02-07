@@ -9,9 +9,7 @@
 
 <template>
   <div id="app">
-    <header>
       <RentopiaHeader />
-    </header>
     <router-view/> <!-- This will render the currently active route component (login or register) -->
   </div>
 </template>
