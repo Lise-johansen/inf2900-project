@@ -14,6 +14,7 @@
     "crypto-js": "^4.2.0",
     "node-rsa": "^1.1.1",
     "vue": "^3.2.13",
+    "vue-cli": "^2.9.6",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
@@ -22,12 +23,13 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-plugin-unit-jest": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
+    "@vue/cli-service": "^5.0.8",
     "@vue/test-utils": "^2.4.0-alpha.2",
     "@vue/vue3-jest": "^27.0.0-alpha.1",
     "babel-jest": "^27.0.6",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
+    "http-proxy-middleware": "^2.0.6",
     "jest": "^27.0.5"
   },
   "eslintConfig": {
