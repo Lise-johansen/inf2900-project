@@ -18,8 +18,9 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Add the directory containing Vue.js static files to STATICFILES_DIRS
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "vue-app/dist"),
+    os.path.join(BASE_DIR, "../../Team11/vue-app/dist"),  # Adjust the path as needed
 ]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -43,9 +44,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'airfinn.apps.AirfinnConfig',
+<<<<<<< HEAD
     'corsheaders',
+    # Django SSL extension
+    'django_extensions',
+=======
     
-    
+>>>>>>> b5b7840fc472f139a0ac3332a31d7592c8fdc1c5
 ]
 
 MIDDLEWARE = [
@@ -60,6 +65,12 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8080']
+
+
+CSRF_COOKIE_SECURE = True  # Set to True if using HTTPS
+CSRF_COOKIE_HTTPONLY = True  # Set to True for increased security
+
 
 ROOT_URLCONF = 'app_project.urls'
 
@@ -110,6 +121,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 
 
 # Internationalization

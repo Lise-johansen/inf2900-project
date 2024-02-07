@@ -24,6 +24,8 @@ appname = 'app_project'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('login', views.login, name='login'),
+    path('api/login/', views.login, name='login'),
+    path('api/register/', views.register, name='register'),
+    path('api/dashboard/', views.dashboard, name='dashboard'),
 ]
 
