@@ -9,8 +9,7 @@
 </template>
 
 <script>
-import axios from '@/axios';
-
+import axios from 'axios'; // Import axios
 
 export default {
   data() {
@@ -20,23 +19,16 @@ export default {
       errorMessage: ''
     };
   },
-  /*
-   * Methods block of the Login component.
-   * it contains the login method that sends a POST request to the /login endpoint of the backend.
-   * The login method is called when the user clicks the Login button.
-   * The login method sends the username and password to the backend.
-   * If the username and password are correct, the backend returns a 200 OK response.
-   *  */
   methods: {
     login() {
+
+      // Send the encrypted payload along with other data
       axios.post('http://localhost:8000/api/login/', {
-          username: this.username,
-          password: this.password,
+        username: this.username,
+        password: this.password
         })
         .then(response => {
           console.log(response);
-          console.log("Login successful!");
-          axios.get('http://localhost:8000/api/dashboard/')
           this.$router.push('/dashboard');
         })
         .catch(error => {

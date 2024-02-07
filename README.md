@@ -21,6 +21,8 @@
 
 # 5. Download vue-cli
     -$ npm install -g @vue/cli
+    -$ npm install crypto-js
+    -$ npm install axios
 
 # 5.1 Start vue server (MUST be done inside vue-app folder) also use a different window for this as you need to run both simultaniously
     -$ npm run serve
