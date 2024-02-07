@@ -35,10 +35,12 @@ export default {
         })
         .then(response => {
           console.log(response);
+          console.log("Login successful!");
           axios.get('http://localhost:8000/api/dashboard/')
           this.$router.push('/dashboard');
         })
         .catch(error => {
+          console.log("Login failed!");
           this.errorMessage = 'Invalid username or password';
           console.error('There was an error!', error);
         });

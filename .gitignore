@@ -3,3 +3,4 @@
 /app_project/app_project/__pycache__
 /app_project/airfinn/__pycache__/
 /app_project/airfinn/migrations/__pycache__/
+.db.sqlite3
