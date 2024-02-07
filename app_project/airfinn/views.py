@@ -6,6 +6,10 @@ from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+
+
+
+
 def index(request):
     return render(request, 'index.html')
 
@@ -14,11 +18,13 @@ def dashboard(request):
     if request.user.is_authenticated:
         return JsonResponse({'message': 'You are authenticated'}, status=200)
 
-
+@csrf_exempt
 def login(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'], 'Only POST requests are allowed for login.')
     
+
+    # Process the decrypted payload
     data = json.loads(request.body)
 
     username = data.get('username')
@@ -33,6 +39,40 @@ def login(request):
     else:
         # Authentication failed
         return JsonResponse({'success': False, 'error': 'Invalid Credentials'}, status=401)
+    
+
+
+# @csrf_exempt
+# def login(request):
+#     print(f"request: ",request.method)
+#     if request.method != 'POST':
+#         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+
+#     # Get the encrypted payload from the request body
+#     encrypted_payload = request.POST.get('encryptedPayload')
+
+#     # Decrypt the payload using RSA private key
+#     key = RSA()
+#     key.importKey(open('private.pem').read())  # Import RSA private key from file
+#     decrypted_data = key.decrypt(encrypted_payload, 'utf8')
+
+#     # Parse JSON data from the decrypted payload
+#     user_data = json.loads(decrypted_data)
+#     print(f"user_data: ",user_data)
+        
+#     username = user_data.get('username')
+#     password = user_data.get('password')
+        
+#     # Authenticate user
+#     user = authenticate(username=username, password=password)
+        
+#     if user is not None:
+#         # Authentication successful
+#         return JsonResponse({'success': True})
+#     else:
+#         # Authentication failed
+#         return JsonResponse({'success': False, 'error': 'Invalid Credentials'}, status=401)
+
 
 @csrf_exempt
 def register(request):

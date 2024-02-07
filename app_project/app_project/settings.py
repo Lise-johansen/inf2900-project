@@ -44,13 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'airfinn.apps.AirfinnConfig',
-<<<<<<< HEAD
     'corsheaders',
     # Django SSL extension
     'django_extensions',
-=======
-    
->>>>>>> b5b7840fc472f139a0ac3332a31d7592c8fdc1c5
 ]
 
 MIDDLEWARE = [
@@ -64,10 +60,11 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', # CORS middleware
 ]
 
+CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'http://localhost:8000']
 CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8080']
+CORS_ALLOW_CREDENTIALS = True
 
-
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8080', 'http://localhost:8000']
 CSRF_COOKIE_SECURE = True  # Set to True if using HTTPS
 CSRF_COOKIE_HTTPONLY = True  # Set to True for increased security
 
