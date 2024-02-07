@@ -46,8 +46,6 @@ INSTALLED_APPS = [
     'corsheaders',
     
     
-    # Django SSL extension
-    'django_extensions',
 ]
 
 MIDDLEWARE = [
