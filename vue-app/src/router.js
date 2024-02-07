@@ -1,3 +1,4 @@
+
 // router.js
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from './components/LoginPath.vue'; // Import your Login component
