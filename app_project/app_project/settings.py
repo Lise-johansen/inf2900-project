@@ -143,6 +143,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Email server for SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.zeptomail.eu'  # Your Zoho Mail SMTP server address
 EMAIL_PORT = 465  # Zoho Mail SMTP port for SSL
