@@ -6,7 +6,7 @@
 
 <template>
         <div>
-        <h1>Welcome to the Index Page</h1>
+                <h1>Welcome to the Index Page</h1>
         <button @click="redirectToLogin">Go to Login</button>
         </div>
 </template>

@@ -20,15 +20,17 @@ export default {
     };
   },
   methods: {
+    showCookie() {
+      console.log(document.cookie);
+    },
     login() {
-
-      // Send the encrypted payload along with other data
       axios.post('http://localhost:8000/api/login/', {
         username: this.username,
         password: this.password
         })
         .then(response => {
-          console.log(response);
+          document.cookie = `user_id=${response.data.token}`;
+          document.cookie = `user_auth=${response.data.user_auth}`;
           this.$router.push('/dashboard');
         })
         .catch(error => {

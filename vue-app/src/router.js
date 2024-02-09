@@ -1,4 +1,3 @@
-// router.js
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from './components/LoginPath.vue'; // Import your Login component
 import Register from './components/RegisterPath.vue'; // Import your Register component
@@ -11,44 +10,36 @@ const routes = [
     name: 'index',
     component: IndexPath,
   },
-
   {
     path: '/login',
     name: 'login',
     component: Login,
-    children:[
-      {
-        path: '/dashboard',
-        name: 'UserDashboard',
-        component: UserDashboard,
-        meta: { requiresAuth: false }, // Add this if authentication is required
-      },
-    ]
   },
-
   {
     path: '/register',
     name: 'register',
     component: Register,
-    children:[
-      {
-        path: '/dashboard',
-        name: 'UserDashboard',
-        component: UserDashboard,
-        meta: { requiresAuth: false }, // Add this if authentication is required
-      },
-    ]
   },
-
-  
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: UserDashboard,
+    meta: { requiresAuth: false }, // Add this if authentication is required
+  },
+  {
+    path: '/user_data',
+    name: 'UserData',
+    component: UserDashboard,
+    meta: { requiresAuth: false }, // Add this if authentication is required
+  },
   // Other routes
 ];
-
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {

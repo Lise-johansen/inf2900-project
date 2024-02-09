@@ -1,17 +1,45 @@
 <!-- UserDashboard.vue -->
 <template>
-    <div>
-        <input type="text" v-model="username" placeholder="Username">
-        <input type="text" v-model="email" placeholder="Email">
-        <router-link to="/" class="button-link">Go to Home</router-link>
+  <div>
+    <!-- Display user's username and email -->
+    <div v-if="user.username && user.email">
+      <input type="text" v-model="user.username" readonly>
+      <input type="text" v-model="user.email" readonly>
+      <router-link to="/" class="button-link">Go to Home</router-link>
     </div>
-  </template>
-  
+    <div v-else>
+      <p>Loading user data...</p>
+    </div>
+  </div>
+</template>
+
 <script>
+import axios from 'axios';
 
-
+export default {
+  data() {
+    return {
+      user: {
+        username: '',
+        email: ''
+      }  // Initialize an empty user object
+    };
+  },
+  mounted() {
+    // Make a GET request to fetch user data from the backend
+    axios.get('http://localhost:8000/api/user_data/')
+      .then(response => {
+        // Update the user object with the received user data
+        this.user = response.data;
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
+  }
+}
 </script>
-  
+
+
 
   <style scoped>
 h3 {
