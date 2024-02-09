@@ -5,6 +5,7 @@ import { getCSRFToken } from './csrf';
 
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8000', // Replace with your Django backend URL
+  withCredentials: true, // Make sure this option is set to true
 });
 
 axiosInstance.interceptors.request.use(

@@ -9,6 +9,12 @@ import json
 def index(request):
     return render(request, 'index.html')
 
+def dashboard(request):
+
+    if request.user.is_authenticated:
+        return JsonResponse({'message': 'You are authenticated'}, status=200)
+
+
 def login(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'], 'Only POST requests are allowed for login.')

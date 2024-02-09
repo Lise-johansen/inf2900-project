@@ -11,6 +11,7 @@
 <script>
 import axios from '@/axios';
 
+
 export default {
   data() {
     return {
@@ -19,15 +20,23 @@ export default {
       errorMessage: ''
     };
   },
+  /*
+   * Methods block of the Login component.
+   * it contains the login method that sends a POST request to the /login endpoint of the backend.
+   * The login method is called when the user clicks the Login button.
+   * The login method sends the username and password to the backend.
+   * If the username and password are correct, the backend returns a 200 OK response.
+   *  */
   methods: {
     login() {
       axios.post('http://localhost:8000/api/login/', {
           username: this.username,
-          password: this.password
+          password: this.password,
         })
         .then(response => {
-          this.errorMessage = '';
           console.log(response);
+          axios.get('http://localhost:8000/api/dashboard/')
+          this.$router.push('/dashboard');
         })
         .catch(error => {
           this.errorMessage = 'Invalid username or password';
@@ -37,7 +46,6 @@ export default {
   }
 }
 </script>
-
 
 
 <style scoped>
