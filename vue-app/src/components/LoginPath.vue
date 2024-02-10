@@ -29,8 +29,10 @@ export default {
         password: this.password
         })
         .then(response => {
-          document.cookie = `user_id=${response.data.token}`;
+          document.cookie = `token=${response.data.token}`;
           document.cookie = `user_auth=${response.data.user_auth}`;
+          alert(document.cookie);
+          console.log(document.cookie);
           this.$router.push('/dashboard');
         })
         .catch(error => {
