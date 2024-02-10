@@ -6,6 +6,7 @@
       <input type="text" v-model="user.username" readonly>
       <input type="text" v-model="user.email" readonly>
       <router-link to="/" class="button-link">Go to Home</router-link>
+      <RouterLink to="/logout" class="button-link">Logout</RouterLink>
     </div>
     <div v-else>
       <p>Loading user data...</p>
@@ -26,10 +27,10 @@ export default {
     };
   },
   mounted() {
-    // Make a GET request to fetch user data from the backend
-    axios.get('http://localhost:8000/api/user_data/')
+    alert(document.cookie);
+    console.log(document.cookie);
+    axios.get('http://localhost:8000/api/dashboard/', { withCredentials: true })
       .then(response => {
-        // Update the user object with the received user data
         this.user = response.data;
       })
       .catch(error => {
