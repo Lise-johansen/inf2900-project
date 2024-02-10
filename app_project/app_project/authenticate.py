@@ -9,7 +9,7 @@ class TokenAuthenticationMiddleware:
 
     def __call__(self, request):
         # Get the token from the request cookie
-        token = request.COOKIES.get('user_id')
+        token = request.COOKIES.get('token')
 
         # Authenticate the user using the token
         user = SimpleLazyObject(lambda: self.authenticate(token))
