@@ -7,50 +7,52 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import jwt
 
-def user_data(request):
 
-    # Check if the user is authenticated
-    if request.user.is_authenticated:
-        # Get the current authenticated user
-        user = request.user
 
-        # Serialize the user data (you can customize this as needed)
-        user_data = {
-            'id': user.id,
-            'username': user.username,
-            'email': user.email
-            # Add any other user data you want to include
-        }
-
-        # Return the user data as JSON response
-        return JsonResponse(user_data)
-    else:
-        # If the user is not authenticated, return an error response
-        return JsonResponse({'error': 'User is not authenticated'}, status=401)
+def get_user_by_id(user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        return user
+    except User.DoesNotExist:
+        return None
 
 def index(request):
-    return render(request, 'index.html')
+    return JsonResponse({'message': 'Welcome to Airfinn!'})
 
 def dashboard(request):
+    print("request: ",request)
+    print("request.method: ",request.method)
+    print("request.body: ",request.body)
+    print("request.COOKIES: ",request.COOKIES)
 
-    # Pull token from request cookies and decode it to get the user_id
+    print("Working in dashboard function")
+
+
+    # Pull token from request cookies and decode it to get the user info
     token = request.COOKIES.get('token')
+    print("dashboard token: ",token)
     # Decode the token
     secret_key = 'St3rkP@ssord'
     try:
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
-        user_id = payload.get('user_id')
+        user_id = payload['user_id']
     except jwt.ExpiredSignatureError:
         return JsonResponse({'error': 'Token has expired'}, status=401)
     except jwt.InvalidTokenError:
         return JsonResponse({'error': 'Invalid token'}, status=401)
+    print("we move on")
     # Get the user from the database
-    user = get_object_or_404(User, pk=user_id)
+    user = get_user_by_id(user_id)
+    print("user: ",user)
+
+    print("returning user: ",user)
 
     return JsonResponse({'username': user.username, 'email': user.email})
     
 
+
 def login(request):
+    print("Working in login function")
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST requests are allowed for login.'}, status=405)
     
@@ -58,60 +60,33 @@ def login(request):
     data = json.loads(request.body)
     username = data.get('username')
     password = data.get('password')
+    
         
     # Authenticate user
     user = authenticate(request, username=username, password=password)
         
     if user is not None:
         # Authentication successful
-        payload = {'user_id': user.id}
-        secret_key = 'St3rkP@ssord'  # Replace with your own secret key
-        token = jwt.encode(payload, secret_key, algorithm='HS256')
+        # Generate an access token
+        secret_key = 'St3rkP@ssord' 
+        token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
+        print("login token: ",token)
         
-        response_data = {
-            'success': True,
-            'token': token,  # Return token directly
-            'message': 'User authenticated successfully.',
-            'user_auth': True,
-        }
-        return JsonResponse(response_data)
+        # Set the token as a cookie in the response
+        response = JsonResponse({'token': token})
+        response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
+        print("login response: ",response)
+        
+        return response
+    
     else:
         # Authentication failed
         return JsonResponse({'success': False, 'error': 'Invalid Credentials'}, status=401)
-# @csrf_exempt
-# def login(request):
-#     print(f"request: ",request.method)
-#     if request.method != 'POST':
-#         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
-
-#     # Get the encrypted payload from the request body
-#     encrypted_payload = request.POST.get('encryptedPayload')
-
-#     # Decrypt the payload using RSA private key
-#     key = RSA()
-#     key.importKey(open('private.pem').read())  # Import RSA private key from file
-#     decrypted_data = key.decrypt(encrypted_payload, 'utf8')
-
-#     # Parse JSON data from the decrypted payload
-#     user_data = json.loads(decrypted_data)
-#     print(f"user_data: ",user_data)
-        
-#     username = user_data.get('username')
-#     password = user_data.get('password')
-        
-#     # Authenticate user
-#     user = authenticate(username=username, password=password)
-        
-#     if user is not None:
-#         # Authentication successful
-#         return JsonResponse({'success': True})
-#     else:
-#         # Authentication failed
-#         return JsonResponse({'success': False, 'error': 'Invalid Credentials'}, status=401)
-
-
+    
 
 def register(request):
+    print("Working in register function")
+
     if request.method != 'POST':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
 
