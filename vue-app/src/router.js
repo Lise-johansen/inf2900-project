@@ -3,6 +3,7 @@ import Login from './components/LoginPath.vue'; // Import your Login component
 import Register from './components/RegisterPath.vue'; // Import your Register component
 import UserDashboard from './components/UserDashboard.vue';
 import IndexPath from './components/IndexPath.vue';
+// import LogoutScript from './components/LogoutScript.vue';
 
 const routes = [
   {
@@ -23,12 +24,6 @@ const routes = [
   {
     path: '/dashboard',
     name: 'dashboard',
-    component: UserDashboard,
-    meta: { requiresAuth: false }, // Add this if authentication is required
-  },
-  {
-    path: '/user_data',
-    name: 'UserData',
     component: UserDashboard,
     meta: { requiresAuth: false }, // Add this if authentication is required
   },
