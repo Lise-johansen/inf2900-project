@@ -1,13 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from './components/LoginPath.vue'; // Import your Login component
 import Register from './components/RegisterPath.vue'; // Import your Register component
-<<<<<<< HEAD
 import PasswordReset from './components/PasswordReset.vue'; // Import Password Reset component
-=======
 import UserDashboard from './components/UserDashboard.vue';
 import IndexPath from './components/IndexPath.vue';
 // import LogoutScript from './components/LogoutScript.vue';
->>>>>>> localtest_johannes
 
 const routes = [
   {
@@ -26,18 +23,16 @@ const routes = [
     component: Register,
   },
   {
-<<<<<<< HEAD
     path: '/reset',
     name: 'reset',
-    component: PasswordReset
-  }
-=======
+    component: PasswordReset,
+  },
+  {
     path: '/dashboard',
     name: 'dashboard',
     component: UserDashboard,
     meta: { requiresAuth: false }, // Add this if authentication is required
   },
->>>>>>> localtest_johannes
   // Other routes
 ];
 
