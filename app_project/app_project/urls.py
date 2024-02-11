@@ -28,6 +28,5 @@ urlpatterns = [
     path('api/register/', views.register, name='register'),
     path('api/send-password-reset-email/', views.send_password_reset_email, name='send_password_reset_email'),
     path('api/dashboard/', views.dashboard, name='dashboard'),
-    path('api/user_data/', views.user_data, name='user_data'),
 ]
 
