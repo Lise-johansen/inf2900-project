@@ -1,8 +1,12 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
+<<<<<<< HEAD
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+=======
+from django.contrib.auth.models import User, AnonymousUser
+>>>>>>> localtest_johannes
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
@@ -10,31 +14,88 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 import json
+import jwt
+
+
+
+def get_user_by_id(user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        return user
+    except User.DoesNotExist:
+        return None
 
 def index(request):
-    return render(request, 'index.html')
+    return JsonResponse({'message': 'Welcome to Airfinn!'})
+
+def dashboard(request):
+    print("request: ",request)
+    print("request.method: ",request.method)
+    print("request.body: ",request.body)
+    print("request.COOKIES: ",request.COOKIES)
+
+    print("Working in dashboard function")
+
+
+    # Pull token from request cookies and decode it to get the user info
+    token = request.COOKIES.get('token')
+    print("dashboard token: ",token)
+    # Decode the token
+    secret_key = 'St3rkP@ssord'
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    print("we move on")
+    # Get the user from the database
+    user = get_user_by_id(user_id)
+    print("user: ",user)
+
+    print("returning user: ",user)
+
+    return JsonResponse({'username': user.username, 'email': user.email})
+    
+
 
 def login(request):
+    print("Working in login function")
     if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'], 'Only POST requests are allowed for login.')
+        return JsonResponse({'error': 'Only POST requests are allowed for login.'}, status=405)
     
+    # Process the decrypted payload
     data = json.loads(request.body)
-
     username = data.get('username')
     password = data.get('password')
+    
         
     # Authenticate user
-    user = authenticate(username=username, password=password)
+    user = authenticate(request, username=username, password=password)
         
     if user is not None:
         # Authentication successful
-        return JsonResponse({'success': True})
+        # Generate an access token
+        secret_key = 'St3rkP@ssord' 
+        token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
+        print("login token: ",token)
+        
+        # Set the token as a cookie in the response
+        response = JsonResponse({'token': token})
+        response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
+        print("login response: ",response)
+        
+        return response
+    
     else:
         # Authentication failed
         return JsonResponse({'success': False, 'error': 'Invalid Credentials'}, status=401)
+    
 
-@csrf_exempt
 def register(request):
+    print("Working in register function")
+
     if request.method != 'POST':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
 

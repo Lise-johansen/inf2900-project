@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import axios from '@/axios';
+import axios from 'axios'; // Import axios
 
 export default {
   data() {
@@ -21,16 +21,23 @@ export default {
     };
   },
   methods: {
+    showCookie() {
+      console.log(document.cookie);
+    },
     login() {
       axios.post('http://localhost:8000/api/login/', {
-          username: this.username,
-          password: this.password
+        username: this.username,
+        password: this.password
         })
         .then(response => {
-          this.errorMessage = '';
-          console.log(response);
+          document.cookie = `token=${response.data.token}`;
+          document.cookie = `user_auth=${response.data.user_auth}`;
+          alert(document.cookie);
+          console.log(document.cookie);
+          this.$router.push('/dashboard');
         })
         .catch(error => {
+          console.log("Login failed!");
           this.errorMessage = 'Invalid username or password';
           console.error('There was an error!', error);
         });
@@ -38,7 +45,6 @@ export default {
   }
 }
 </script>
-
 
 
 <style scoped>

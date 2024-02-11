@@ -31,10 +31,10 @@ export default {
             password: this.password
             })
             .then(response => {
-            this.errorMessage = '';
-            console.log(response);
+              this.$router.push('/dashboard');
+              console.log(response);
             })
-            .catch(error => {
+            .catch(error =>  {
             this.errorMessage = 'Invalid username or password';
             console.error('Registration failed:', error.response.data.error);
             });

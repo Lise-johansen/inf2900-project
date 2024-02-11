@@ -1,5 +1,9 @@
 {
   "dependencies": {
+<<<<<<< HEAD
     "nodemailer": "^6.9.9"
+=======
+    "js-cookie": "^3.0.5"
+>>>>>>> localtest_johannes
   }
 }
