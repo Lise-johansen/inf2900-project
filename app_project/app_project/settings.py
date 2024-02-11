@@ -73,16 +73,11 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
 }
 
-<<<<<<< HEAD
-CSRF_COOKIE_SECURE = False  # Set to True if using HTTPS
-CSRF_COOKIE_HTTPONLY = False  # Set to True for increased security
-=======
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
->>>>>>> localtest_johannes
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default Django authentication backend
