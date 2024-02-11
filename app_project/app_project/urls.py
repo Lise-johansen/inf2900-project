@@ -26,11 +26,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('api/login/', views.login, name='login'),
     path('api/register/', views.register, name='register'),
-<<<<<<< HEAD
     path('api/send-password-reset-email/', views.send_password_reset_email, name='send_password_reset_email'),
-=======
     path('api/dashboard/', views.dashboard, name='dashboard'),
     path('api/user_data/', views.user_data, name='user_data'),
->>>>>>> localtest_johannes
 ]
 
