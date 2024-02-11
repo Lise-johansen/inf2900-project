@@ -1,12 +1,8 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
-<<<<<<< HEAD
-from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-=======
 from django.contrib.auth.models import User, AnonymousUser
->>>>>>> localtest_johannes
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
@@ -15,8 +11,6 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 import json
 import jwt
-
-
 
 def get_user_by_id(user_id):
     try:
@@ -35,7 +29,6 @@ def dashboard(request):
     print("request.COOKIES: ",request.COOKIES)
 
     print("Working in dashboard function")
-
 
     # Pull token from request cookies and decode it to get the user info
     token = request.COOKIES.get('token')
@@ -58,8 +51,6 @@ def dashboard(request):
 
     return JsonResponse({'username': user.username, 'email': user.email})
     
-
-
 def login(request):
     print("Working in login function")
     if request.method != 'POST':
