@@ -60,7 +60,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware', # CORS middleware
     # Other middleware classes...
-    'app_project.authenticate.TokenAuthenticationMiddleware',
 
 ]
 
@@ -69,7 +68,7 @@ CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
 CORS_ALLOW_CREDENTIALS = True
 
 SIMPLE_JWT = {
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Example: Refresh token expires after 1 day
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),  # Example: Refresh token expires after 1 day
     'ROTATE_REFRESH_TOKENS': True,
 }
 
