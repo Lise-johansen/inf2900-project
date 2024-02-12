@@ -20,17 +20,8 @@ def index(request):
     return JsonResponse({'message': 'Welcome to Airfinn!'})
 
 def dashboard(request):
-    print("request: ",request)
-    print("request.method: ",request.method)
-    print("request.body: ",request.body)
-    print("request.COOKIES: ",request.COOKIES)
-
-    print("Working in dashboard function")
-
-
     # Pull token from request cookies and decode it to get the user info
     token = request.COOKIES.get('token')
-    print("dashboard token: ",token)
     # Decode the token
     secret_key = 'St3rkP@ssord'
     try:
@@ -40,19 +31,15 @@ def dashboard(request):
         return JsonResponse({'error': 'Token has expired'}, status=401)
     except jwt.InvalidTokenError:
         return JsonResponse({'error': 'Invalid token'}, status=401)
-    print("we move on")
+
     # Get the user from the database
     user = get_user_by_id(user_id)
-    print("user: ",user)
-
-    print("returning user: ",user)
 
     return JsonResponse({'username': user.username, 'email': user.email})
     
 
 
 def login(request):
-    print("Working in login function")
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST requests are allowed for login.'}, status=405)
     

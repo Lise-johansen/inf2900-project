@@ -31,7 +31,6 @@ export default {
         .then(response => {
           document.cookie = `token=${response.data.token}`;
           document.cookie = `user_auth=${response.data.user_auth}`;
-          alert(document.cookie);
           console.log(document.cookie);
           this.$router.push('/dashboard');
         })
