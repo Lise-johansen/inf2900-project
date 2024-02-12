@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User, AnonymousUser
 from django.http import JsonResponse, HttpResponseNotAllowed
-from django.views.decorators.csrf import csrf_exempt
+from cryptography.fernet import Fernet
 import json
 import jwt
 
@@ -46,22 +46,23 @@ def login(request):
     # Process the decrypted payload
     data = json.loads(request.body)
     username = data.get('username')
-    password = data.get('password')
+    key = Fernet.generate_key()
+    fernet =  Fernet(key)
+    encrypted_password = fernet.encrypt(data.get('password').encode())
+    print("encrypted pw: ",encrypted_password)
     
     # Authenticate user
-    user = authenticate(request, username=username, password=password)
+    user = authenticate(request, username=username, password=fernet.decrypt(encrypted_password).decode())
         
     if user is not None:
         # Authentication successful
         # Generate an access token
         secret_key = 'St3rkP@ssord' 
         token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
-        print("login token: ",token)
         
         # Set the token as a cookie in the response
         response = JsonResponse({'token': token})
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
-        print("login response: ",response)
         
         return response
     
