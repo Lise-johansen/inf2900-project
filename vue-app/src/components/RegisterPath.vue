@@ -19,7 +19,10 @@ export default {
         username: '',
         password: '',
         email: '',
-        errorMessage: ''
+        errorMessage: '',
+        errorEmail: '',
+        errorUsernameExists: '',
+        errorEmailExists: ''
         };
     },
 
@@ -35,8 +38,24 @@ export default {
               console.log(response);
             })
             .catch(error =>  {
-            this.errorMessage = 'Invalid username or password';
-            console.error('Registration failed:', error.response.data.error);
+                if (error.response) {
+                    const data = error.response.data;
+                    if (data.error_email) {
+                        this.errorEmail = data.error_email;
+                        this.errorMessage = this.errorEmail
+                    }
+                    if (data.error_username_exists) {
+                        this.errorUsernameExists = data.error_username_exists;
+                        this.errorMessage = this.errorUsernameExists
+                    }
+                    if (data.error_email_exists) {
+                        this.errorEmailExists = data.error_email_exists;
+                        this.errorMessage = this.errorEmailExists
+                    }
+                } else {
+                    this.errorMessage = 'Registration failed. Please try again later.';
+                    console.error('Registration failed:', error);
+                }
             });
         },
     }
