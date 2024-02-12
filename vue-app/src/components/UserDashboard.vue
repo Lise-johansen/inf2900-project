@@ -20,10 +20,11 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      // Initialize an empty user object
       user: {
         username: '',
         email: ''
-      }  // Initialize an empty user object
+      }  
     };
   },
   mounted() {
