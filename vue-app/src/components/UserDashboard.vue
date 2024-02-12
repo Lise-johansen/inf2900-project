@@ -27,7 +27,6 @@ export default {
     };
   },
   mounted() {
-    console.log(document.cookie);
     axios.get('http://localhost:8000/api/dashboard/', { withCredentials: true })
       .then(response => {
         this.user = response.data;
