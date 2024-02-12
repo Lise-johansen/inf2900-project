@@ -71,7 +71,6 @@ def login(request):
     
 
 def register(request):
-    print("Working in register function")
 
     if request.method != 'POST':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
