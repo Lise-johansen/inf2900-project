@@ -24,7 +24,7 @@ export default {
       console.log(document.cookie);
     },
     login() {
-      axios.post('http://localhost:8000/api/login/', {
+      axios.post('https://django.dybedahlserver.net/api/login/', {
         username: this.username,
         password: this.password
         })
