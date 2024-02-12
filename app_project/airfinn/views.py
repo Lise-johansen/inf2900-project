@@ -48,7 +48,6 @@ def login(request):
     username = data.get('username')
     password = data.get('password')
     
-        
     # Authenticate user
     user = authenticate(request, username=username, password=password)
         
