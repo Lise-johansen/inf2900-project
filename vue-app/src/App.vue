@@ -1,4 +1,3 @@
-
 /**
  * This is the main component that renders the matched route component.
  * It also imports the redirectToLogin component that we created earlier.
@@ -11,6 +10,7 @@
   <div id="app">
     <header>
       <RentopiaHeader />
+      <search-filter @filter="applyFilter" />
     </header>
     <router-view/> <!-- This will render the currently active route component (login or register) -->
   </div>
@@ -18,23 +18,35 @@
 
 
 <script>
-import RentopiaHeader from './components/RentopiaHeader.vue';
-
-export default {
-  name: 'App',
-  components: { RentopiaHeader }
-};
+  import RentopiaHeader from './components/RentopiaHeader.vue';
+  import SearchFilter from './components/SearchFilter.vue';
+  
+  export default {
+    name: 'App',
+    components: { RentopiaHeader, SearchFilter },
+    data() {
+      return {
+        filteredItems: []
+      };
+    },
+    methods:
+    {
+      applyFilter(filteredItems)
+      {
+        this.filteredItems = filteredItems;
+      },
+    },
+  };  
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin: 0;
-  padding: 0;
-}
-
+  #app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    margin: 0;
+    padding: 0;
+  }
 </style>

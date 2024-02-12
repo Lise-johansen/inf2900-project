@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
+from .models import Item 
 import json
 
 def index(request):
@@ -58,3 +59,12 @@ def register(request):
     # Optionally, you can perform additional actions like sending a confirmation email
         
     return JsonResponse({'message': 'User registered successfully'}, status=201)
+
+def search_items(request):
+    query = request.GET.get('q', '')
+    if query:
+        items = Item.objects.filter(name__icontains=query)
+    else:
+        items = Item.objects.all()
+    data = [{'id': item.id, 'name': item.name} for item in items]
+    return JsonResponse(data, safe=False)
