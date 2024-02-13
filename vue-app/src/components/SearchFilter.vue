@@ -1,37 +1,47 @@
 <template>
     <div>
-        <input type="text" v-model="searchTerm" @input="search">
-        <ul>
-            <li v-for="item in filteredItems" :key="item.id"> {{ item.name }} </li>
-        </ul>
+      <input type="text" v-model="searchTerm" @input="handleSearchChange">
+      <ul v-if="!loading">
+        <li v-for="item in filteredItems" :key="item.id">{{ item.name }}</li>
+      </ul>
+      <div v-else>
+        Loading...
+      </div>
     </div>
-</template>
-
-<script>
-    import axios from 'axios';
-
-    export default {
-        data() {
-            return {
-                searchTerm: '',
-                items: [],
-                filteredItems: []
-            };
-        },
-        methods: {
-            async search() {
-                try {
-                    const response = await axios.get('api/search/', {
-                        params: {
-                            q: this.searchTerm
-                        }
-                    });
-                    this.filteredItems = response.data;
-                }
-                catch (error) {
-                    console.error("Error searching:", error)
-                }
-            }
+  </template>
+  
+  <script>
+  import { ref } from 'vue';
+  import axios from 'axios';
+  
+  export default {
+    setup() {
+      const searchTerm = ref('');
+      const loading = ref(false);
+      const filteredItems = ref([]);
+      let timeoutId = null;
+  
+      const fetchData = async () => {
+        try {
+          const response = await axios.get('api/search', {
+            params: { q: searchTerm.value }
+          });
+          filteredItems.value = response.data;
+        } catch (err) {
+          console.error(`Something went wrong: ${err}`);
+        } finally {
+          loading.value = false;
         }
+      };
+  
+      const handleSearchChange = () => {
+        clearTimeout(timeoutId);
+        loading.value = true;
+        timeoutId = setTimeout(fetchData, 1000);
+      };
+  
+      return { searchTerm, loading, filteredItems, handleSearchChange };
     }
-</script>
+  };
+  </script>
+  
