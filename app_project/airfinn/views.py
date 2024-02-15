@@ -25,6 +25,12 @@ def is_simple_sequence(password, length=4):
             return True
     return False
 
+def email_checks(email):
+    # Check if the email is valid
+    if not re.search(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
+        return JsonResponse({'error': 'Invalid email address'}, status=400)
+    return True
+
     
 def password_checks(password):
     if len(password) < 8:
@@ -43,10 +49,6 @@ def password_checks(password):
         return JsonResponse({'error': 'Password should contain at least one special character'}, status=400)
     
     # Check if the password is not based on common patterns or sequences
-    # Additional checks if needed
-    has_alpha = any(c.isalpha() for c in password)
-    has_special = any(c in "!@#$%^&*(),.?\":{}|<>" for c in password)
-
     if is_simple_sequence(password):
         return JsonResponse({'error': 'Password can not be a sequence of numbers'}, status=400)
 
@@ -54,7 +56,6 @@ def password_checks(password):
 
 
 
-    
 
 def index(request):
     return JsonResponse({'message': 'Welcome to Airfinn!'})
@@ -128,26 +129,34 @@ def register(request):
 
     key = Fernet.generate_key()
     fernet =  Fernet(key)
-    encrypted_password = fernet.encrypt(data.get('password').encode())
+    encrypted_password1 = fernet.encrypt(data.get('password1').encode())
+    encrypted_password2 = fernet.encrypt(data.get('password2').encode())
 
-    if password_checks(fernet.decrypt(encrypted_password).decode()) == True:
+    if password_checks(fernet.decrypt(encrypted_password1).decode()) == True:
         print("okay password")
+    if password_checks(fernet.decrypt(encrypted_password2).decode()) == True:
+        print("okay password")
+    elif fernet.decrypt(encrypted_password1).decode() != fernet.decrypt(encrypted_password2).decode():
+        return JsonResponse({'error': 'Passwords do not match'}, status=400)
     else:
-        return password_checks(fernet.decrypt(encrypted_password).decode())
+        return password_checks(fernet.decrypt(encrypted_password1).decode())
 
 
     enc_email = fernet.encrypt(data.get('email').encode())
+    if email_checks(fernet.decrypt(enc_email).decode()) == True:
+        print("okay email")
+    else:
+        return email_checks(fernet.decrypt(enc_email).decode())
         
     # Check if the username or email is already in use
     if User.objects.filter(username=username).exists():
-        return JsonResponse({'error_username_exists': 'Username already exists'}, status=400)
+        return JsonResponse({'error': 'Username already exists'}, status=400)
     if User.objects.filter(email=fernet.decrypt(enc_email).decode()).exists():
-        return JsonResponse({'error_email_exists': 'Email already exists'}, status=400)
+        return JsonResponse({'error': 'Email already exists'}, status=400)
         
     # Create a new user
-    user = User.objects.create_user(username, fernet.decrypt(enc_email).decode(), fernet.decrypt(encrypted_password).decode())
-    # Optionally, you can perform additional actions like sending a confirmation email
-        
+    user = User.objects.create_user(username, fernet.decrypt(enc_email).decode(), fernet.decrypt(encrypted_password1).decode())
+
     # Create cookie token to direct user to dashboard
     if user is not None:
         # Authentication successful
