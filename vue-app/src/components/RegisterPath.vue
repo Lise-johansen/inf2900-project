@@ -11,7 +11,7 @@
 
 
 <script>
-import axios from '@/axios';
+import axiosInstance from '@/axios';
 
 export default {
     data() {
@@ -25,7 +25,7 @@ export default {
 
     methods: {
         register() {
-        axios.post('http://127.0.0.1:8000/api/register/', {
+        axiosInstance.post('register/', {
             username: this.username,
             email: this.email,
             password: this.password
