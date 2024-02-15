@@ -5,7 +5,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.models import User, AnonymousUser
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
@@ -115,7 +115,6 @@ def send_password_reset_email(request):
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
         
     data = json.loads(request.body)
-    
     email = data.get('email')
     user = User.objects.filter(email=email).first()
     
@@ -124,8 +123,23 @@ def send_password_reset_email(request):
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = token_generator.make_token(user)
         reset_link = f"http://localhost:8080/reset-password/{uidb64}/{token}/"
-        email_body = render_to_string('password_reset_email.html', {'reset_link': reset_link})
-        send_mail('Password Reset', email_body, 'noreply@dybedahlserver.net', [email])
+        
+        # Load HTML content from template
+        html_content = render_to_string('password_reset_email.html', {'reset_link': reset_link})
+        
+        # Load plain text content from template
+        text_content = render_to_string('password_reset_email.txt', {'reset_link': reset_link})
+        
+        # Create EmailMultiAlternatives object to include both versions
+        subject = "Password Reset"
+        from_email = "noreply@dybedahlserver.net"
+        to_email = email
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+        msg.attach_alternative(html_content, "text/html")
+        
+        # Send the email
+        msg.send()
+        
         return JsonResponse({'message': 'Password reset email sent'}, status=200)
     else:
         return JsonResponse({'error': 'User not found'}, status=404)
