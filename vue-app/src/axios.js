@@ -2,10 +2,9 @@
 
 import axios from 'axios';
 
-
 const axiosInstance = axios.create({
-  baseURL: 'https://django.dybedahlserver.net', // Replace with your Django backend URL
-  withCredentials: true, // Make sure this option is set to true
+  baseURL: 'http://django.dybedahlserver.net', // Use the domain Nginx forwards requests to
+  withCredentials: true, // Ensure cookies are sent with cross-origin requests
 });
 
 export default axiosInstance;
