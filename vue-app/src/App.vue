@@ -1,3 +1,34 @@
+<<<<<<< HEAD
+<template>
+	<div id="app">
+		<header>
+			<RentopiaHeader />
+		</header>
+		<router-view/>
+	</div>
+</template>
+  
+<script>
+	import RentopiaHeader from './components/RentopiaHeader.vue';
+  
+	export default {
+		name: 'App',
+		components: { RentopiaHeader }
+	};
+</script>
+  
+<style>
+	#app {
+		font-family: Avenir, Helvetica, Arial, sans-serif;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-align: center;
+		color: #2c3e50;
+		margin: 0;
+		padding: 0;
+	}
+</style> 
+=======
 /**
  * This is the main component that renders the matched route component.
  * It also imports the redirectToLogin component that we created earlier.
@@ -50,3 +81,4 @@
     padding: 0;
   }
 </style>
+>>>>>>> 2ee7ca78f5fdced1e7a9f44d3c04b8ce53b0650e
