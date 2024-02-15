@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """
 URL configuration for app_project project.
 
@@ -31,38 +30,3 @@ urlpatterns = [
     path('api/dashboard/', views.dashboard, name='dashboard'),
     path('api/search/', views.search_items, name='search_items')
 ]
-=======
-"""
-URL configuration for app_project project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from airfinn import views
-
-
-from django.urls import path, include  # Ensure include is imported
-
-
-appname = 'app_project'
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', views.index, name='index'),
-    path('api/login/', views.login, name='login'),
-    path('api/register/', views.register, name='register'),
-    path('api/dashboard/', views.dashboard, name='dashboard'),
-    path('api/search/', views.search_items, name='search_items')
-]
-
->>>>>>> 2ee7ca78f5fdced1e7a9f44d3c04b8ce53b0650e
