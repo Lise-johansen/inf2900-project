@@ -4,6 +4,7 @@
     <input type="password" v-model="password" placeholder="Password">
     <button @click="login">Login</button>
     <router-link to="/register" class="button-link">Don't have an account? Register</router-link>
+    <router-link to="/reset" class="button-link">Reset Password</router-link>
     <p v-if="errorMessage">{{ errorMessage }}</p>
   </div>
 </template>
@@ -24,13 +25,15 @@ export default {
       console.log(document.cookie);
     },
     login() {
-      axios.post('https://django.dybedahlserver.net/api/login/', {
+      axios.post('http://localhost:8000/api/login/', {
         username: this.username,
         password: this.password
         })
         .then(response => {
           document.cookie = `token=${response.data.token}`;
           document.cookie = `user_auth=${response.data.user_auth}`;
+          alert(document.cookie);
+          console.log(document.cookie);
           this.$router.push('/dashboard');
         })
         .catch(error => {

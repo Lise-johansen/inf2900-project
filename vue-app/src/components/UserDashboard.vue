@@ -20,14 +20,15 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      // Initialize an empty user object
       user: {
         username: '',
         email: ''
-      }  
+      }  // Initialize an empty user object
     };
   },
   mounted() {
+    alert(document.cookie);
+    console.log(document.cookie);
     axios.get('http://localhost:8000/api/dashboard/', { withCredentials: true })
       .then(response => {
         this.user = response.data;
