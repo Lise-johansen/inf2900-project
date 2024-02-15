@@ -53,7 +53,7 @@ def dashboard(request):
 
     return JsonResponse({'username': user.username, 'email': user.email})
     
-def login(request):
+def login(request, user=None):
     print("Working in login function")
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST requests are allowed for login.'}, status=405)
