@@ -9,10 +9,9 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
-from .models import Item 
 import json
 import jwt
-from airfinn.utils import get_user_by_id, email_checks, password_checks
+from airfinn.utils import get_user_by_id, email_checks, password_checks, search_items
 
 
 def index(request):
@@ -60,7 +59,7 @@ def login(request):
         token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
         
         # Set the token as a cookie in the response
-        response = JsonResponse({'token': token})
+        response = JsonResponse({'token': token, 'auth_user': True})
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
         
         return response
@@ -162,12 +161,15 @@ def send_password_reset_email(request):
         return JsonResponse({'message': 'Password reset email sent'}, status=200)
     else:
         return JsonResponse({'error': 'User not found'}, status=404)
+
+def logout(request):
+    response = JsonResponse({'message': 'Logged out'})
     
-def search_items(request):
-    query = request.GET.get('q', '')
-    if query:
-        items = Item.objects.filter(name__icontains=query)
-    else:
-        items = Item.objects.all()
-    data = [{'id': item.id, 'name': item.name} for item in items]
-    return JsonResponse(data, safe=False)    
+    # Clear all cookies by setting their expiration time to a past date
+    response.set_cookie('token', '', expires=0)
+    response.set_cookie('auth_user', False)
+
+    print("logged out")
+    print("cookies: ", request.COOKIES)
+    
+    return response
