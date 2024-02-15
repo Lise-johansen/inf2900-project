@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import axios from 'axios'; // Import axios
+import axiosInstance from 'axios'; // Import axios
 
 export default {
   data() {
@@ -25,7 +25,7 @@ export default {
       console.log(document.cookie);
     },
     login() {
-      axios.post('http://127.0.0.1:8000/api/login/', {
+      axiosInstance.post('login/', {
         username: this.username,
         password: this.password
         })
