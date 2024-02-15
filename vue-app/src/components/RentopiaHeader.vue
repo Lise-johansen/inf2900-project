@@ -66,7 +66,7 @@
         }
         
         .company-logo img {
-            max-width: 50px; /* Set a maximum width for the image */
+            max-width: 45px; /* Set a maximum width for the image */
             height: auto; /* Allow the height to adjust proportionally */
         }
 

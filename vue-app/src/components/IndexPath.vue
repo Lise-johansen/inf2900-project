@@ -7,6 +7,7 @@
 
         <div>
                 <h1>Welcome to the Index Page</h1>
+        <button @click="redirectToLogin">Go to Login</button>
         </div>
 </template>
 
@@ -17,7 +18,13 @@
  */
 
 <script>
-
+export default {
+        methods: {
+        redirectToLogin() {
+                this.$router.push('/login');
+                }
+        }
+ }
 </script>
 
 <style scoped>

@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
+
 
 
 
@@ -44,33 +46,42 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'airfinn.apps.AirfinnConfig',
-<<<<<<< HEAD
     'corsheaders',
     # Django SSL extension
     'django_extensions',
-=======
-    
->>>>>>> b5b7840fc472f139a0ac3332a31d7592c8fdc1c5
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware', # CORS middleware
+    # Other middleware classes...
+
 ]
 
+CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'http://localhost:8000']
 CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8080']
+CORS_ALLOW_CREDENTIALS = True
 
+SIMPLE_JWT = {
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),  # Example: Refresh token expires after 1 day
+    'ROTATE_REFRESH_TOKENS': True,
+}
 
-CSRF_COOKIE_SECURE = True  # Set to True if using HTTPS
-CSRF_COOKIE_HTTPONLY = True  # Set to True for increased security
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default Django authentication backend
+    # Add any additional authentication backends as needed
+]
 
 ROOT_URLCONF = 'app_project.urls'
 
@@ -122,9 +133,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CSRF_COOKIE_NAME = 'csrftoken'
-CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -147,3 +155,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email server for SMTP
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.zeptomail.eu'  # Your Zoho Mail SMTP server address
+EMAIL_PORT = 465  # Zoho Mail SMTP port for SSL
+EMAIL_USE_SSL = True  # Use SSL/TLS for secure connection
+EMAIL_USE_TLS = False  # No need for TLS if using SSL
+EMAIL_HOST_USER = 'emailapikey'  # Your Zoho Mail API key as the username
+EMAIL_HOST_PASSWORD = 'yA6KbHsMugT+kDpWQ0hs1ZWNoo40qqAwjXm+sX/kdJYuKNnn26E71BJkdNTvJzWLitfX56oDbY5AL4C9vYoLfJZiZ9YEL5TGTuv4P2uV48xh8ciEYNYkgZigCrAVFa9MeBoiDSw2QfgoWA=='  # Your Zoho Mail Send Mail Token 1 as the password
+DEFAULT_FROM_EMAIL = 'dybedahlserver.net'  # Your domain/sender address
