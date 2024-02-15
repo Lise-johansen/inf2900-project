@@ -14,7 +14,7 @@ module.exports = {
   devServer: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8000', // Change this to your backend server URL
+        target: 'http://django.dybedahlserver.net', // Change this to your backend server URL
         changeOrigin: true,
         secure: false,
       },
