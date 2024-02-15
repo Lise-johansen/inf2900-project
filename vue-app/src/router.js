@@ -5,6 +5,7 @@ import Register from './components/RegisterPath.vue'; // Import your Register co
 import PasswordReset from './components/PasswordReset.vue'; // Import Password Reset component
 import UserDashboard from './components/UserDashboard.vue';
 import IndexPath from './components/IndexPath.vue';
+import PasswordResetForm from './components/PasswordResetForm.vue'; // Import Password Reset Form component
 // import LogoutScript from './components/LogoutScript.vue';
 
 const routes = [
@@ -27,6 +28,11 @@ const routes = [
     path: '/reset',
     name: 'reset',
     component: PasswordReset,
+  },
+  {
+    path: '/reset-password/:uidb64/:token',
+    name: 'resetform',
+    component: PasswordResetForm,
   },
   {
     path: '/dashboard',
