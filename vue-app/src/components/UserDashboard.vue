@@ -28,7 +28,7 @@ export default {
     };
   },
   mounted() {
-    axios.get('http://localhost:8000/api/dashboard/', { withCredentials: true })
+    axios.get('http://django.dybedahlserver.net/api/dashboard/', { withCredentials: true })
       .then(response => {
         this.user = response.data;
       })
