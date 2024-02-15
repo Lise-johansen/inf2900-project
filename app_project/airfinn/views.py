@@ -61,20 +61,10 @@ def register(request):
     return JsonResponse({'message': 'User registered successfully'}, status=201)
 
 def search_items(request):
-    # Get the selected category from the request parameters
-    category = request.GET.get('category', '')
     query = request.GET.get('q', '')
-
-    # Filter items based on the selected category and search query
-    items = Item.objects.all()
-    if category:
-        # Filter items based on the selected category
-        items = items.filter(category=category)
     if query:
-        # Filter items based on the search query
-        items = items.filter(name__icontains=query)
-
-    # Serialize the filtered items
+        items = Item.objects.filter(name__icontains=query)
+    else:
+        items = Item.objects.all()
     data = [{'id': item.id, 'name': item.name} for item in items]
-
     return JsonResponse(data, safe=False)
