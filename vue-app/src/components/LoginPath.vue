@@ -25,7 +25,7 @@ export default {
       console.log(document.cookie);
     },
     login() {
-      axios.post('http://localhost:8000/api/login/', {
+      axios.post('http://127.0.0.1:8000/api/login/', {
         username: this.username,
         password: this.password
         })

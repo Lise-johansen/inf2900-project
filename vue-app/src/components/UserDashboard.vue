@@ -29,7 +29,7 @@ export default {
   mounted() {
     alert(document.cookie);
     console.log(document.cookie);
-    axios.get('http://localhost:8000/api/dashboard/', { withCredentials: true })
+    axios.get('http://127.0.0.1:8000/api/dashboard/', { withCredentials: true })
       .then(response => {
         this.user = response.data;
       })

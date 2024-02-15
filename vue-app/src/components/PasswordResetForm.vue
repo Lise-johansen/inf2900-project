@@ -26,7 +26,7 @@
             const uidb64 = this.$route.params.uidb64;
             const token = this.$route.params.token;
 
-            axios.post(`http://localhost:8000/api/reset-password/${uidb64}/${token}/`, {
+            axios.post(`http://127.0.0.1:8000/api/reset-password/${uidb64}/${token}/`, {
                 new_password1: this.password, // Ensure both new_password1 and new_password2 are provided
                 new_password2: this.confirmPassword
             })

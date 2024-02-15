@@ -5,7 +5,7 @@ import axios from 'axios';
 export default {
     methods: {
         logout() {
-            axios.get('http://localhost:8000/api/logout/')
+            axios.get('http://127.0.0.1:8000/api/logout/')
                 .then(response => {
                     // Clear the token and user_auth cookies
                     document.cookie = `token=${'undefined'}`;

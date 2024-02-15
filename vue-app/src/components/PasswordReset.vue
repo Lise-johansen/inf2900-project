@@ -88,7 +88,7 @@ export default {
                 return;
             }
             this.isSubmitting = true;
-            axios.post('http://localhost:8000/api/send-password-reset-email/', { 
+            axios.post('http://127.0.0.1:8000/api/send-password-reset-email/', { 
                 email: this.email 
             })
             .then(() => {

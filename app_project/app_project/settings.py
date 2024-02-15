@@ -63,7 +63,7 @@ MIDDLEWARE = [
 
 ]
 
-CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'http://localhost:8000']
+CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'http://localhost:8000', 'https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net']
 CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
 CORS_ALLOW_CREDENTIALS = True
 

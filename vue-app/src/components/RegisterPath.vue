@@ -25,7 +25,7 @@ export default {
 
     methods: {
         register() {
-        axios.post('http://localhost:8000/api/register/', {
+        axios.post('http://127.0.0.1:8000/api/register/', {
             username: this.username,
             email: this.email,
             password: this.password

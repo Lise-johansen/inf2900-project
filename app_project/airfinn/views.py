@@ -125,7 +125,7 @@ def send_password_reset_email(request):
         token_generator = PasswordResetTokenGenerator()
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = token_generator.make_token(user)
-        reset_link = f"http://localhost:8080/reset-password/{uidb64}/{token}/"
+        reset_link = f"https://django.dybedahlserver.net/reset-password/{uidb64}/{token}/"
         
         # Load HTML content from template
         html_content = render_to_string('password_reset_email.html', {'reset_link': reset_link, 'username': username})
