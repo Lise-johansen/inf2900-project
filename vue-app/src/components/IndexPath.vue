@@ -4,10 +4,11 @@
  */
 
 <template>
-
-        <div>
-                <h1>Welcome to the Index Page</h1>
-        </div>
+	<div>
+		<search-filter @filter="applyFilter" />
+		<h1>Welcome to the Index Page</h1>
+		<SmallListing v-for="item in filteredItems" :key="item.id" :imageUrl="item.imageUrl" :title="item.title" :location="item.location" />
+	</div>
 </template>
 
 /**
@@ -17,7 +18,22 @@
  */
 
 <script>
-
+	import SearchFilter from './SearchFilter.vue';
+	import SmallListing from './SmallListing.vue';
+	export default {
+		name: 'App',
+		components: { SearchFilter, SmallListing },
+		data() {
+			return {
+				filteredItems: []
+			};
+		},
+		methods: {
+			applyFilter(filteredItems) {
+				this.filteredItems = filteredItems;
+			},
+		},
+	};
 </script>
 
 <style scoped>
