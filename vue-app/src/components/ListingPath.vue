@@ -1,30 +1,33 @@
 <template>
     <div class="listing-container">
-      <div class="listing-content">
+      <header class="listing-header">
         <img class="listing-image" src="@/assets/skiutstyr.jpg" alt="Listing Image">
         <div class="listing-details">
-          <div class="listing-title">
-            <h1 class="Title">Skiutstyr</h1>
-          </div>
-          <div class="listing-description">
-            <h1 class="Description">Add description here</h1>
-          </div>
-          <div class="rating-container" @click="scrollToRating">
-
-            <!-- Use the StarRating component to display the rating -->
-            <star-rating :rating="rating" :editable="false" />
-          </div>
+            <h1 class="listing-title">Skiutstyr</h1>
+            <div class="rating-container" @click="scrollToRating">
+              <!-- Use the StarRating component to display the rating -->
+              <star-rating :rating="rating" :editable="false" />
+            </div>
+          <h1 class="listing-description">Add description here</h1>
         </div>
-      </div>
-      <div id="more-ratings-section" class="more-ratings-section">
-
-        <!-- Content for more ratings from other users goes here -->
-        <h2>More Ratings from Other Users</h2>
-        <star-rating :rating="4.2" :editable="false" />
-        <star-rating :rating="3.8" :editable="false" />
-        <star-rating :rating="4.0" :editable="false" />
-        <!-- Add more user ratings as needed -->
-      </div>
+    </header>
+    <!--  -->
+    <div class="new-rating-container">
+      <star-rating v-model="newRating" :editable="true" />
+      <textarea v-model="newDescription" placeholder="Add a new description (max 150 characters)"></textarea>
+      <button @click="addNewRating">Add Rating</button>
+    </div>
+    <!--  -->
+      <section id="more-ratings-section" class="more-ratings-section-container">
+        <!-- Container for existing additional ratings -->
+        <div v-for="(item, index) in additionalRatings" :key="index" class="additional-rating-container">
+          <star-rating :rating="item.rating" :editable="false" />
+          <p class="additional-description">{{ item.description }}</p>
+        </div>
+      </section>
+      <section class="add-rating-section">
+        <!-- Container for adding a new rating -->
+      </section>
     </div>
   </template>
   
@@ -34,18 +37,33 @@
   export default {
     data() {
       return {
-        rating: 3.5, // Initial rating for the listing
-        userRating: 0, // User's editable rating
+        rating: 4.5, // Initial rating for the listing
+        additionalRatings: [
+          { rating: 4.2, description: 'Description 1 (max 150 characters)' },
+          { rating: 3.8, description: 'Description 2 (max 150 characters)' },
+          // Add more ratings and descriptions as needed
+        ],
+        newRating: 0, // New rating to be added
+        newDescription: '', // New description to be added
       };
     },
     methods: {
       scrollToRating() {
         // Scroll to the rating section using smooth behavior
-        document.getElementById('rating-section').scrollIntoView({ behavior: 'smooth' });
+        // You can customize this behavior based on your needs
       },
-      updateUserRating(rating) {
-        // Update the user's editable rating
-        this.userRating = rating;
+      addNewRating() {
+        // Add a new rating and description to the list
+        if (this.newRating > 0 && this.newDescription.length <= 150) {
+          this.additionalRatings.push({
+            rating: this.newRating,
+            description: this.newDescription,
+          });
+  
+          // Reset new rating and description
+          this.newRating = 0;
+          this.newDescription = '';
+        }
       },
     },
     components: {
@@ -61,59 +79,90 @@
     align-items: center;
     justify-content: flex-end;
   }
-  /* Shift all compunted to the lest */
-  .listing-content {
+  
+  .listing-header {
     display: flex;
-    width: 90%;
+    width: 100%;
   }
   
   /* Image size */
   .listing-image {
-    max-width: 35%; /* Adjust the width as needed */
+    max-width: 40%; /* Adjust the width as needed */
     height: auto;
   }
   /* Text container */
   .listing-details {
     flex: 1;
-    padding: 30px;
+    /* padding: 0px; */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    /* justify-content: space-between; */
   }
   
-  /* Shift conntent to the left */
   .listing-title,
   .listing-description {
     width: 100%;
-    padding-bottom: 20px;
+    padding-bottom: 5px;
   }
-  /* Listing image cotainer */
+  
   .listing-image {
     align-self: flex-start; /* Align to the start (left) of the flex container */
   }
   
-  /* Container for the listing rating (sum/#)*/
   .rating-container {
     cursor: pointer;
     margin-top: 20px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    text-align: center;
+    text-align: flex-start;
+}
+
+.more-ratings-section-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    align-self: flex-start; 
   }
   
-  /* Styling for the section containing more rating*/
-  .more-ratings-section {
-    padding: 15px;
+  /* Container for existing additional ratings */
+  .additional-rating-container {
+    margin-top: 10px;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    margin-top: 100px;
-    opacity: 0.95;
-    transition: opacity 0.5s ease; /* Smooth transition effect */
+    text-align: center;
+    align-self: flex-start; 
+
   }
   
-  .visible {
-    opacity: 1;
+  /* Container for adding a new rating */
+  .add-rating-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .new-rating-container {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    align-self: flex-start;
+  }
+  
+  /* Add styles for the textarea and button as needed */
+  textarea {
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  button {
+    margin-top: 10px;
+    cursor: pointer;
   }
   </style>
   
