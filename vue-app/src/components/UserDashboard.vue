@@ -1,17 +1,67 @@
-<!-- UserDashboard.vue -->
 <template>
-    <div>
-        <input type="text" v-model="username" placeholder="Username">
-        <input type="text" v-model="email" placeholder="Email">
-        <router-link to="/" class="button-link">Go to Home</router-link>
-    </div>
-  </template>
-  
+  <div class="user-dashboard">
+    <input type="file" accept="image/*" @change="handleImageUpload">
+    
+    <!-- Display profile picture -->
+    <img v-if="profilePicture" :src="profilePicture" alt="Profile Picture">
+
+    <h2>Username: {{ user.username }}</h2>
+    <p>Email: {{ user.email }}</p>
+    <p>Address: {{ user.address }}</p>
+    <p>Postal Code: {{ user.postal_code }}</p>
+    
+    <!-- Button to navigate to user's listings -->
+    <router-link to="/listings" class="button-link">My Listings</router-link>
+    <button @click="logout">Logout</button>
+
+  </div>
+</template>
+
 <script>
+import axios from 'axios';
 
-
+export default {
+  data() {
+    return {
+      // Initialize an empty user object
+      user: {
+        username: '',
+        email: '',
+        address: '',
+        postal_code: '',
+        profile_picture: ''
+      },
+      profilePicture: null
+    };
+  },
+  methods: {
+    logout() {
+      axios.get('http://localhost:8000/api/logout')
+      .then(response => {
+        document.cookie = `token=${response.data.token}`;
+        document.cookie = `auth_user=${response.data.auth_user}`;
+        console.log('auth_user:', document.cookie);
+        console.log('Logged out successfully');
+        this.$router.push('/');
+        alert(document.cookies);
+      })
+    },
+  },
+  mounted() {
+    // Fetch user data upon component mount
+    axios.get('http://localhost:8000/api/dashboard/', { withCredentials: true })
+      .then(response => {
+        this.user = response.data;
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
+  }
+};
 </script>
-  
+
+
+
 
   <style scoped>
 h3 {
