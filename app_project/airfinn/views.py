@@ -144,6 +144,7 @@ def send_password_reset_email(request):
         return JsonResponse({'message': 'Password reset email sent'}, status=200)
     else:
         return JsonResponse({'error': 'User not found'}, status=404)
+    
 def search_items(request):
     query = request.GET.get('q', '')
     if query:
