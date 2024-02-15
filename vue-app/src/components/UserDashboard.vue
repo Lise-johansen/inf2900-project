@@ -43,8 +43,28 @@ export default {
       .catch(error => {
         console.error('Error fetching user data:', error);
       });
-  }
-}
+  },
+  // handleImageUpload(event) {
+      // const selectedFile = event.target.files[0];
+      // You can perform additional checks on the selected file here
+      
+      // Display the selected image
+      // this.profilePicture = URL.createObjectURL(selectedFile);
+      
+      // // Upload the image to the server (send selectedFile to the backend)
+      // // Example:
+      // const formData = new FormData();
+      // formData.append('profilePicture', selectedFile);
+      // axios.post('http://localhost:8000/api/upload-profile-picture/', formData)
+      //   .then(response => {
+      //     console.log('Profile picture uploaded successfully');
+      //   })
+      //   .catch(error => {
+      //     this.errorMessage = 'Failed to upload profile picture';
+      //     console.error('Error uploading profile picture:', error);
+      //   });
+    // }
+  };
 </script>
 
 
