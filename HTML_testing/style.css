@@ -1,0 +1,62 @@
+/* style.css */
+
+@font-face {
+    font-family: 'louis_george_cafe';
+    src: url('assets/louis_george_cafe.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'cotton_cloud';
+    src: url('assets/Cotton_Cloud.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f5f5f5;
+}
+
+h1 {
+    font-family: 'Cotton_Cloud', sans-serif;
+    text-align: center;
+    color: #5373d4;
+}
+
+.listing {
+    border: 2px solid #5d69ed;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.listing:hover {
+    border-color: #333;
+}
+
+.listing img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border: 2px solid #5d69ed;
+    border-radius: 5px;
+}
+
+.listing h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+    color: #333;
+    font-family: 'louis_george_cafe', sans-serif;
+}
+
+.listing p {
+    color: #666;
+    font-family: 'louis_george_cafe', sans-serif;
+}
+

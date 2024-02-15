@@ -155,3 +155,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email server for SMTP
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.zeptomail.eu'  # Your Zoho Mail SMTP server address
+EMAIL_PORT = 465  # Zoho Mail SMTP port for SSL
+EMAIL_USE_SSL = True  # Use SSL/TLS for secure connection
+EMAIL_USE_TLS = False  # No need for TLS if using SSL
+EMAIL_HOST_USER = 'emailapikey'  # Your Zoho Mail API key as the username
+EMAIL_HOST_PASSWORD = 'yA6KbHsMugT+kDpWQ0hs1ZWNoo40qqAwjXm+sX/kdJYuKNnn26E71BJkdNTvJzWLitfX56oDbY5AL4C9vYoLfJZiZ9YEL5TGTuv4P2uV48xh8ciEYNYkgZigCrAVFa9MeBoiDSw2QfgoWA=='  # Your Zoho Mail Send Mail Token 1 as the password
+DEFAULT_FROM_EMAIL = 'dybedahlserver.net'  # Your domain/sender address
