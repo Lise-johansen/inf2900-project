@@ -18,7 +18,13 @@
  */
 
 <script>
-
+export default {
+        methods: {
+        redirectToLogin() {
+                this.$router.push('/login');
+                }
+        }
+ }
 </script>
 
 <style scoped>
