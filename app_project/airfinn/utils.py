@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from .models import Item
 from django.http import JsonResponse, HttpResponseNotAllowed
 import re
 
@@ -46,3 +47,14 @@ def password_checks(password):
         return JsonResponse({'error': 'Password can not be a sequence of numbers'}, status=400)
 
     return True
+
+
+
+def search_items(request):
+    query = request.GET.get('q', '')
+    if query:
+        items = Item.objects.filter(name__icontains=query)
+    else:
+        items = Item.objects.all()
+    data = [{'id': item.id, 'name': item.name} for item in items]
+    return JsonResponse(data, safe=False)    
