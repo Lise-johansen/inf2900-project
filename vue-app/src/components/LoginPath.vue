@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import axiosInstance from 'axios'; // Import axios
+import axiosInstance from '@/axios'; // Import axios
 
 export default {
   data() {
