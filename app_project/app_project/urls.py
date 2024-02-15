@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from airfinn import views
 
+
 from django.urls import path, include  # Ensure include is imported
 
 
@@ -28,5 +29,6 @@ urlpatterns = [
     path('api/register/', views.register, name='register'),
     path('api/send-password-reset-email/', views.send_password_reset_email, name='send_password_reset_email'),
     path('api/dashboard/', views.dashboard, name='dashboard'),
+    path('api/search/', views.search_items, name='search_items')
 ]
 

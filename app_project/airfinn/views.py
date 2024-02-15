@@ -9,6 +9,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
+from .models import Item 
 import json
 import jwt
 
@@ -143,3 +144,11 @@ def send_password_reset_email(request):
         return JsonResponse({'message': 'Password reset email sent'}, status=200)
     else:
         return JsonResponse({'error': 'User not found'}, status=404)
+def search_items(request):
+    query = request.GET.get('q', '')
+    if query:
+        items = Item.objects.filter(name__icontains=query)
+    else:
+        items = Item.objects.all()
+    data = [{'id': item.id, 'name': item.name} for item in items]
+    return JsonResponse(data, safe=False)
