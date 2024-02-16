@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axiosInstance from '@/axios';
 
 export default {
   data() {
@@ -29,7 +29,7 @@ export default {
   mounted() {
     alert(document.cookie);
     console.log(document.cookie);
-    axios.get('http://localhost:8000/api/dashboard/', { withCredentials: true })
+    axiosInstance.get('dashboard/', { withCredentials: true })
       .then(response => {
         this.user = response.data;
       })

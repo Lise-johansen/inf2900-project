@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -124,7 +125,10 @@ def send_password_reset_email(request):
         token_generator = PasswordResetTokenGenerator()
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = token_generator.make_token(user)
-        reset_link = f"http://localhost:8080/reset-password/{uidb64}/{token}/"
+        
+        domain = get_current_site(request).domain
+        
+        reset_link = f"http://{domain}/api/reset-password/{uidb64}/{token}/"
         
         # Load HTML content from template
         html_content = render_to_string('password_reset_email.html', {'reset_link': reset_link})
