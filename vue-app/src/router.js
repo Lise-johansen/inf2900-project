@@ -34,6 +34,12 @@ const routes = [
     component: UserDashboard,
     meta: { requiresAuth: false }, // Add this if authentication is required
   },
+  {
+    path:'/userregister',
+    name: 'userregister',
+    component: () => import('./components/UserRegister.vue'),
+    meta: { requiresAuth: false },
+  },
   // Other routes
 ];
 
