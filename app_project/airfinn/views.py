@@ -160,7 +160,7 @@ def register(request):
         token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
         
         # Set the token as a cookie in the response
-        response = JsonResponse({'token': token})
+        response = JsonResponse({'token': token, 'auth_user': True})
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
         
         return response
@@ -204,3 +204,5 @@ def send_password_reset_email(request):
 
 
 
+def UserRegister(response):
+    pass
