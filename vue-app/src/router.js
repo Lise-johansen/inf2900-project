@@ -7,6 +7,7 @@ import UserDashboard from './components/UserDashboard.vue';
 import IndexPath from './components/IndexPath.vue';
 import ListingPath from './components/ListingPath.vue';
 import StarRating from './components/StarRating.vue';
+import AboutUs from './components/AboutUs.vue';
 // import LogoutScript from './components/LogoutScript.vue';
 
 const routes = [
@@ -46,6 +47,11 @@ const routes = [
     path: '/star-rating',
     name: 'star-rating',
     component: StarRating,
+  },
+  {
+    path: '/about-us',
+    name: 'about-us',
+    component: AboutUs,
   },
   // Other routes
 ];
