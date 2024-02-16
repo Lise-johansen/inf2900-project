@@ -31,5 +31,6 @@ urlpatterns = [
     path('api/dashboard/', views.dashboard, name='dashboard'),
     path('api/search/', views.search_items, name='search_items'),
     path('api/logout/', views.logout, name='logout'),
+    path('api/UserRegister', views.UserRegister, name='UserRegister'),
 ]
 
