@@ -17,6 +17,11 @@ from airfinn.utils import get_user_by_id, email_checks, password_checks, search_
 def index(request):
     return JsonResponse({'message': 'Welcome to Airfinn!'})
 
+"""
+Pull the token from the request cookies and decode it to get the user info from the database. 
+Return a JsonResponse object with the user info. 
+(name and email as of now, should be extended to include more info: phone number, address, etc.)
+"""
 def dashboard(request):
     # Pull token from request cookies and decode it to get the user info
     token = request.COOKIES.get('token')
@@ -34,8 +39,29 @@ def dashboard(request):
     user = get_user_by_id(user_id)
 
     return JsonResponse({'username': user.username, 'email': user.email})
+
+"""
+Function to logout the user by clearing the token cookie and setting the auth_user cookie to False. 
+This function returns a JsonResponse object with the cookies set to expire immediately.
+The result is that the token is invalidated and the user cant access the dashboard until the user logs in again.
+"""
+def logout(request):
+    # Create a response object
+    response = JsonResponse()
+    # Clear all cookies by setting their expiration time to a past date
+    response.set_cookie('token', '', expires=0)
+    response.set_cookie('auth_user', False)
+    
+    return response
+
+"""
+Function to login the user and set the token as a cookie in the response.
+This function returns a JsonResponse object with the token set as a cookie.
+The result is that the user can access the dashboard until the token expires.
+"""
     
 def login(request):
+    # Check if the request method is POST
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST requests are allowed for login.'}, status=405)
     
@@ -43,34 +69,41 @@ def login(request):
     data = json.loads(request.body)
     username = data.get('username')
 
+    # Encrypt the password
     key = Fernet.generate_key()
     fernet =  Fernet(key)
     encrypted_password = fernet.encrypt(data.get('password').encode())
-    print("encrypted pw: ",encrypted_password)
-    print("pulled pw: ", data.get('password'))
-    
+
+
     # Authenticate user
     user = authenticate(request, username=username, password=fernet.decrypt(encrypted_password).decode())
         
+    # Authentication successful
     if user is not None:
-        # Authentication successful
         # Generate an access token
         secret_key = 'St3rkP@ssord' 
         token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
         
         # Set the token as a cookie in the response
         response = JsonResponse({'token': token, 'auth_user': True})
+        # Set the auth_user cookie to True    
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
-        
+
+        # Return the response
         return response
     
     else:
         # Authentication failed
         return JsonResponse({'success': False, 'error': 'Invalid Credentials'}, status=401)
     
-
+"""
+Function to register the user and set the token as a cookie in the response.
+This function returns a JsonResponse object with the token set as a cookie.
+The result is that the user can access the dashboard until the token expires,
+and they have created a user which is stored in the database.
+"""
 def register(request):
-
+    # Check if the request method is POST
     if request.method != 'POST':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
 
@@ -79,28 +112,35 @@ def register(request):
     # get username and encrypt password and email.
     username = data.get('username')
 
+    # Check if the email, password and username is empty
     if data.get('email') == '': 
         return JsonResponse({'error_email': 'Requires email to register an account'}, status=400)
+    if data.get('password1') == '':
+        return JsonResponse({'error_password': 'Requires password to register an account'}, status=400)
+    if data.get('password2') == '':
+        return JsonResponse({'error_password': 'Requires password to register an account'}, status=400)
+    if data.get('username') == '':
+        return JsonResponse({'error_username': 'Requires username to register an account'}, status=400)
 
+    # Encrypt the password 
     key = Fernet.generate_key()
     fernet =  Fernet(key)
     encrypted_password1 = fernet.encrypt(data.get('password1').encode())
     encrypted_password2 = fernet.encrypt(data.get('password2').encode())
 
-    if password_checks(fernet.decrypt(encrypted_password1).decode()) == True:
-        print("okay password")
-    if password_checks(fernet.decrypt(encrypted_password2).decode()) == True:
-        print("okay password")
-    elif fernet.decrypt(encrypted_password1).decode() != fernet.decrypt(encrypted_password2).decode():
-        return JsonResponse({'error': 'Passwords do not match'}, status=400)
-    else:
+    # Check if the password and email is valid
+    if password_checks(fernet.decrypt(encrypted_password1).decode()) == False:
+        return password_checks(fernet.decrypt(encrypted_password1).decode())
+    if password_checks(fernet.decrypt(encrypted_password2).decode()) == False:
         return password_checks(fernet.decrypt(encrypted_password1).decode())
 
+    # Check if the passwords match
+    elif fernet.decrypt(encrypted_password1).decode() != fernet.decrypt(encrypted_password2).decode():
+        return JsonResponse({'error': 'Passwords do not match'}, status=400)
 
+    # Encrypt the email
     enc_email = fernet.encrypt(data.get('email').encode())
-    if email_checks(fernet.decrypt(enc_email).decode()) == True:
-        print("okay email")
-    else:
+    if email_checks(fernet.decrypt(enc_email).decode()) == False:
         return email_checks(fernet.decrypt(enc_email).decode())
         
     # Check if the username or email is already in use
@@ -162,14 +202,5 @@ def send_password_reset_email(request):
     else:
         return JsonResponse({'error': 'User not found'}, status=404)
 
-def logout(request):
-    response = JsonResponse({'message': 'Logged out'})
-    
-    # Clear all cookies by setting their expiration time to a past date
-    response.set_cookie('token', '', expires=0)
-    response.set_cookie('auth_user', False)
 
-    print("logged out")
-    print("cookies: ", request.COOKIES)
-    
-    return response
+
