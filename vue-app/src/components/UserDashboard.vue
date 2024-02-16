@@ -1,16 +1,19 @@
-<!-- UserDashboard.vue -->
 <template>
-  <div>
-    <!-- Display user's username and email -->
-    <div v-if="user.username && user.email">
-      <input type="text" v-model="user.username" readonly>
-      <input type="text" v-model="user.email" readonly>
-      <router-link to="/" class="button-link">Go to Home</router-link>
-      <RouterLink to="/logout" class="button-link">Logout</RouterLink>
-    </div>
-    <div v-else>
-      <p>Loading user data...</p>
-    </div>
+  <div class="user-dashboard">
+    <input type="file" accept="image/*" @change="handleImageUpload">
+    
+    <!-- Display profile picture -->
+    <img v-if="profilePicture" :src="profilePicture" alt="Profile Picture">
+
+    <h2>Username: {{ user.username }}</h2>
+    <p>Email: {{ user.email }}</p>
+    <p>Address: {{ user.address }}</p>
+    <p>Postal Code: {{ user.postal_code }}</p>
+    
+    <!-- Button to navigate to user's listings -->
+    <router-link to="/listings" class="button-link">My Listings</router-link>
+    <button @click="logout">Logout</button>
+
   </div>
 </template>
 
@@ -20,15 +23,32 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      // Initialize an empty user object
       user: {
         username: '',
-        email: ''
-      }  // Initialize an empty user object
+        email: '',
+        address: '',
+        postal_code: '',
+        profile_picture: ''
+      },
+      profilePicture: null
     };
   },
+  methods: {
+    logout() {
+      axios.get('http://localhost:8000/api/logout')
+      .then(response => {
+        document.cookie = `token=${response.data.token}`;
+        document.cookie = `auth_user=${response.data.auth_user}`;
+        console.log('auth_user:', document.cookie);
+        console.log('Logged out successfully');
+        this.$router.push('/');
+        alert(document.cookies);
+      })
+    },
+  },
   mounted() {
-    alert(document.cookie);
-    console.log(document.cookie);
+    // Fetch user data upon component mount
     axios.get('http://localhost:8000/api/dashboard/', { withCredentials: true })
       .then(response => {
         this.user = response.data;
@@ -37,8 +57,9 @@ export default {
         console.error('Error fetching user data:', error);
       });
   }
-}
+};
 </script>
+
 
 
 
