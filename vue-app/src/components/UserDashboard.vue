@@ -43,7 +43,6 @@ export default {
         console.log('auth_user:', document.cookie);
         console.log('Logged out successfully');
         this.$router.push('/');
-        alert(document.cookies);
       })
     },
   },

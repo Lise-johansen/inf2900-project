@@ -6,7 +6,7 @@
 <template>
 	<div>
 		<search-filter @filter="applyFilter" />
-		<h1>Welcome to the Index Page</h1>
+		<h1></h1>
 		<SmallListing v-for="item in filteredItems" :key="item.id" :imageUrl="item.imageUrl" :title="item.title" :location="item.location" />
 	</div>
 </template>
