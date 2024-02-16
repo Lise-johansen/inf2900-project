@@ -9,10 +9,13 @@
             <p>
             FOR outdoor enthusiasts and individuals with occasional needs <br>
             WHO seek an affordable and sustainable way to access specialized gear, <br>
-            The Rentopia is a comprehensive online platform
+            The Rentopia is a comprehensive online platform <br>
             THAT facilitates seamless renting and lending of various items, <br>
             UNLIKE traditional marketplaces such as Finn.no, <br>
-            OUR PRODUCT prioritizes the shared economy, offering a hassle-free and community-driven experience for users to easily rent or rent out gear, fostering a sense of accessibility, affordability, and environmental responsibility
+            OUR PRODUCT prioritizes the shared economy, 
+            offering a hassle-free and community-driven <br>
+            experience for users to easily rent or rent out gear, <br>
+            fostering a sense of accessibility, affordability, and environmental responsibility <br>
             </p>
         </div>
   
@@ -47,7 +50,6 @@
     margin-top: 20px;
   }
   
-  /* make a container for the text */
   .project-vision {
         margin-top: 20px;
         border: 1px solid #ccc;
