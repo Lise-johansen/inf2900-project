@@ -2,6 +2,7 @@
   <div>
     <input type="text" v-model="username" placeholder="Username">
     <input type="password" v-model="password" placeholder="Password">
+
     <button @click="login">Login</button>
     <router-link to="/register" class="button-link">Don't have an account? Register</router-link>
     <router-link to="/reset" class="button-link">Reset Password</router-link>
@@ -20,31 +21,60 @@ export default {
       errorMessage: ''
     };
   },
+  created() {
+    // Call the method to redirect if the user is already logged in
+    this.redirectIfLoggedIn();
+  },
   methods: {
-    showCookie() {
-      console.log(document.cookie);
-    },
     login() {
+      console.log("Login method called");
+      // Token and auth_user are not present, proceed with login
       axiosInstance.post('login/', {
         username: this.username,
         password: this.password
-        })
-        .then(response => {
-          document.cookie = `token=${response.data.token}`;
-          document.cookie = `user_auth=${response.data.user_auth}`;
-          alert(document.cookie);
-          console.log(document.cookie);
-          this.$router.push('/dashboard');
-        })
-        .catch(error => {
-          console.log("Login failed!");
-          this.errorMessage = 'Invalid username or password';
-          console.error('There was an error!', error);
-        });
+      })
+      .then(response => {
+        document.cookie = `token=${response.data.token}`;
+        document.cookie = `auth_user=${response.data.auth_user}`;
+        this.$router.push('/dashboard');
+      })
+      .catch(error => {
+        console.log("Login failed!");
+        this.errorMessage = 'Invalid username or password';
+        console.error('There was an error!', error);
+      });
     },
+    redirectIfLoggedIn() {
+      const token = this.getTokenFromCookies();
+      const authUser = this.getAuthUserFromCookies();
+      if (token && authUser && authUser.toLowerCase() === 'true') {
+        this.$router.push('/dashboard');
+      }
+    },
+    getTokenFromCookies() {
+      const cookies = document.cookie.split('; ');
+      for (const cookie of cookies) {
+        const [name, value] = cookie.split('=');
+        if (name === 'token') {
+          return value;
+        }
+      }
+      return null; // Token not found in cookies
+    },
+    getAuthUserFromCookies() {
+      const cookies = document.cookie.split('; ');
+      for (const cookie of cookies) {
+        const [name, value] = cookie.split('=');
+        if (name === 'auth_user') {
+          return value;
+        }
+      }
+      return null; // auth_user not found in cookies
+    }
   }
-}
+};
 </script>
+
 
 
 <style scoped>

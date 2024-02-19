@@ -30,6 +30,7 @@ urlpatterns = [
     path('api/send-password-reset-email/', views.send_password_reset_email, name='send_password_reset_email'),
     path('api/dashboard/', views.dashboard, name='dashboard'),
     path('api/search/', views.search_items, name='search_items'),
-    path('api/reset-password/<str:uidb64>/<str:token>/', views.reset_password, name='reset_password'),
+    path('api/logout/', views.logout, name='logout'),
+    path('api/UserRegister', views.UserRegister, name='UserRegister'),
 ]
 
