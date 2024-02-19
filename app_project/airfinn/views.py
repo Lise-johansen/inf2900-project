@@ -11,7 +11,8 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Item 
+from .models import Item
+from django.conf import settings # Import settings to get the frontend URL
 import json
 import jwt
 from airfinn.utils import get_user_by_id, email_checks, password_checks, search_items
@@ -185,9 +186,11 @@ def send_password_reset_email(request):
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = token_generator.make_token(user)
         
-        domain = get_current_site(request).domain
+        # Get the frontend URL from settings or pass it as a parameter
+        frontend_url = settings.FRONTEND_URL  # Assuming you set FRONTEND_URL in your settings
         
-        reset_link = f"http://{domain}/api/reset-password/{uidb64}/{token}/"
+        # Construct the reset link with the correct frontend URL
+        reset_link = f"{frontend_url}/reset-password/{uidb64}/{token}/"
         
         # Load HTML content from template
         html_content = render_to_string('password_reset_email.html', {'reset_link': reset_link, 'username': username})
