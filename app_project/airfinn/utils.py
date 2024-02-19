@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from .models import Item
 from django.http import JsonResponse, HttpResponseNotAllowed
+from django.views.decorators.csrf import csrf_exempt
 import re
 
 
@@ -58,3 +59,18 @@ def search_items(request):
         items = Item.objects.all()
     data = [{'id': item.id, 'name': item.name} for item in items]
     return JsonResponse(data, safe=False)    
+
+
+def upload_profile_picture(request):
+    print('upload_profile_picture')
+    if request.method == 'POST' :
+        print('in if')
+        profile_picture = request.FILES['profilePicture']
+            
+        # Process the uploaded image here
+        # For example, you can save the image to a specific location or perform additional operations
+            
+        return JsonResponse({'message': 'Profile picture uploaded successfully'})
+    else:
+         print('in else')
+         return JsonResponse({'error': 'Failed to upload profile picture'}, status=400)

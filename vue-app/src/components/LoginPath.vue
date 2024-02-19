@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import axios from 'axios'; // Import axios
+import axiosInstance from '@/axios';
 
 export default {
   data() {
@@ -27,10 +27,8 @@ export default {
   },
   methods: {
     login() {
-      console.log("Login method called");
-
       // Token and auth_user are not present, proceed with login
-      axios.post('http://localhost:8000/api/login/', {
+      axiosInstance.post('login/', {
         username: this.username,
         password: this.password
       })

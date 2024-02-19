@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from airfinn import views
+from airfinn import utils
 
 
 from django.urls import path, include  # Ensure include is imported
@@ -31,6 +32,7 @@ urlpatterns = [
     path('api/dashboard/', views.dashboard, name='dashboard'),
     path('api/search/', views.search_items, name='search_items'),
     path('api/logout/', views.logout, name='logout'),
-    path('api/UserRegister', views.UserRegister, name='UserRegister'),
+    path('api/userregister/', views.userregister, name='userregister'),
+    path('api/upload-profile-picture/', utils.upload_profile_picture, name='upload_profile_picture'),
 ]
 

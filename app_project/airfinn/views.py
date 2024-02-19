@@ -204,5 +204,6 @@ def send_password_reset_email(request):
 
 
 
-def UserRegister(response):
-    pass
+def userregister(response):
+    print('UserRegister')
+    return JsonResponse({'message': 'User registered successfully!'})

@@ -21,7 +21,7 @@
 
 
 <script>
-import axios from '@/axios';
+import axiosInstance from '@/axios';
 
 export default {
     data() {
@@ -41,14 +41,14 @@ export default {
             this.errorMessage = 'Passwords do not match';
             return; // Exit the method early if passwords don't match
           }
-          axios.post('http://localhost:8000/api/register/', {
+          axiosInstance.post('register', {
             username: this.username,
             email: this.email,
             password1: this.password1,
             password2: this.password2
             })
             .then(response => {
-              this.$router.push('/dashboard');
+              this.$router.push('dashboard');
               console.log(response);
             })
             .catch(error =>  {
