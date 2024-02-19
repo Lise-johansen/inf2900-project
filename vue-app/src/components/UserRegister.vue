@@ -29,7 +29,7 @@
 
 
 <script>
-import axios from 'axios';
+import axiosInstance from 'axios';
 
 export default {
     data() {
@@ -43,7 +43,7 @@ export default {
     },
     methods: {
         registerUser() {
-            axios.post('http://localhost:8000/api/userregister/', {
+            axiosInstance.post('userregister/', {
                 name: this.name,
                 address: this.address,
                 phone: this.phone,

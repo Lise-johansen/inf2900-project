@@ -12,7 +12,7 @@
   
   <script>
   import { ref } from 'vue';
-  import axios from 'axios';
+  import axiosInstance from 'axios';
   
   export default {
     setup() {
@@ -23,7 +23,7 @@
   
       const fetchData = async () => {
         try {
-          const response = await axios.get('api/search', {
+          const response = await axiosInstance.get('search/', {
             params: { q: searchTerm.value }
           });
           filteredItems.value = response.data;
