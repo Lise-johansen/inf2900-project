@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     logout() {
-      axios.get('http://localhost:8000/api/logout')
+      axiosInstance.get('logout/')
       .then(response => {
         document.cookie = `token=${response.data.token}`;
         document.cookie = `auth_user=${response.data.auth_user}`;
