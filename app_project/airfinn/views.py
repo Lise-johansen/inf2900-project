@@ -249,5 +249,6 @@ def reset_password(request, uidb64, token):
     
 
 
-def UserRegister(response):
-    pass
+def userregister(response):
+    print('UserRegister')
+    return JsonResponse({'message': 'User registered successfully!'})
