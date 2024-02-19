@@ -180,6 +180,7 @@ def send_password_reset_email(request):
     user = User.objects.filter(email=email).first()
     
     if user:
+        username = user.username
         token_generator = PasswordResetTokenGenerator()
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = token_generator.make_token(user)
@@ -189,10 +190,10 @@ def send_password_reset_email(request):
         reset_link = f"http://{domain}/api/reset-password/{uidb64}/{token}/"
         
         # Load HTML content from template
-        html_content = render_to_string('password_reset_email.html', {'reset_link': reset_link})
+        html_content = render_to_string('password_reset_email.html', {'reset_link': reset_link, 'username': username})
         
         # Load plain text content from template
-        text_content = render_to_string('password_reset_email.txt', {'reset_link': reset_link})
+        text_content = render_to_string('password_reset_email.txt', {'reset_link': reset_link, 'username': username})
         
         # Create EmailMultiAlternatives object to include both versions
         subject = "Password Reset"
@@ -206,8 +207,9 @@ def send_password_reset_email(request):
         
         return JsonResponse({'message': 'Password reset email sent'}, status=200)
     else:
-        return JsonResponse({'error': 'User not found'}, status=404)
-
+        # Return a custom error message instead of raising a 404 error
+        return JsonResponse({'error': 'User not found'}, status=400)
+    
 def reset_password(request, uidb64, token):
     if request.method == 'POST':
         # Decode uidb64 to get the user's ID
