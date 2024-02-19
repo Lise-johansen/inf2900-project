@@ -30,6 +30,9 @@ STATICFILES_DIRS = [
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-&@nmsdwxy*o!l1_r8p@t#&w4n@w3ljbeoqzq4t87q8accy=fdw'
 
+# Change the following to VUE app URL
+FRONTEND_URL = 'http://localhost:8080'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
