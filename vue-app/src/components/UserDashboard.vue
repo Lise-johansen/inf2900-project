@@ -23,7 +23,6 @@ import axiosInstance from '@/axios';
 export default {
   data() {
     return {
-      // Initialize an empty user object
       user: {
         username: '',
         email: '',

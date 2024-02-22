@@ -66,9 +66,10 @@ MIDDLEWARE = [
 
 ]
 
-CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'http://localhost:8000']
+CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'http://localhost:8000', 'https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net']
 CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
 CORS_ALLOW_CREDENTIALS = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=365),  # Example: Refresh token expires after 1 day
