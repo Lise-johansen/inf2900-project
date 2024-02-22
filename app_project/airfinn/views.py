@@ -173,3 +173,6 @@ def logout(request):
     print("cookies: ", request.COOKIES)
     
     return response
+
+def create_item():
+    return JsonResponse({'message': 'Create a new listing'})

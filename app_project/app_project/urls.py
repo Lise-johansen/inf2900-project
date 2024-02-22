@@ -31,4 +31,5 @@ urlpatterns = [
     path('api/dashboard/', views.dashboard, name='dashboard'),
     path('api/search/', views.search_items, name='search_items'),
     path('api/logout/', views.logout, name='logout'),
+    path('api/create-item/', views.create_item, name='create_item'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

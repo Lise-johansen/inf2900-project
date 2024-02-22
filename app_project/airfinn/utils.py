@@ -59,3 +59,20 @@ def search_items(request):
         items = Item.objects.all()
     data = [{'id': item.id, 'name': item.name} for item in items]
     return JsonResponse(data, safe=False)
+
+def create_item(request):
+    """
+    Create a new item with the info user has given
+    """
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    data = json.loads(request.body)
+    name = data.get('name')
+    price = data.get('price')
+    description = data.get('description')
+    image = data.get('image')
+    user_id = data.get('user_id')
+    user = get_user_by_id(user_id)
+    if user is None:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    item = Item.objects.create(name=name, price=price, description=description, image=image, user=user)
