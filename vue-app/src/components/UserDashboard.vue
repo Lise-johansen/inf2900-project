@@ -21,52 +21,40 @@
 import axiosInstance from '@/axios';
 
 export default {
-  data() {
-    return {
-      user: {
-        username: '',
-        email: '',
-        address: '',
-        postal_code: '',
-        profile_picture: ''
-      },
-      profilePicture: null
-    };
-  },
-  methods: {
-    logout() {
-      axiosInstance.get('logout/')
-      .then(response => {
-        document.cookie = `token=${response.data.token}`;
-        document.cookie = `auth_user=${response.data.auth_user}`;
-        console.log('auth_user:', document.cookie);
-        console.log('Logged out successfully');
-        this.$router.push('/');
-      })
+    data() {
+        return {
+        user: {
+            username: '',
+            email: '',
+            address: '',
+            postal_code: '',
+            profile_picture: ''
+        },
+        profilePicture: null
+        };
     },
-  },
-  methods: {
-    logout() {
-      axiosInstance.get('logout/')
-      .then(response => {
-        document.cookie = `token=${response.data.token}`;
-        document.cookie = `auth_user=${response.data.auth_user}`;
-        console.log('auth_user:', document.cookie);
-        console.log('Logged out successfully');
-        this.$router.push('/');
-      })
+    methods: {
+        logout() {
+        axiosInstance.get('logout/')
+        .then(response => {
+            document.cookie = `token=${response.data.token}`;
+            document.cookie = `auth_user=${response.data.auth_user}`;
+            console.log('auth_user:', document.cookie);
+            console.log('Logged out successfully');
+            this.$router.push('/');
+        })
+        },
     },
-  },
-  mounted() {
-    // Fetch user data upon component mount
-    axiosInstance.get('dashboard/', { withCredentials: true })
-      .then(response => {
-        this.user = response.data;
-      })
-      .catch(error => {
-        console.error('Error fetching user data:', error);
-      });
-  }
+    mounted() {
+        // Fetch user data upon component mount
+        axiosInstance.get('dashboard/', { withCredentials: true })
+        .then(response => {
+            this.user = response.data;
+        })
+        .catch(error => {
+            console.error('Error fetching user data:', error);
+        });
+    }
 };
 </script>
 
