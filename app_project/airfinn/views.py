@@ -1,16 +1,15 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.contrib.auth.models import User, AnonymousUser
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Item 
+from .models import Item, User
 import json
 import jwt
 
@@ -98,7 +97,9 @@ def register(request):
     username = data.get('username')
     password = data.get('password')
     email = data.get('email')
-        
+    
+    User = get_user_model()
+    
     # Check if the username or email is already in use
     if User.objects.filter(username=username).exists():
         return JsonResponse({'error': 'Username already exists'}, status=400)
@@ -106,8 +107,8 @@ def register(request):
         return JsonResponse({'error': 'Email already exists'}, status=400)
         
     # Create a new user
-    user = User.objects.create_user(username, email, password)
-        
+    user = User.objects.create_user(username=username, email=email, password=password)
+            
     # Optionally, you can perform additional actions like sending a confirmation email
         
     return JsonResponse({'message': 'User registered successfully'}, status=201)
