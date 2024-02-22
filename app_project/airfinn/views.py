@@ -167,7 +167,27 @@ def register(request):
         response = JsonResponse({'token': token, 'auth_user': True})
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
         
-        return response
+        verification_token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256').decode('utf-8')
+        
+        verification_link = f"{settings.FRONTEND_URL}/verify-email?token={verification_token}"
+        
+        # Load HTML content from template
+        html_content = render_to_string('verification_email.html', {'verification_link': verification_link, 'username': username})
+    
+        # Load plain text content from template
+        text_content = render_to_string('verification_email.txt', {'verification_link': verification_link, 'username': username})
+
+        # Create EmailMultiAlternatives object to include both versions
+        subject = "Verify Your Email"
+        from_email = "noreply@dybedahlserver.net"
+        to_email = user.email
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+        msg.attach_alternative(html_content, "text/html")
+        
+        # Send the email
+        msg.send()
+        
+        return response, JsonResponse({'message': 'Verification email sent'}, status=200)
     else:
         # Authentication failed
         return JsonResponse({'success': False, 'error': 'Not able to create user'}, status=401)
