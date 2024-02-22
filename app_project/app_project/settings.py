@@ -35,6 +35,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '129.151.210.152', '2900project.dybedahlserver.net', 'django.dybedahlserver.net']
 
+USER_MODEL = 'airfinn.User'
 
 # Application definition
 
@@ -110,8 +111,12 @@ WSGI_APPLICATION = 'app_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / '../db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'St3rkP@ss0rd',
+        'HOST': '10.0.0.194',
+        'PORT': '5432',
     }
 }
 
