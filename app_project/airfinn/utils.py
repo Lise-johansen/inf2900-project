@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from .models import Item
 from django.http import JsonResponse, HttpResponseNotAllowed
+from django.core.serializers import serialize
 import re
 
 
@@ -52,10 +53,15 @@ def password_checks(password):
 
 
 def search_items(request):
+    category = request.GET.get('category', '')
     query = request.GET.get('q', '')
+
+    items = Item.objects.all()
+    if category:
+        items = items.filter(category=category)
     if query:
-        items = Item.objects.filter(name__icontains=query)
-    else:
-        items = Item.objects.all()
-    data = [{'id': item.id, 'name': item.name} for item in items]
+        items = items.filter(name__icontains=query)
+
+    # Serialize the queryset of items
+    data = serialize('json', items)
     return JsonResponse(data, safe=False)
