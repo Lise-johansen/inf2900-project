@@ -1,27 +1,17 @@
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
-from django.contrib.sites.shortcuts import get_current_site
-from django.contrib.auth import authenticate, login, get_user_model, login
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.contrib.auth.forms import SetPasswordForm
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.http import JsonResponse, HttpResponseNotAllowed
-from django.views.decorators.csrf import csrf_exempt
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.http import JsonResponse
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Item, User
-from django.core.mail import send_mail, EmailMultiAlternatives
-from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from .models import Item
+from .models import User
 from django.conf import settings # Import settings to get the frontend URL
+from fernet import Fernet
 import json
 import jwt
-from airfinn.utils import get_user_by_id, email_checks, password_checks, search_items
+from airfinn.utils import get_user_by_id, email_checks, password_checks
 
 
 def get_user_by_id(user_id):
