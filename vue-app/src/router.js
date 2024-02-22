@@ -6,6 +6,7 @@ import PasswordReset from './components/PasswordReset.vue'; // Import Password R
 import UserDashboard from './components/UserDashboard.vue';
 import IndexPath from './components/IndexPath.vue';
 import PasswordResetForm from './components/PasswordResetForm.vue'; // Import Password Reset Form component
+import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email component
 // import LogoutScript from './components/LogoutScript.vue';
 
 const routes = [
@@ -45,6 +46,11 @@ const routes = [
     name: 'userregister',
     component: () => import('./components/UserRegister.vue'),
     meta: { requiresAuth: false },
+  },
+  {
+    path: '/verify-email/:token',
+    name: 'verifyemail',
+    component: VerifyEmail,
   },
   // Other routes
 ];
