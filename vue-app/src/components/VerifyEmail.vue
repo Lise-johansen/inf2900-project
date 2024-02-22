@@ -2,6 +2,7 @@
     <div>
       <p>Verifying your email address...</p>
       <p v-if="verificationError">{{ verificationError }}</p>
+      <p v-if="verificationSuccess">Email verified successfully!</p>
     </div>
   </template>
   
@@ -11,7 +12,8 @@
   export default {
     data() {
       return {
-        verificationError: null
+        verificationError: null,
+        verificationSuccess: false
       };
     },
     created() {
@@ -23,8 +25,7 @@
         axiosInstance.get(`verify-email/?token=${token}`)
           .then(response => {
             console.log(response);
-            // Handle successful verification (e.g., redirect to dashboard)
-            this.$router.push('/dashboard');
+            this.verificationSuccess = true; // Set verification success flag
           })
           .catch(error => {
             this.verificationError = error.response.data.message;
