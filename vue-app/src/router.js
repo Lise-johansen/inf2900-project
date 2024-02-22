@@ -48,7 +48,7 @@ const routes = [
     meta: { requiresAuth: false },
   },
   {
-    path: '/verify-email/:token',
+    path: '/verify-email',
     name: 'verifyemail',
     component: VerifyEmail,
   },
