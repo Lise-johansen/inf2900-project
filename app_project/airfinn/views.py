@@ -15,7 +15,7 @@ from airfinn.utils import get_user_by_id, email_checks, password_checks, search_
 
 
 def index(request):
-    return JsonResponse({'message': 'Welcome to Airfinn!'})
+    return JsonResponse({'message': 'Welcome to Rentopia!'})
 
 def dashboard(request):
     # Pull token from request cookies and decode it to get the user info
