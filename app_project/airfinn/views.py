@@ -162,12 +162,8 @@ def register(request):
         # Generate an access token
         secret_key = 'St3rkP@ssord' 
         token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
-        
-        # Set the token as a cookie in the response
-        response = JsonResponse({'token': token, 'auth_user': True})
-        response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
-        
-        verification_token = token.decode('utf-8')
+
+        verification_token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256')
         
         verification_link = f"{settings.FRONTEND_URL}/verify-email?token={verification_token}"
         
@@ -184,10 +180,14 @@ def register(request):
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
         msg.attach_alternative(html_content, "text/html")
         
+        # Set the token as a cookie in the response
+        response = JsonResponse({'token': token, 'auth_user': True, 'verification_sent': True})
+        response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
+        
         # Send the email
         msg.send()
         
-        return response, JsonResponse({'message': 'Verification email sent'}, status=200)
+        return response
     else:
         # Authentication failed
         return JsonResponse({'success': False, 'error': 'Not able to create user'}, status=401)
@@ -269,8 +269,6 @@ def reset_password(request, uidb64, token):
     else:
         # Only POST requests are allowed for password reset
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
-    
-
 
 def userregister(response):
     print('UserRegister')
