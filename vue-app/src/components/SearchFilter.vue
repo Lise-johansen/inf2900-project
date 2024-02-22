@@ -2,7 +2,9 @@
     <div>
         <input type="text" v-model="searchTerm" @input="handleSearchChange">
         <ul v-if="!loading">
-            <pre v-if="!loading">{{ jsonResult }}</pre>
+            <li v-for="item in filteredItems" :key="item.pk">
+                {{ item.fields.name }}
+            </li>
         </ul>
         <div v-else class="loading-text">
             Searching...
@@ -13,13 +15,15 @@
 <script>
     import { ref } from 'vue';
     import axios from 'axios';
-
+    
     export default {
         setup() {
             const searchTerm = ref('');
             const loading = ref(false);
-            const filteredItems = ref([]);
+            const filteredItems = ref([])
             let timeoutId = null;
+
+            // v-for="item in filteredItems" :key="item.pk"
 
             const fetchData = async () => {
                 try {
@@ -27,7 +31,8 @@
                     const response = await axios.get('/api/search', {
                         params: { q: searchTerm.value }
                     });
-                    filteredItems.value = response.data;
+                    filteredItems.value = JSON.parse(response.data)
+
                 } catch (err) {
                     console.error(`Something went wrong: ${err}`);
                 } finally {
