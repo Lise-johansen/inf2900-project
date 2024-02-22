@@ -167,7 +167,7 @@ def register(request):
         response = JsonResponse({'token': token, 'auth_user': True})
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
         
-        verification_token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256').decode('utf-8')
+        verification_token = token.decode('utf-8')
         
         verification_link = f"{settings.FRONTEND_URL}/verify-email?token={verification_token}"
         
@@ -275,3 +275,20 @@ def reset_password(request, uidb64, token):
 def userregister(response):
     print('UserRegister')
     return JsonResponse({'message': 'User registered successfully!'})
+
+def verify_email(request):
+    token = request.GET.get('token')
+
+    try:
+        decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+        user_id = decoded_token.get('user_id')
+        
+        user = User.objects.get(id=user_id)
+        user.is_staff = True
+        user.save()
+
+        return JsonResponse({'message': 'Email verified successfully'}, status=200)
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'message': 'Verification link has expired'}, status=400)
+    except jwt.DecodeError:
+        return JsonResponse({'message': 'Invalid verification token'}, status=400)
