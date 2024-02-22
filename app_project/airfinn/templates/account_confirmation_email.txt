@@ -1,8 +1,0 @@
-You created an account at our website Rentopia. Click the link below to confirm your email:
-
-{{ verification_link }}
-
-If you didn't create an account, you should probably change password.
-
-Sincerely,
-The Rentopia Team
