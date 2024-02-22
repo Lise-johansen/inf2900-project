@@ -1,10 +1,7 @@
 .DS_Store
 /appenv
+/venv
 /app_project/app_project/__pycache__
 /app_project/airfinn/__pycache__/
 /app_project/airfinn/migrations/__pycache__/
-<<<<<<< HEAD
-/db.sqlite3
-=======
-.db.sqlite3
->>>>>>> localtest_johannes
+/app_project/node_modules

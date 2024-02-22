@@ -11,6 +11,7 @@ def get_user_by_id(user_id):
     except User.DoesNotExist:
         return None
 
+
 def is_simple_sequence(password, length=4):
     # Check if the password is composed of a sequence of digits
     for i in range(len(password) - length + 1):
@@ -19,13 +20,14 @@ def is_simple_sequence(password, length=4):
             return True
     return False
 
+
 def email_checks(email):
     # Check if the email is valid
     if not re.search(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
         return JsonResponse({'error': 'Invalid email address'}, status=400)
     return True
 
-    
+
 def password_checks(password):
     if len(password) < 8:
         return JsonResponse({'error': 'Password is too short'}, status=400)
@@ -41,13 +43,12 @@ def password_checks(password):
     # Check if the password contains at least one special character
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
         return JsonResponse({'error': 'Password should contain at least one special character'}, status=400)
-    
+
     # Check if the password is not based on common patterns or sequences
     if is_simple_sequence(password):
         return JsonResponse({'error': 'Password can not be a sequence of numbers'}, status=400)
 
     return True
-
 
 
 def search_items(request):
@@ -57,4 +58,4 @@ def search_items(request):
     else:
         items = Item.objects.all()
     data = [{'id': item.id, 'name': item.name} for item in items]
-    return JsonResponse(data, safe=False)    
+    return JsonResponse(data, safe=False)
