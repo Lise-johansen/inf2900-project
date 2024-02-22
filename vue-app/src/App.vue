@@ -8,26 +8,12 @@
 </template>
   
 <script>
-  import RentopiaHeader from './components/RentopiaHeader.vue';
-  import SearchFilter from './components/SearchFilter.vue';
-  
+	import RentopiaHeader from './components/RentopiaHeader.vue';
+	
 	export default {
-  		name: 'App',
-    components: { RentopiaHeader, SearchFilter },
-    data() {
-      return {
-        filteredItems: []
-      };
-    },
-    methods:
-    {
-      applyFilter(filteredItems)
-      {
-        this.filteredItems = filteredItems;
-      },
-    },
-		components: { RentopiaHeader }
-	  };  
+		name: 'App',
+		components: { RentopiaHeader },
+	};  
 </script>
   
 <style>
