@@ -41,7 +41,7 @@ export default {
             this.errorMessage = 'Passwords do not match';
             return; // Exit the method early if passwords don't match
           }
-          axiosInstance.post('register', {
+          axiosInstance.post('register/', {
             username: this.username,
             email: this.email,
             password1: this.password1,
