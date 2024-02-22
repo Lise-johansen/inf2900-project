@@ -39,7 +39,7 @@
 		-webkit-text-fill-color: transparent;
 		-webkit-background-clip: text;
 	}
-	
+
 	ul {
 		list-style-type: none;
 		padding: 0;

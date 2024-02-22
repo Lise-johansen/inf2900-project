@@ -2,7 +2,11 @@
     <div>
         <input type="text" v-model="searchTerm" @input="handleSearchChange">
         <ul v-if="!loading">
-            <pre v-if="!loading">{{ jsonResult }}</pre>
+            <li v-for="item in filteredItems" :key="item.id">
+                <div>
+                    <h3>{{ item.name }}</h3>
+                </div>
+            </li>
         </ul>
         <div v-else class="loading-text">
             Searching...
