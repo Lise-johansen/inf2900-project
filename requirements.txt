@@ -13,3 +13,7 @@ pycparser==2.21
 PyJWT==2.8.0
 djangorestframework==3.14.0
 djangorestframework_simplejwt==5.3.1
+<<<<<<< HEAD
+=======
+pillow==10.2.0
+>>>>>>> localtest_heine
