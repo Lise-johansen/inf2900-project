@@ -53,12 +53,6 @@ const routes = [
     meta: { requiresAuth: false }, // Add this if authentication is required
   },
   {
-    path:'/userregister',
-    name: 'userregister',
-    component: () => import('./components/UserRegister.vue'),
-    meta: { requiresAuth: false },
-  },
-  {
     path: '/verify-email/:token',
     name: 'verifyemail',
     component: VerifyEmail,

@@ -34,7 +34,6 @@ urlpatterns = [
     path('api/dashboard/', views.dashboard, name='dashboard'),
     path('api/search/', views.search_items, name='search_items'),
     path('api/logout/', views.logout, name='logout'),
-    path('api/userregister/', views.userregister, name='userregister'),
     path('api/upload-profile-picture/', utils.upload_profile_picture, name='upload_profile_picture'),
 ]
 

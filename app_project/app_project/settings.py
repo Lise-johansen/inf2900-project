@@ -39,6 +39,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '129.151.210.152', '2900project.dybedahlserver.net', 'django.dybedahlserver.net']
 
 USER_MODEL = 'airfinn.User'
+AUTH_USER_MODEL = 'airfinn.User'
 
 # Application definition
 
@@ -118,7 +119,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'St3rkP@ss0rd',
-        'HOST': '10.0.0.194',
+        'HOST': '129.151.210.152',
         'PORT': '5432',
     }
 }

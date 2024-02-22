@@ -10,13 +10,11 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Item, User
+from .models import Item, User, User
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from .models import Item
 from django.conf import settings # Import settings to get the frontend URL
+from fernet import Fernet
 import json
 import jwt
 from airfinn.utils import get_user_by_id, email_checks, password_checks, search_items
@@ -86,17 +84,24 @@ def login(request, user=None):
     
     # Process the decrypted payload
     data = json.loads(request.body)
-    username = data.get('username')
+    first_name = data.get('firstName')
+    last_name = data.get('lastName')
 
     # Encrypt the password
     key = Fernet.generate_key()
     fernet =  Fernet(key)
     encrypted_password = fernet.encrypt(data.get('password').encode())
 
-
+    print("data get pword type: ", type(data.get('password')))
+    print("email: ", data.get('username'))
+    pword = fernet.decrypt(encrypted_password).decode()
+    print("pword: ", pword)
+    print("length: ", len(pword))
     # Authenticate user
-    user = authenticate(request, username=username, password=password)
-        
+    user = authenticate(request, username=data.get('username') ,password=pword)
+    
+    print("pword:", fernet.decrypt(encrypted_password).decode())
+    print("pword len:", len(fernet.decrypt(encrypted_password).decode()))
     # Authentication successful
     if user is not None:
         # Generate an access token
@@ -130,7 +135,6 @@ def register(request):
     # Get JSON data from the request body
     data = json.loads(request.body)
     # get username and encrypt password and email.
-    username = data.get('username')
 
     # Check if the email, password and username is empty
     if data.get('email') == '': 
@@ -141,6 +145,9 @@ def register(request):
         return JsonResponse({'error_password': 'Requires password to register an account'}, status=400)
     if data.get('username') == '':
         return JsonResponse({'error_username': 'Requires username to register an account'}, status=400)
+
+    first_name = data.get('firstName')
+    last_name = data.get('lastName')
 
     # Encrypt the password 
     key = Fernet.generate_key()
@@ -164,13 +171,15 @@ def register(request):
         return email_checks(fernet.decrypt(enc_email).decode())
         
     # Check if the username or email is already in use
-    if User.objects.filter(username=username).exists():
-        return JsonResponse({'error': 'Username already exists'}, status=400)
-    if User.objects.filter(email=fernet.decrypt(enc_email).decode()).exists():
+    if User.objects.filter(email=data.get('email')).exists():
         return JsonResponse({'error': 'Email already exists'}, status=400)
-        
+    
+    username = fernet.decrypt(enc_email).decode()
     # Create a new user
-    user = User.objects.create_user(username, fernet.decrypt(enc_email).decode(), fernet.decrypt(encrypted_password1).decode())
+    print("pword: ", fernet.decrypt(encrypted_password1).decode())
+    user = User.objects.create_user(username=fernet.decrypt(enc_email).decode(), email=fernet.decrypt(enc_email).decode(), password=fernet.decrypt(encrypted_password1).decode())
+    print("user pword: ", user.password)
+
 
     # Create cookie token to direct user to dashboard
     if user is not None:
@@ -183,7 +192,7 @@ def register(request):
         response = JsonResponse({'token': token, 'auth_user': True})
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
         
-        verification_token = token.decode('utf-8')
+        verification_token = token
         
         verification_link = f"{settings.FRONTEND_URL}/verify-email?token={verification_token}"
         
@@ -286,13 +295,7 @@ def reset_password(request, uidb64, token):
         # Only POST requests are allowed for password reset
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
     
-
-
-def userregister(response):
-    print('UserRegister')
-    return JsonResponse({'message': 'User registered successfully!'})
-
-def verify_email(request):
+def verify_email(request):    
     token = request.GET.get('token')
 
     try:
@@ -308,6 +311,7 @@ def verify_email(request):
         return JsonResponse({'message': 'Verification link has expired'}, status=400)
     except jwt.DecodeError:
         return JsonResponse({'message': 'Invalid verification token'}, status=400)
+    
 def send_password_reset_email(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
