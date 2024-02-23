@@ -1,16 +1,18 @@
-from django.contrib.auth.models import User
-from .models import Item
+
+from .models import Item, User
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 import re
-
+from django.contrib.auth import get_user_model
 
 def get_user_by_id(user_id):
+    User = get_user_model()  # Get the custom user model
     try:
         user = User.objects.get(id=user_id)
         return user
     except User.DoesNotExist:
         return None
+
 
 def is_simple_sequence(password, length=4):
     # Check if the password is composed of a sequence of digits
