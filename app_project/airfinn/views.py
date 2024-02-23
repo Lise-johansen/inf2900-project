@@ -46,13 +46,12 @@ def dashboard(request):
     # Get the user from the database
     user = get_user_by_id(user_id)
     print(user)
-
     print("usertype: ", type(user))
 
     if type(user) != type(User): 
         JsonResponse({'success': False, 'error': 'User does not exist'}, status=401)
 
-    return JsonResponse({'email': user.email, 'firstName': user.first_name, 'lastName': user.last_name, 'address': user.address, 'phone': user.phone})
+    return JsonResponse({'email': user.email, 'firstName': user.first_name, 'lastName': user.last_name, 'address': user.address, 'phone': user.phone, 'verified': user.is_verified})
 
 """
 Function to logout the user by clearing the token cookie and setting the auth_user cookie to False. 
