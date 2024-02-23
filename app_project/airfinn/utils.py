@@ -3,6 +3,7 @@ from .models import Item, User
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 import re
+import json
 from django.contrib.auth import get_user_model
 
 def get_user_by_id(user_id):
@@ -50,8 +51,7 @@ def password_checks(password):
         return JsonResponse({'error': 'Password can not be a sequence of numbers'}, status=400)
 
     return True
-
-
+    
 
 def search_items(request):
     query = request.GET.get('q', '')
