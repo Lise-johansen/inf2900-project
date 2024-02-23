@@ -1,53 +1,3 @@
-<!-- <template>
-    <div>
-        <input type="email" v-model="email" placeholder="Email">
-        <button @click="passwordreset">Send Password Reset Email</button>
-    </div>
-</template>
-
-<script>
-import axios from '@/axios';
-
-export default {
-    data() {
-        return {
-            email: '',
-            errorMessage: '' 
-        };
-    },
-    methods: {
-        passwordreset() {
-            axios.post('http://localhost:8000/api/send-password-reset-email/', { 
-                email: this.email 
-            })
-            .then(() => {
-                alert('Password reset email sent');
-            })
-            .catch(error => {
-                if (error.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
-                    if (error.response.status === 400) {
-                        this.errorMessage = 'User not found';
-                    } else {
-                        this.errorMessage = 'Error sending password reset email';
-                    }
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    this.errorMessage = 'No response from server';
-                } else {
-                    // Something happened in setting up the request that triggered an Error
-                    this.errorMessage = 'Request failed';
-                }
-                // Display the error message to the user
-                alert(this.errorMessage);
-            });
-        }
-    }
-};
-</script> -->
-
-
 <template>
     <div>
         <input type="email" v-model="email" placeholder="Email" :class="{ 'is-invalid': emailError }">
@@ -97,8 +47,6 @@ export default {
                 this.email = '';
                 // Display success message
                 this.emailSent = true;
-                // Redirect to login page
-                this.$router.push('/login');
             })
             .catch(error => {
                 if (error.response) {
