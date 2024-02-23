@@ -199,7 +199,7 @@ def register(request):
         # Create EmailMultiAlternatives object to include both versions
         subject = "Verify Your Email"
         from_email = "noreply@dybedahlserver.net"
-        to_email = user.email
+        to_email = fernet.decrypt(enc_email).decode()
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
         msg.attach_alternative(html_content, "text/html")
         
@@ -301,7 +301,7 @@ def verify_email(request):
         user_id = decoded_token.get('user_id')
         
         user = User.objects.get(id=user_id)
-        user.is_staff = True
+        user.is_verified = True
         user.save()
 
         return JsonResponse({'message': 'Email verified successfully'}, status=200)
