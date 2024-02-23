@@ -67,34 +67,34 @@ def search_items(request):
     data = serialize('json', items)
     return JsonResponse(data, safe=False)
 
-def create_item(request, name, price_per_day, description, image, owner_id, location, category):
+def create_item(title, price_per_day, description, availability, condition, image, location, category, owner_id):
     """
     Create a new item with the info user has given
     """
 
     # Debugging
-    print(request)
+    # print(request)
 
-    # Get user input from Vue
-    data = json.loads(request.body)
-    name = data.get('name')
-    description = data.get('description')
-    availability = data.get('availability')
-    condition = data.get('condition')
-    price_per_day = data.get('price')
-    image = data.get('image')
-    location = data.get('location')
-    category = data.get('category')
-    owner_id = data.get('owner_id')
-    item = Item.objects.create(
-                                name, 
-                                description, 
-                                availability, 
-                                condition, 
-                                price_per_day, 
-                                image, 
-                                location, 
-                                category, 
-                                owner_id)
+    # # Get user input from Vue
+    # name = data.get('name')
+    # description = data.get('description')
+    # availability = data.get('availability')
+    # condition = data.get('condition')
+    # price_per_day = data.get('price')
+    # image = data.get('image')
+    # location = data.get('location')
+    # category = data.get('category')
+    # owner_id = data.get('owner_id')
+    print(price_per_day)
+    print(f'title: {title}, desc: {description}, availability: {availability}, condition: {condition}, Price: {price_per_day}, image: {image}, location: {location}, category:{category}, owner ID: {owner_id}')
+    item = Item.objects.create( name=title,
+                                description=description,
+                                availability=True,
+                                condition=condition,
+                                price_per_day=price_per_day,
+                                images=image,
+                                location=location,
+                                category=category,
+                                owner_id=0)
     
     return JsonResponse({'id': item.id})

@@ -180,17 +180,18 @@ def create_item_api(request):
     try:
         data = json.loads(request.body)
 
-        name = data.get('name'),
-        price = data.get('price'),
+        title = data.get('title'),
+        price_per_day = data.get('price_per_day'),
         description = data.get('description'),
         availability = data.get('availability'),
         condition = data.get('condition'),
         image = data.get('image'),
+        location = data.get('location'),
         category = data.get('category'),
         owner_id = data.get('owner_id')
 
         create_item(
-            name, price, description, availability, condition, image, category, owner_id
+            title, price_per_day[0], description, availability, condition, image, location, category, owner_id
         )
         return JsonResponse({'message': 'Item created'})
         

@@ -12,64 +12,64 @@
 </template>
 
 <script>
-import axios from 'axios';
+    import axios from 'axios';
 
-export default {
-    data() {
-        return {
-            title: '',
-            description: '',
-            price_per_day: '',
-            location: '',
-            availability: true,
-            image: '',
-            condition:'',
-            category: '',
-            owner_id: '',
-        }
-    },
-    methods: {
-        createItem() {
-            // Create a new item
-            // const newItem = {
-            //     title: this.title,
-            //     description: this.description,
-            //     price_per_day: this.price_per_day,
-            //     location: this.location,
-            //     availability: this.availability,
-            //     image: this.image,
-            //     owner_id: this.owner_id,
-            //     condition: this.condition,
-            //     category: this.category,
-            // };
+    export default {
+        data() {
+            return {
+                title: '',
+                description: '',
+                price_per_day: '',
+                location: '',
+                availability: true,
+                image: '',
+                condition:'',
+                category: '',
+                owner_id: '',
+            }
+        },
+        methods: {
+            createItem() {
+                // Create a new item
+                // const newItem = {
+                //     title: this.title,
+                //     description: this.description,
+                //     price_per_day: this.price_per_day,
+                //     location: this.location,
+                //     availability: this.availability,
+                //     image: this.image,
+                //     owner_id: this.owner_id,
+                //     condition: this.condition,
+                //     category: this.category,
+                // };
 
-            axios.post('/api/create-item/', {
-                title: this.title,
-                description: this.description,
-                price_per_day: this.price_per_day,
-                location: this.location,
-                availability: this.availability,
-                image: this.image,
-                owner_id: this.owner_id,
-                condition: this.condition,
-                category: this.category,
-            
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(() => {
-                    // Handle successful creation
-                    console.log('Item created successfully');
+                axios.post('/api/create-item/', {
+                    title: this.title,
+                    description: this.description,
+                    price_per_day: this.price_per_day,
+                    location: this.location,
+                    availability: this.availability,
+                    image: this.image,
+                    owner_id: this.owner_id,
+                    condition: this.condition,
+                    category: this.category,
+                
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 })
-                .catch(error => {
-                    // Handle error
-                    console.error('Error creating item:', error);
-                });
+                    .then(() => {
+                        // Handle successful creation
+                        console.log('Item created successfully');
+                    })
+                    .catch(error => {
+                        // Handle error
+                        console.error('Error creating item:', error);
+                    });
+            }
         }
     }
-}
 </script>
 
 <style>
