@@ -66,7 +66,6 @@ def logout(request):
     
     # Clear all cookies by setting their expiration time to a past date
     response.set_cookie('token', '', expires=0)
-    response.set_cookie('auth_user', '', expires=0)  # Set the value to an empty string instead of False for consistency
     
     return response
 """
@@ -98,10 +97,9 @@ def login(request):
         # Generate an access token
         secret_key = 'St3rkP@ssord' 
         token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
-        print("login token: ",token)
         
         # Set the token as a cookie in the response
-        response = JsonResponse({'token': token, 'auth_user': True})
+        response = JsonResponse({'token': token})
         # Set the auth_user cookie to True    
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
 
@@ -127,7 +125,6 @@ def register(request):
     data = json.loads(request.body)
     # get username and encrypt password and email.
 
-    print("phone: ", data.get('phoneNumber'))
     # Check if the email, password and username is empty
     if data.get('email') == '': 
         return JsonResponse({'error_email': 'Requires email to register an account'}, status=400)
@@ -164,7 +161,6 @@ def register(request):
         return JsonResponse({'error': 'Email already exists'}, status=400)
     
     username = fernet.decrypt(enc_email).decode()
-    print(data.get('phone'))
     # Create a new user
     user = User.objects.create_user(username= fernet.decrypt(enc_email).decode(), 
                                     email= fernet.decrypt(enc_email).decode(), 
@@ -183,8 +179,9 @@ def register(request):
         token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
         
         # Set the token as a cookie in the response
-        response = JsonResponse({'token': token, 'auth_user': True})
+        response = JsonResponse({'token': token})
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
+        print(response.cookies)
         
         verification_token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256')
         
