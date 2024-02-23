@@ -1,4 +1,5 @@
 
+
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from './components/LoginPath.vue'; // Import your Login component
 import Register from './components/RegisterPath.vue'; // Import your Register component
@@ -36,16 +37,20 @@ const routes = [
     component: PasswordResetForm,
   },
   {
+    path: '/reset',
+    name: 'reset',
+    component: PasswordReset,
+  },
+  {
+    path: '/reset-password/:uidb64/:token',
+    name: 'resetform',
+    component: PasswordResetForm,
+  },
+  {
     path: '/dashboard',
     name: 'dashboard',
     component: UserDashboard,
     meta: { requiresAuth: false }, // Add this if authentication is required
-  },
-  {
-    path:'/userregister',
-    name: 'userregister',
-    component: () => import('./components/UserRegister.vue'),
-    meta: { requiresAuth: false },
   },
   {
     path: '/verify-email',

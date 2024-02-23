@@ -5,10 +5,11 @@
     <!-- Display profile picture -->
     <img v-if="profilePicture" :src="profilePicture" alt="Profile Picture">
 
-    <h2>Username: {{ user.username }}</h2>
+    <p>First Name: {{ user.firstName }}</p>
+    <p>Last Name: {{ user.lastName }}</p>
     <p>Email: {{ user.email }}</p>
     <p>Address: {{ user.address }}</p>
-    <p>Postal Code: {{ user.postal_code }}</p>
+    <p>Phone Number: {{ user.phone }}</p>
     
     <!-- Button to navigate to user's listings -->
     <router-link to="/listings" class="button-link">My Listings</router-link>
@@ -21,40 +22,39 @@
 import axiosInstance from '@/axios';
 
 export default {
-    data() {
-        return {
-        user: {
-            username: '',
-            email: '',
-            address: '',
-            postal_code: '',
-            profile_picture: ''
-        },
-        profilePicture: null
-        };
+  data() {
+    return {
+      user: {
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        address: '',
+        profile_picture: ''
+      },
+      profilePicture: null
+    };
+  },
+  methods: {
+    logout() {
+      axiosInstance.get('logout/')
+      .then(response => {
+        document.cookie = `token=${response.data.token}`;
+        document.cookie = `auth_user=${response.data.auth_user}`;
+        this.$router.push('/');
+      })
     },
-    methods: {
-        logout() {
-        axiosInstance.get('logout/')
-        .then(response => {
-            document.cookie = `token=${response.data.token}`;
-            document.cookie = `auth_user=${response.data.auth_user}`;
-            console.log('auth_user:', document.cookie);
-            console.log('Logged out successfully');
-            this.$router.push('/');
-        })
-        },
-    },
-    mounted() {
-        // Fetch user data upon component mount
-        axiosInstance.get('dashboard/', { withCredentials: true })
-        .then(response => {
-            this.user = response.data;
-        })
-        .catch(error => {
-            console.error('Error fetching user data:', error);
-        });
-    }
+  },
+  mounted() {
+    // Fetch user data upon component mount
+    axiosInstance.get('dashboard/', { withCredentials: true })
+      .then(response => {
+        this.user = response.data;
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
+  }
 };
 </script>
 

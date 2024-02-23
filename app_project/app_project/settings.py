@@ -39,6 +39,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '129.151.210.152', '2900project.dybedahlserver.net', 'django.dybedahlserver.net']
 
 USER_MODEL = 'airfinn.User'
+AUTH_USER_MODEL = 'airfinn.User'
 
 # Application definition
 
