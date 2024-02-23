@@ -276,7 +276,6 @@ def reset_password(request, uidb64, token):
                 
                 # Log the user in after password reset
                 user = authenticate(request, username=user.username, password=form.cleaned_data['new_password1'])
-                login(request, user)
                 
                 # Generate an access token
                 secret_key = 'St3rkP@ssord'  # Replace with your secret key
@@ -309,80 +308,7 @@ def verify_email(request):
         return JsonResponse({'message': 'Verification link has expired'}, status=400)
     except jwt.DecodeError:
         return JsonResponse({'message': 'Invalid verification token'}, status=400)
-    
-def send_password_reset_email(request):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
-        
-    data = json.loads(request.body)
-    email = data.get('email')
-    user = User.objects.filter(email=email).first()
-    
-    if user:
-        username = user.username
-        token_generator = PasswordResetTokenGenerator()
-        uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-        token = token_generator.make_token(user)
-        reset_link = f"https://django.dybedahlserver.net/reset-password/{uidb64}/{token}/"
-        
-        # Load HTML content from template
-        html_content = render_to_string('password_reset_email.html', {'reset_link': reset_link, 'username': username})
-        
-        # Load plain text content from template
-        text_content = render_to_string('password_reset_email.txt', {'reset_link': reset_link, 'username': username})
-        
-        # Create EmailMultiAlternatives object to include both versions
-        subject = "Password Reset"
-        from_email = "noreply@dybedahlserver.net"
-        to_email = email
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-        msg.attach_alternative(html_content, "text/html")
-        
-        # Send the email
-        msg.send()
-        
-        return JsonResponse({'message': 'Password reset email sent'}, status=200)
-    else:
-        # Return a custom error message instead of raising a 404 error
-        return JsonResponse({'error': 'User not found'}, status=400)
-    
-def reset_password(request, uidb64, token):
-    if request.method == 'POST':
-        # Decode uidb64 to get the user's ID
-        try:
-            uid = force_str(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            user = None
-
-        # Validate the token
-        token_generator = PasswordResetTokenGenerator()
-        if user is not None and token_generator.check_token(user, token):
-            # Token is valid, process the password reset form
-            form = SetPasswordForm(user=user, data=json.loads(request.body))
-            if form.is_valid():
-                # Update user's password in the database
-                form.save()
-                
-                # Log the user in after password reset
-                user = authenticate(request, username=user.username, password=form.cleaned_data['new_password1'])
-                login(request, user)
-                
-                # Generate an access token
-                secret_key = 'St3rkP@ssord'  # Replace with your secret key
-                access_token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
-                
-                return JsonResponse({'message': 'Password reset successfully', 'token': access_token})
-            else:
-                # Form is invalid, return form errors
-                return JsonResponse({'error': form.errors}, status=400)
-        else:
-            # Invalid token or user not found, return an error response
-            return JsonResponse({'error': 'Invalid password reset link'}, status=400)
-    else:
-        # Only POST requests are allowed for password reset
-        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
-    
+ 
 def search_items(request):
     query = request.GET.get('q', '')
     if query:
