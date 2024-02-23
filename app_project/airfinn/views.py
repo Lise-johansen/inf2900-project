@@ -10,7 +10,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Item, User, User
+from .models import Item, User
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings # Import settings to get the frontend URL
@@ -29,16 +29,9 @@ Return a JsonResponse object with the user info.
 (name and email as of now, should be extended to include more info: phone number, address, etc.)
 """
 def dashboard(request):
-    print("request: ",request)
-    print("request.method: ",request.method)
-    print("request.body: ",request.body)
-    print("request.COOKIES: ",request.COOKIES)
-
-    print("Working in dashboard function")
 
     # Pull token from request cookies and decode it to get the user info
     token = request.COOKIES.get('token')
-    print("dashboard token: ",token)
     # Decode the token
     secret_key = 'St3rkP@ssord'
     try:
@@ -48,66 +41,62 @@ def dashboard(request):
         return JsonResponse({'error': 'Token has expired'}, status=401)
     except jwt.InvalidTokenError:
         return JsonResponse({'error': 'Invalid token'}, status=401)
-    print("we move on")
+
     # Get the user from the database
     user = get_user_by_id(user_id)
-    print("user: ",user)
+    print(user)
 
-    print("returning user: ",user)
+    print("usertype: ", type(user))
 
-    return JsonResponse({'username': user.username, 'email': user.email})
+    if type(user) != type(User): 
+        JsonResponse({'success': False, 'error': 'User does not exist'}, status=401)
+
+    return JsonResponse({'email': user.email, 'firstName': user.first_name, 'lastName': user.last_name, 'address': user.address, 'phone': user.phone})
 
 """
 Function to logout the user by clearing the token cookie and setting the auth_user cookie to False. 
 This function returns a JsonResponse object with the cookies set to expire immediately.
 The result is that the token is invalidated and the user cant access the dashboard until the user logs in again.
 """
+
 def logout(request):
-    # Create a response object
-    response = JsonResponse()
+    # Create a response object with an empty dictionary or a simple message
+    response = JsonResponse({'message': 'Logged out successfully'}, safe=False)
+    
     # Clear all cookies by setting their expiration time to a past date
     response.set_cookie('token', '', expires=0)
-    response.set_cookie('auth_user', False)
+    response.set_cookie('auth_user', '', expires=0)  # Set the value to an empty string instead of False for consistency
     
     return response
-
 """
 Function to login the user and set the token as a cookie in the response.
 This function returns a JsonResponse object with the token set as a cookie.
 The result is that the user can access the dashboard until the token expires.
 """
     
-def login(request, user=None):
+def login(request):
     # Check if the request method is POST
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST requests are allowed for login.'}, status=405)
     
     # Process the decrypted payload
     data = json.loads(request.body)
-    first_name = data.get('firstName')
-    last_name = data.get('lastName')
 
     # Encrypt the password
     key = Fernet.generate_key()
     fernet =  Fernet(key)
     encrypted_password = fernet.encrypt(data.get('password').encode())
 
-    print("data get pword type: ", type(data.get('password')))
-    print("email: ", data.get('username'))
     pword = fernet.decrypt(encrypted_password).decode()
-    print("pword: ", pword)
-    print("length: ", len(pword))
+    print(f"data.get.password: {data.get('password')}, data.get.username: {data.get('username')}")
     # Authenticate user
-    user = authenticate(request, username=data.get('username') ,password=pword)
+    user = authenticate(request, username=data.get('username'), password=data.get('password'))
     
-    print("pword:", fernet.decrypt(encrypted_password).decode())
-    print("pword len:", len(fernet.decrypt(encrypted_password).decode()))
     # Authentication successful
-    if user is not None:
+    if user:
         # Generate an access token
         secret_key = 'St3rkP@ssord' 
         token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
-        print("login token: ",token)
         
         # Set the token as a cookie in the response
         response = JsonResponse({'token': token, 'auth_user': True})
@@ -136,6 +125,7 @@ def register(request):
     data = json.loads(request.body)
     # get username and encrypt password and email.
 
+    print("phone: ", data.get('phoneNumber'))
     # Check if the email, password and username is empty
     if data.get('email') == '': 
         return JsonResponse({'error_email': 'Requires email to register an account'}, status=400)
@@ -145,9 +135,6 @@ def register(request):
         return JsonResponse({'error_password': 'Requires password to register an account'}, status=400)
     if data.get('username') == '':
         return JsonResponse({'error_username': 'Requires username to register an account'}, status=400)
-
-    first_name = data.get('firstName')
-    last_name = data.get('lastName')
 
     # Encrypt the password 
     key = Fernet.generate_key()
@@ -175,11 +162,16 @@ def register(request):
         return JsonResponse({'error': 'Email already exists'}, status=400)
     
     username = fernet.decrypt(enc_email).decode()
+    print(data.get('phone'))
     # Create a new user
-    print("pword: ", fernet.decrypt(encrypted_password1).decode())
-    user = User.objects.create_user(username=fernet.decrypt(enc_email).decode(), email=fernet.decrypt(enc_email).decode(), password=fernet.decrypt(encrypted_password1).decode())
-    print("user pword: ", user.password)
-
+    user = User.objects.create_user(username= fernet.decrypt(enc_email).decode(), 
+                                    email= fernet.decrypt(enc_email).decode(), 
+                                    password= fernet.decrypt(encrypted_password1).decode(),
+                                    first_name= data.get('firstName'),
+                                    last_name= data.get('lastName'),
+                                    address= data.get('address'),
+                                    phone=data.get('phone')
+                                    )
 
     # Create cookie token to direct user to dashboard
     if user is not None:
