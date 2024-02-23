@@ -3,6 +3,7 @@ from .models import Item
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.core.serializers import serialize
 import re
+import json
 
 
 def get_user_by_id(user_id):
@@ -66,19 +67,34 @@ def search_items(request):
     data = serialize('json', items)
     return JsonResponse(data, safe=False)
 
-def create_item(request):
+def create_item(request, name, price_per_day, description, image, owner_id, location, category):
     """
     Create a new item with the info user has given
     """
-    if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'])
+
+    # Debugging
+    print(request)
+
+    # Get user input from Vue
     data = json.loads(request.body)
     name = data.get('name')
-    price = data.get('price')
     description = data.get('description')
+    availability = data.get('availability')
+    condition = data.get('condition')
+    price_per_day = data.get('price')
     image = data.get('image')
-    user_id = data.get('user_id')
-    user = get_user_by_id(user_id)
-    if user is None:
-        return JsonResponse({'error': 'User not found'}, status=404)
-    item = Item.objects.create(name=name, price=price, description=description, image=image, user=user)
+    location = data.get('location')
+    category = data.get('category')
+    owner_id = data.get('owner_id')
+    item = Item.objects.create(
+                                name, 
+                                description, 
+                                availability, 
+                                condition, 
+                                price_per_day, 
+                                image, 
+                                location, 
+                                category, 
+                                owner_id)
+    
+    return JsonResponse({'id': item.id})

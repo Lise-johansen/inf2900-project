@@ -1,43 +1,64 @@
 <template>
-  <div>
-    <h1>Create Listing</h1>
-    <form @submit.prevent="submitListing">
-      <label for="title">Title:</label>
-      <input type="text" id="title" v-model="title" required>
-      
-      <label for="description">Description:</label>
-      <textarea id="description" v-model="description" required></textarea>
-      
-      <label for="price">Price:</label>
-      <input type="number" id="price" v-model="price" required>
-      
-      <button type="submit">Submit</button>
-    </form>
-  </div>
+    <div>
+        <h1 class="title">Create Item</h1> <!-- Fixed syntax error here -->
+        <input type="text" v-model="title" placeholder="Title">
+        <input type="text" v-model="description" placeholder="Description">
+        <input type="text" v-model="price" placeholder="Price">
+        <input type="text" v-model="location" placeholder="Location">
+    </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
-  data() {
-    return {
-      title: '',
-      description: '',
-      price: 0
-    };
-  },
-  methods: {
-    submitListing() {
-      // Here you can handle the submission logic, e.g., send the data to a server
-      console.log('Submitted listing:', {
-        title: this.title,
-        description: this.description,
-        price: this.price
-      });
+    data() {
+        return {
+            title: '',
+            description: '',
+            price_per_day: '',
+            location: '',
+            availability: true,
+            image: '',
+            owner_id: '',
+            condition:'',
+            category: '',
+            location: '',
+        }
+
+    },
+    methods:
+    {
+        createItem() {
+            //
+            axios.post(`/api/create-item/`)
+                        .then(() => {
+                            // Handle successful deletion
+                            console.log("Item created successfully");
+                        })
+                        .catch(error => {
+                            // Handle error
+                            console.error("Error creating item:", error);
+                        });
+                }
+            }
     }
-  }
-};
 </script>
 
-<style scoped>
-/* Add your custom styles here */
+<style>
+    input[type="text"] {
+        font-family: 'louis_george_cafe', sans-serif;
+        font-size: 23px;
+        font-weight: bold;
+        background: linear-gradient(to right, #ff5733 0%, #ffa500 25%, #ffa500 50%, #4169e1 75%, #ff5733 100%);
+        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text;
+        background-clip: text;
+        width: 100%;
+        max-width: 400px; /* Adjust as needed */
+        padding: 1em .5em;
+        border: 1px solid #ccc;
+        border-radius: 99999999px;
+        box-sizing: border-box;
+    }
 </style>

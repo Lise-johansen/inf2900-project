@@ -11,7 +11,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 import json
 import jwt
-from airfinn.utils import get_user_by_id, email_checks, password_checks, search_items
+from airfinn.utils import get_user_by_id, email_checks, password_checks, search_items, create_item
 
 
 def index(request):
@@ -174,5 +174,25 @@ def logout(request):
     
     return response
 
-def create_item():
-    return JsonResponse({'message': 'Create a new listing'})
+def create_item_api(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    try:
+        data = json.loads(request.body)
+
+        name = data.get('name'),
+        price = data.get('price'),
+        description = data.get('description'),
+        availability = data.get('availability'),
+        condition = data.get('condition'),
+        image = data.get('image'),
+        category = data.get('category'),
+        owner_id = data.get('owner_id')
+
+        create_item(
+            name, price, description, availability, condition, image, category, owner_id
+        )
+        return JsonResponse({'message': 'Item created'})
+        
+    except json.decoder.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
