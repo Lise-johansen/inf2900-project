@@ -10,7 +10,7 @@
         </div>
         <!-- Last Name -->
         <div class="form-group">
-          <label for="last-name">Last Name:</label>
+          <label for="lastName">Last Name:</label>
           <input type="text" class="form-control" id="last-name" v-model="lastName">
         </div>
         <!-- Email -->
@@ -26,7 +26,7 @@
         <!-- Phone Number -->
         <div class="form-group">
           <label for="phone">Phone Number:</label>
-          <input type="tel" class="form-control" id="phone" v-model="phoneNumber">
+          <input type="text" class="form-control" id="phone" v-model="phoneNumber">
         </div>
         <!-- Password -->
         <div class="form-group">
@@ -54,6 +54,8 @@
           firstName: '',
           lastName: '',
           email: '',
+          address: '',
+          phone:'',
           password1: '',
           password2: '',
           password: '',
@@ -69,19 +71,22 @@
               return; // Exit the method early if passwords don't match
             }
             else 
-               this. password = this.password1
-            axiosInstance.post('register/', {
-              firstName: this.firstName,
-              lastName: this.lastName,
-              email: this.email,
-              password1: this.password1,
-              password2: this.password2
-              })
-              .then(response => {
+                this. password = this.password1
+                axiosInstance.post('register/', {
+                firstName: this.firstName,
+                lastName: this.lastName,
+                email: this.email,
+                address: this.address,
+                phone: this.phoneNumber,
+                password1: this.password1,
+                password2: this.password2
+            })
+            .then(response => {
                 this.$router.push('dashboard/');
                 console.log(response);
-              })
-              .catch(error =>  {
+            })
+            .catch(error =>  {
+                  alert(this.phoneNumber)
                   this.errorMessage = error.response.data.error;
             });  
           },
