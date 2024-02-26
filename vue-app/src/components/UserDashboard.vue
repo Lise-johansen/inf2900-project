@@ -5,14 +5,13 @@
     <!-- Display profile picture -->
     <img v-if="profilePicture" :src="profilePicture" alt="Profile Picture">
     
-    <p>First Name: {{ user.firstName }}</p>
-
     <!-- Display checkmark icon if user is verified -->
     <svg v-if="user.verified" class="verified-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <!-- Include SVG path for the checkmark icon -->
         <path fill="blue" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
     </svg>
     
+    <p>First Name: {{ user.firstName }}</p>
     <p>Last Name: {{ user.lastName }}</p>
     <p>Email: {{ user.email }}</p>
     <p>Address: {{ user.address }}</p>
