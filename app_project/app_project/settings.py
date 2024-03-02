@@ -36,7 +36,10 @@ FRONTEND_URL = 'https://django.dybedahlserver.net'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '129.151.210.152', '2900project.dybedahlserver.net', 'django.dybedahlserver.net']
+# Use HTTPS for secure connections
+SECURE_SSL_REDIRECT = True
+
+ALLOWED_HOSTS = ['django.dybedahlserver.net']
 
 USER_MODEL = 'airfinn.User'
 AUTH_USER_MODEL = 'airfinn.User'
@@ -68,7 +71,7 @@ MIDDLEWARE = [
 
 ]
 
-CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'http://localhost:8000', 'https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net']
+CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net']
 CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
 CORS_ALLOW_CREDENTIALS = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
