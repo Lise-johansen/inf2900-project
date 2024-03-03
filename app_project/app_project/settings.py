@@ -31,7 +31,7 @@ STATICFILES_DIRS = [
 SECRET_KEY = 'django-insecure-&@nmsdwxy*o!l1_r8p@t#&w4n@w3ljbeoqzq4t87q8accy=fdw'
 
 # Change the following to VUE app URL
-FRONTEND_URL = 'http://localhost:8080'
+FRONTEND_URL = 'https://django.dybedahlserver.net'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
