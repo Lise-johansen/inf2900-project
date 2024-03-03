@@ -54,11 +54,13 @@
                     condition: this.condition,
                     category: this.category,
                 
-                }, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                } 
+                // {
+                //     headers: {
+                //         'Content-Type': 'application/json'
+                //     }
+                // }
+                )
                     .then(() => {
                         // Handle successful creation
                         console.log('Item created successfully');

@@ -94,7 +94,8 @@ def create_item(title, price_per_day, description, availability, condition, imag
                                 price_per_day=price_per_day,
                                 images=image,
                                 location=location,
-                                category=category,
-                                owner_id=0)
+                                category=category
+                                # owner_id=0)
+    )
     
     return JsonResponse({'id': item.id})

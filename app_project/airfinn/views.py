@@ -178,7 +178,7 @@ def create_item_api(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode())
 
         title = data.get('title'),
         price_per_day = data.get('price_per_day'),
