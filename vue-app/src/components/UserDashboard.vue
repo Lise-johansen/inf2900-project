@@ -1,10 +1,16 @@
 <template>
-  <div class="user-dashboard">
+    <div class="user-dashboard">
     <input type="file" accept="image/*" @change="handleImageUpload">
     
     <!-- Display profile picture -->
     <img v-if="profilePicture" :src="profilePicture" alt="Profile Picture">
-
+    
+    <!-- Display checkmark icon if user is verified -->
+    <svg v-if="user.verified" class="verified-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        <!-- Include SVG path for the checkmark icon -->
+        <path fill="blue" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+    </svg>
+    
     <p>First Name: {{ user.firstName }}</p>
     <p>Last Name: {{ user.lastName }}</p>
     <p>Email: {{ user.email }}</p>
@@ -14,8 +20,7 @@
     <!-- Button to navigate to user's listings -->
     <router-link to="/listings" class="button-link">My Listings</router-link>
     <button @click="logout">Logout</button>
-
-  </div>
+    </div>
 </template>
 
 <script>
@@ -30,7 +35,8 @@ export default {
         email: '',
         phone: '',
         address: '',
-        profile_picture: ''
+        profile_picture: '',
+        verified: false,
       },
       profilePicture: null
     };
@@ -57,9 +63,6 @@ export default {
   }
 };
 </script>
-
-
-
 
   <style scoped>
 h3 {
@@ -88,5 +91,11 @@ a {
 }
 .button-link:hover {
     background-color: #0056b3;
+}
+.verified-icon {
+  width: 24px; /* Adjust size as needed */
+  height: 24px; /* Adjust size as needed */
+  fill: rgb(0, 197, 219); /* Change color as needed */
+  margin-left: 5px; /* Adjust margin as needed */
 }
 </style> 
