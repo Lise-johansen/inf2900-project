@@ -11,22 +11,38 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from datetime import timedelta
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+# Add the directory containing Vue.js static files to STATICFILES_DIRS
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "../../Team11/vue-app/dist"),  # Adjust the path as needed
+]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-&@nmsdwxy*o!l1_r8p@t#&w4n@w3ljbeoqzq4t87q8accy=fdw'
 
+# Change the following to VUE app URL
+FRONTEND_URL = 'https://django.dybedahlserver.net'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '129.151.210.152', '2900project.dybedahlserver.net', 'django.dybedahlserver.net']
+# Use HTTPS for secure connections
+SECURE_SSL_REDIRECT = True
 
+ALLOWED_HOSTS = ['django.dybedahlserver.net']
+
+USER_MODEL = 'airfinn.User'
+AUTH_USER_MODEL = 'airfinn.User'
 
 # Application definition
 
@@ -37,8 +53,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'airfinn',
-    
+    'airfinn.apps.AirfinnConfig',
+    'corsheaders',
     # Django SSL extension
     'django_extensions',
 ]
@@ -47,10 +63,33 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # CORS middleware
+    # Other middleware classes...
+
+]
+
+CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net']
+CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
+CORS_ALLOW_CREDENTIALS = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+SIMPLE_JWT = {
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),  # Example: Refresh token expires after 1 day
+    'ROTATE_REFRESH_TOKENS': True,
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default Django authentication backend
+    # Add any additional authentication backends as needed
 ]
 
 ROOT_URLCONF = 'app_project.urls'
@@ -58,7 +97,7 @@ ROOT_URLCONF = 'app_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,7 +122,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'St3rkP@ss0rd',
-        'HOST': '10.0.0.194',
+        'HOST': '129.151.210.152',
         'PORT': '5432',
     }
 }
@@ -129,3 +168,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email server for SMTP
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.zeptomail.eu'  # Your Zoho Mail SMTP server address
+EMAIL_PORT = 465  # Zoho Mail SMTP port for SSL
+EMAIL_USE_SSL = True  # Use SSL/TLS for secure connection
+EMAIL_USE_TLS = False  # No need for TLS if using SSL
+EMAIL_HOST_USER = 'emailapikey'  # Your Zoho Mail API key as the username
+EMAIL_HOST_PASSWORD = 'yA6KbHsMugT+kDpWQ0hs1ZWNoo40qqAwjXm+sX/kdJYuKNnn26E71BJkdNTvJzWLitfX56oDbY5AL4C9vYoLfJZiZ9YEL5TGTuv4P2uV48xh8ciEYNYkgZigCrAVFa9MeBoiDSw2QfgoWA=='  # Your Zoho Mail Send Mail Token 1 as the password
+DEFAULT_FROM_EMAIL = 'dybedahlserver.net'  # Your domain/sender address
