@@ -16,6 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from airfinn import views
+from airfinn import utils
+
+
 from django.urls import path, include  # Ensure include is imported
 from django.conf.urls.static import static
 from django.conf import settings
@@ -26,9 +29,12 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('api/login/', views.login, name='login'),
     path('api/register/', views.register, name='register'),
-    path('api/send-password-reset-email/',
-         views.send_password_reset_email, name='send_password_reset_email'),
+    path('api/send-password-reset-email/', views.send_password_reset_email, name='send_password_reset_email'),
+    path('api/reset-password/<str:uidb64>/<str:token>/', views.reset_password, name='reset_password'),
     path('api/dashboard/', views.dashboard, name='dashboard'),
     path('api/search/', views.search_items, name='search_items'),
     path('api/logout/', views.logout, name='logout'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('api/upload-profile-picture/', utils.upload_profile_picture, name='upload_profile_picture'),
+    path('api/verify-email/', views.verify_email, name='verify_email'),
+]
+
