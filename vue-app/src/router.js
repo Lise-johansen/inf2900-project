@@ -6,6 +6,7 @@ import PasswordReset from './components/PasswordReset.vue'; // Import Password R
 import UserDashboard from './components/UserDashboard.vue';
 import IndexPath from './components/IndexPath.vue';
 // import LogoutScript from './components/LogoutScript.vue';
+import CreateItem from './components/CreateItem.vue';
 
 const routes = [
   {
@@ -34,6 +35,11 @@ const routes = [
     component: UserDashboard,
     meta: { requiresAuth: false }, // Add this if authentication is required
   },
+  {
+    path: '/create-listing',
+    name: 'create-listing',
+    component: CreateItem
+  }
   // Other routes
 ];
 

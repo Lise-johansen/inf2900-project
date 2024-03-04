@@ -1,47 +1,76 @@
 <template>
     <div>
-        <h1 class="title">Create Item</h1> <!-- Fixed syntax error here -->
+        <h1 class="title">Create Item</h1>
         <input type="text" v-model="title" placeholder="Title">
         <input type="text" v-model="description" placeholder="Description">
-        <input type="text" v-model="price" placeholder="Price">
+        <input type="text" v-model="price_per_day" placeholder="Price">
         <input type="text" v-model="location" placeholder="Location">
+    </div>
+    <div>
+        <button @click="createItem">Create Item</button>
     </div>
 </template>
 
 <script>
-import axios from 'axios';
+    import axios from 'axios';
 
-export default {
-    data() {
-        return {
-            title: '',
-            description: '',
-            price_per_day: '',
-            location: '',
-            availability: true,
-            image: '',
-            owner_id: '',
-            condition:'',
-            category: '',
-            location: '',
-        }
-
-    },
-    methods:
-    {
-        createItem() {
-            //
-            axios.post(`/api/create-item/`)
-                        .then(() => {
-                            // Handle successful deletion
-                            console.log("Item created successfully");
-                        })
-                        .catch(error => {
-                            // Handle error
-                            console.error("Error creating item:", error);
-                        });
-                }
+    export default {
+        data() {
+            return {
+                title: '',
+                description: '',
+                price_per_day: '',
+                location: '',
+                availability: true,
+                image: '',
+                condition:'',
+                category: '',
+                owner_id: '',
             }
+        },
+        methods: {
+            createItem() {
+                // Create a new item
+                // const newItem = {
+                //     title: this.title,
+                //     description: this.description,
+                //     price_per_day: this.price_per_day,
+                //     location: this.location,
+                //     availability: this.availability,
+                //     image: this.image,
+                //     owner_id: this.owner_id,
+                //     condition: this.condition,
+                //     category: this.category,
+                // };
+
+                axios.post('/api/create-item/', {
+                    title: this.title,
+                    description: this.description,
+                    price_per_day: this.price_per_day,
+                    location: this.location,
+                    availability: this.availability,
+                    image: this.image,
+                    owner_id: this.owner_id,
+                    condition: this.condition,
+                    category: this.category,
+                
+                } 
+                // {
+                //     headers: {
+                //         'Content-Type': 'application/json'
+                //     }
+                // }
+                )
+                    .then(() => {
+                        // Handle successful creation
+                        console.log('Item created successfully');
+                    })
+                    .catch(error => {
+                        // Handle error
+                        console.error('Error creating item:', error);
+                    });
+            }
+        }
     }
 </script>
 
