@@ -314,3 +314,35 @@ def search_items(request):
         items = Item.objects.all()
     data = [{'id': item.id, 'name': item.name} for item in items]
     return JsonResponse(data, safe=False)
+
+def create_item_api(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    try:
+        data = json.loads(request.body.decode())
+
+        title = data.get('title'),
+        price_per_day = data.get('price_per_day'),
+        description = data.get('description'),
+        availability = data.get('availability'),
+        condition = data.get('condition'),
+        image = data.get('image'),
+        location = data.get('location'),
+        category = data.get('category'),
+        owner_id = data.get('owner_id')
+
+        item = Item.objects.create( name=title,
+                                    description=description,
+                                    availability=True,
+                                    condition=condition,
+                                    price_per_day=price_per_day,
+                                    images=image,
+                                    location=location,
+                                    category=category
+                                    # owner_id=0)
+        )
+        # return JsonResponse({'id': item.id})
+        return JsonResponse({'message': 'Item created'})
+        
+    except json.decoder.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
