@@ -1,11 +1,13 @@
-from django.contrib.auth.models import User
-from .models import Item
+
+from .models import Item, User
 from django.http import JsonResponse, HttpResponseNotAllowed
+from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers import serialize
 import re
-
+from django.contrib.auth import get_user_model
 
 def get_user_by_id(user_id):
+    User = get_user_model()  # Get the custom user model
     try:
         user = User.objects.get(id=user_id)
         return user
@@ -51,17 +53,16 @@ def password_checks(password):
 
     return True
 
-
-def search_items(request):
-    category = request.GET.get('category', '')
-    query = request.GET.get('q', '')
-
-    items = Item.objects.all()
-    if category:
-        items = items.filter(category=category)
-    if query:
-        items = items.filter(name__icontains=query)
-
-    # Serialize the queryset of items
-    data = serialize('json', items)
-    return JsonResponse(data, safe=False)
+def upload_profile_picture(request):
+    print('upload_profile_picture')
+    if request.method == 'POST' :
+        print('in if')
+        profile_picture = request.FILES['profilePicture']
+            
+        # Process the uploaded image here
+        # For example, you can save the image to a specific location or perform additional operations
+            
+        return JsonResponse({'message': 'Profile picture uploaded successfully'})
+    else:
+         print('in else')
+         return JsonResponse({'error': 'Failed to upload profile picture'}, status=400)
