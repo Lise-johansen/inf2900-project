@@ -14,6 +14,7 @@
 <script>
 	import SearchFilter from './SearchFilter.vue';
 	import SmallListing from './SmallListing.vue';
+	
 	export default {
 		name: 'App',
 		components: { SearchFilter, SmallListing },
@@ -31,7 +32,6 @@
 </script>
 
 <style scoped>
-
 	.headline {
 		font-family: 'louis_george_cafe', sans-serif;
 		text-align: center;
@@ -52,6 +52,13 @@
 
 	a {
 		color: #42b983;
+	}
+
+	@font-face {
+		font-family: 'louis_george_cafe';
+		src: url('@/assets/louis_george_cafe.ttf') format('truetype');
+		font-weight: normal;
+		font-style: normal;
 	}
 
 	@font-face {

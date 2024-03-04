@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import axios from 'axios'; // Import axios
+import axiosInstance from '@/axios';
 
 export default {
   data() {
@@ -27,10 +27,8 @@ export default {
   },
   methods: {
     login() {
-      console.log("Login method called");
-
       // Token and auth_user are not present, proceed with login
-      axios.post('http://localhost:8000/api/login/', {
+      axiosInstance.post('login/', {
         username: this.username,
         password: this.password
       })
@@ -47,8 +45,7 @@ export default {
     },
     redirectIfLoggedIn() {
       const token = this.getTokenFromCookies();
-      const authUser = this.getAuthUserFromCookies();
-      if (token && authUser && authUser.toLowerCase() === 'true') {
+      if (token != 'undefined') {
         this.$router.push('/dashboard');
       }
     },
@@ -62,16 +59,6 @@ export default {
       }
       return null; // Token not found in cookies
     },
-    getAuthUserFromCookies() {
-      const cookies = document.cookie.split('; ');
-      for (const cookie of cookies) {
-        const [name, value] = cookie.split('=');
-        if (name === 'auth_user') {
-          return value;
-        }
-      }
-      return null; // auth_user not found in cookies
-    }
   }
 };
 </script>

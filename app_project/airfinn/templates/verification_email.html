@@ -44,13 +44,13 @@
 <body>
     <div class="container">
         <div class="logo">
-            <img src="https://django.dybedahlserver.net/img/logo.fb06446f.png" alt="Rentopia Logo">
+            <img src="../../vue-app/src/assets/logo.png" alt="Rentopia Logo">
         </div>
         <div class="content">
             <p>Hello {{ username }},</p>
-            <p>You requested a password reset. Click the link below to reset your password:</p>
-            <p><a href="{{ reset_link }}" class="button">Reset Password</a></p>
-            <p>If you didn't request this, you can safely ignore this email.</p>
+            <p>You created an account at our website Rentopia. Click the link below to confirm your email:</p>
+            <p><a href="{{ verification_link }}" class="button">Confirm Email</a></p>
+            <p>If you didn't create an account, you should probably change password.</p>
             <p>Sincerely,<br>The Rentopia Team</p>
         </div>
     </div>
