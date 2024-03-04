@@ -11,7 +11,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 import json
 import jwt
-from airfinn.utils import get_user_by_id, email_checks, password_checks, search_items, create_item
+from airfinn.utils import get_user_by_id, email_checks, password_checks, search_items
+from airfinn.models import Item
 
 
 def index(request):
@@ -190,9 +191,17 @@ def create_item_api(request):
         category = data.get('category'),
         owner_id = data.get('owner_id')
 
-        create_item(
-            title, price_per_day[0], description, availability, condition, image, location, category, owner_id
+        item = Item.objects.create( name=title,
+                                    description=description,
+                                    availability=True,
+                                    condition=condition,
+                                    price_per_day=price_per_day,
+                                    images=image,
+                                    location=location,
+                                    category=category
+                                    # owner_id=0)
         )
+        # return JsonResponse({'id': item.id})
         return JsonResponse({'message': 'Item created'})
         
     except json.decoder.JSONDecodeError:
