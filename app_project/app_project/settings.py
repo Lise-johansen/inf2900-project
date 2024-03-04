@@ -15,14 +15,13 @@ import os
 from datetime import timedelta
 
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Add the directory containing Vue.js static files to STATICFILES_DIRS
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "../../Team11/vue-app/dist"),  # Adjust the path as needed
+    # Adjust the path as needed
+    os.path.join(BASE_DIR, "../../Team11/vue-app/dist"),
 ]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -66,7 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware', # CORS middleware
+    'corsheaders.middleware.CorsMiddleware',  # CORS middleware
     # Other middleware classes...
 
 ]
@@ -77,7 +76,8 @@ CORS_ALLOW_CREDENTIALS = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 SIMPLE_JWT = {
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),  # Example: Refresh token expires after 1 day
+    # Example: Refresh token expires after 1 day
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
     'ROTATE_REFRESH_TOKENS': True,
 }
 
@@ -88,7 +88,8 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',  # Default Django authentication backend
+    # Default Django authentication backend
+    'django.contrib.auth.backends.ModelBackend',
     # Add any additional authentication backends as needed
 ]
 
@@ -163,6 +164,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -176,5 +179,6 @@ EMAIL_PORT = 465  # Zoho Mail SMTP port for SSL
 EMAIL_USE_SSL = True  # Use SSL/TLS for secure connection
 EMAIL_USE_TLS = False  # No need for TLS if using SSL
 EMAIL_HOST_USER = 'emailapikey'  # Your Zoho Mail API key as the username
-EMAIL_HOST_PASSWORD = 'yA6KbHsMugT+kDpWQ0hs1ZWNoo40qqAwjXm+sX/kdJYuKNnn26E71BJkdNTvJzWLitfX56oDbY5AL4C9vYoLfJZiZ9YEL5TGTuv4P2uV48xh8ciEYNYkgZigCrAVFa9MeBoiDSw2QfgoWA=='  # Your Zoho Mail Send Mail Token 1 as the password
+# Your Zoho Mail Send Mail Token 1 as the password
+EMAIL_HOST_PASSWORD = 'yA6KbHsMugT+kDpWQ0hs1ZWNoo40qqAwjXm+sX/kdJYuKNnn26E71BJkdNTvJzWLitfX56oDbY5AL4C9vYoLfJZiZ9YEL5TGTuv4P2uV48xh8ciEYNYkgZigCrAVFa9MeBoiDSw2QfgoWA=='
 DEFAULT_FROM_EMAIL = 'dybedahlserver.net'  # Your domain/sender address
