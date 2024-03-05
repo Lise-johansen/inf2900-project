@@ -118,14 +118,22 @@ WSGI_APPLICATION = 'app_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
+
+    # Use the following configuration for PostgreSQL:
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'St3rkP@ss0rd',
-        'HOST': '129.151.210.152',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
+
+    # # Use the following configuration for local database with SQLite:
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / '../db.sqlite3',
+    # }
 }
 
 
