@@ -21,7 +21,6 @@ import jwt
 from airfinn.utils import get_user_by_id, email_checks, password_checks
 
 
-
 def index(request):
     return JsonResponse({'message': 'Welcome to Rentopia!'})
 
@@ -55,12 +54,12 @@ def dashboard(request):
 
     return JsonResponse({'email': user.email, 'firstName': user.first_name, 'lastName': user.last_name, 'address': user.address, 'phone': user.phone, 'verified': user.is_verified})
 
+
 """
 Function to logout the user by clearing the token cookie and setting the auth_user cookie to False. 
 This function returns a JsonResponse object with the cookies set to expire immediately.
 The result is that the token is invalidated and the user cant access the dashboard until the user logs in again.
 """
-
 def logout(request):
     # Create a response object with an empty dictionary or a simple message
     response = JsonResponse({'message': 'Logged out successfully'}, safe=False)
@@ -69,12 +68,13 @@ def logout(request):
     response.set_cookie('token', '', expires=0)
     
     return response
+
+
 """
 Function to login the user and set the token as a cookie in the response.
 This function returns a JsonResponse object with the token set as a cookie.
 The result is that the user can access the dashboard until the token expires.
 """
-    
 def login(request):
     # Check if the request method is POST
     if request.method != 'POST':
@@ -110,6 +110,7 @@ def login(request):
     else:
         # Authentication failed
         return JsonResponse({'success': False, 'error': 'Invalid Credentials'}, status=401)
+    
     
 """
 Function to register the user and set the token as a cookie in the response.
@@ -264,6 +265,7 @@ def send_password_reset_email(request):
         # Return a custom error message instead of raising a 404 error
         return JsonResponse({'error': 'User not found'}, status=400)
     
+    
 def reset_password(request, uidb64, token):
     if request.method == 'POST':
         # Decode uidb64 to get the user's ID
@@ -300,6 +302,7 @@ def reset_password(request, uidb64, token):
         # Only POST requests are allowed for password reset
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
     
+    
 def verify_email(request):    
     token = request.GET.get('token')
 
@@ -316,6 +319,7 @@ def verify_email(request):
         return JsonResponse({'message': 'Verification link has expired'}, status=400)
     except jwt.DecodeError:
         return JsonResponse({'message': 'Invalid verification token'}, status=400)
+ 
  
 def search_items(request):
     category = request.GET.get('category', '')

@@ -14,6 +14,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+
     def create_superuser(self, email, username, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -24,6 +25,7 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email, username, password, **extra_fields)
+
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
@@ -47,6 +49,7 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.username
+    
     
 class Item(models.Model):
     id = models.AutoField(primary_key=True)
