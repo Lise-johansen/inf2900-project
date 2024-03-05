@@ -33,6 +33,7 @@
         .then(() => {
           alert('Password reset successfully');
           // Optionally, redirect the user to another page
+          this.$router.push('/login');
         })
         .catch((error) => {
           if (error && error.response && error.response.data && error.response.data.error) {

@@ -20,7 +20,8 @@ from airfinn import utils
 
 
 from django.urls import path, include  # Ensure include is imported
-
+from django.conf.urls.static import static
+from django.conf import settings
 
 appname = 'app_project'
 urlpatterns = [
@@ -35,5 +36,4 @@ urlpatterns = [
     path('api/logout/', views.logout, name='logout'),
     path('api/upload-profile-picture/', utils.upload_profile_picture, name='upload_profile_picture'),
     path('api/verify-email/', views.verify_email, name='verify_email'),
-]
-
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

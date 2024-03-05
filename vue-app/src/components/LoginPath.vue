@@ -6,7 +6,6 @@
     <button @click="login">Login</button>
     <router-link to="/register" class="button-link">Don't have an account? Register</router-link>
     <router-link to="/reset" class="button-link">Reset Password</router-link>
-    <router-link to="/reset" class="button-link">Reset Password</router-link>
     <p v-if="errorMessage">{{ errorMessage }}</p>
   </div>
 </template>

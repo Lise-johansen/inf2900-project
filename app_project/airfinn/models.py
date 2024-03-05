@@ -49,4 +49,14 @@ class User(AbstractBaseUser):
         return self.username
     
 class Item(models.Model):
-    name = models.CharField(max_length = 100)
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, default='')
+    description = models.TextField(default='')
+    availability = models.BooleanField(default=True)
+    condition = models.CharField(max_length=100, default='')
+    price_per_day = models.FloatField(max_length=1000, default=0.0)
+    images = models.ImageField(
+        upload_to='images/', default='images/default.jpg')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default=None)
+    location = models.CharField(max_length=100, default='')
+    category = models.CharField(max_length=100, default='')
