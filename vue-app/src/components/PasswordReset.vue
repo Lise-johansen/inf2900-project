@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import axiosInstance from '@/axios';
+import axios from 'axios';
 
 export default {
     data() {
@@ -38,7 +38,7 @@ export default {
                 return;
             }
             this.isSubmitting = true;
-            axiosInstance.post('send-password-reset-email/', { 
+            axios.post('send-password-reset-email/', { 
                 email: this.email 
             })
             .then(() => {

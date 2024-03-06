@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import axiosInstance from '@/axios';
+import axios from 'axios';
 
 export default {
   data() {
@@ -43,7 +43,7 @@ export default {
   },
   methods: {
     logout() {
-      axiosInstance.get('logout/')
+      axios.get('logout/')
       .then(response => {
         document.cookie = `token=${response.data.token}`;
         document.cookie = `auth_user=${response.data.auth_user}`;
@@ -53,7 +53,7 @@ export default {
   },
   mounted() {
     // Fetch user data upon component mount
-    axiosInstance.get('dashboard/', { withCredentials: true })
+    axios.get('dashboard/')
       .then(response => {
         this.user = response.data;
       })
