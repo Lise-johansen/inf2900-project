@@ -75,7 +75,7 @@
             }
             else 
               this. password = this.password1
-              axiosInstance.post('register/', {
+              axios.post('register/', {
               firstName: this.firstName,
               lastName: this.lastName,
               email: this.email,
