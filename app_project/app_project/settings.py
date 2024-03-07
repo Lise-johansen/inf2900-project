@@ -30,15 +30,15 @@ STATICFILES_DIRS = [
 SECRET_KEY = 'django-insecure-&@nmsdwxy*o!l1_r8p@t#&w4n@w3ljbeoqzq4t87q8accy=fdw'
 
 # Change the following to VUE app URL
-FRONTEND_URL = 'https://django.dybedahlserver.net'
+FRONTEND_URL = 'http://localhost:8080'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # Use HTTPS for secure connections
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 
-ALLOWED_HOSTS = ['django.dybedahlserver.net']
+ALLOWED_HOSTS = ['django.dybedahlserver.net', 'localhost']
 
 USER_MODEL = 'airfinn.User'
 AUTH_USER_MODEL = 'airfinn.User'
@@ -119,21 +119,21 @@ WSGI_APPLICATION = 'app_project.wsgi.application'
 
 DATABASES = {
 
-    # Use the following configuration for PostgreSQL:
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'St3rkP@ss0rd',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-
-    # # Use the following configuration for local database with SQLite:
+    # # Use the following configuration for PostgreSQL:
     # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / '../db.sqlite3',
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'postgres',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'St3rkP@ss0rd',
+    #     'HOST': 'localhost',
+    #     'PORT': '5432',
     # }
+
+    # Use the following configuration for local database with SQLite:
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / '../db.sqlite3',
+    }
 }
 
 
