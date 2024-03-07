@@ -14,7 +14,7 @@
 
 <script>
     import { ref } from 'vue';
-    import axiosInstance from '@/axios';
+    import axios from 'axios';
     
     export default {
         setup() {
