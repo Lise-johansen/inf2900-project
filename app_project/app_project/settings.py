@@ -30,13 +30,13 @@ STATICFILES_DIRS = [
 SECRET_KEY = 'django-insecure-&@nmsdwxy*o!l1_r8p@t#&w4n@w3ljbeoqzq4t87q8accy=fdw'
 
 # Change the following to VUE app URL
-FRONTEND_URL = 'http://localhost:8080'
+FRONTEND_URL = 'https://django.dybedahlserver.net'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # Use HTTPS for secure connections
-SECURE_SSL_REDIRECT = False
+SECURE_SSL_REDIRECT = True
 
 ALLOWED_HOSTS = ['django.dybedahlserver.net', 'localhost']
 
@@ -70,8 +70,7 @@ MIDDLEWARE = [
 
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net']
+CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net']
 CORS_ALLOW_ALL_ORIGINS = True  # CORS middleware
 CORS_ALLOW_CREDENTIALS = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -83,8 +82,7 @@ SIMPLE_JWT = {
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    'DEFAULT_AUTHENTICATION_CLASSES': [ 'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
 
