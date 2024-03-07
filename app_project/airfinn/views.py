@@ -34,10 +34,8 @@ def dashboard(request):
 
     # Pull token from request cookies and decode it to get the user info
     token = request.COOKIES.get('token')
-    # Decode the token
-    secret_key = 'St3rkP@ssord'
     try:
-        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
         user_id = payload['user_id']
     except jwt.ExpiredSignatureError:
         return JsonResponse({'error': 'Token has expired'}, status=401)
@@ -95,9 +93,7 @@ def login(request):
     
     # Authentication successful
     if user:
-        # Generate an access token
-        secret_key = 'St3rkP@ssord'
-        token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
+        token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256')
 
         # Set the token as a cookie in the response
         response = JsonResponse({'token': token})
@@ -126,7 +122,6 @@ def register(request):
     # Get JSON data from the request body
     data = json.loads(request.body)
     # get username and encrypt password and email.
-
 
     # Check if the email, password and username is empty
     if data.get('email') == '': 
@@ -185,8 +180,7 @@ def register(request):
     if user is not None:
         # Authentication successful
         # Generate an access token
-        secret_key = 'St3rkP@ssord'
-        token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
+        token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256')
 
         # Set the token as a cookie in the response
         response = JsonResponse({'token': token})
@@ -287,9 +281,7 @@ def reset_password(request, uidb64, token):
                 # Log the user in after password reset
                 user = authenticate(request, username=user.username, password=form.cleaned_data['new_password1'])
                 
-                # Generate an access token
-                secret_key = 'St3rkP@ssord'  # Replace with your secret key
-                access_token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
+                access_token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256')
                 
                 return JsonResponse({'message': 'Password reset successfully', 'token': access_token})
             else:
