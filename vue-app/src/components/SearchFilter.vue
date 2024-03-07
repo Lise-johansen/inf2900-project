@@ -27,7 +27,8 @@
 
             const fetchData = async () => {
                 try {
-                    const response = await axiosInstance.get('search/', {
+                    // Maybe update the API endpoint URL , idk if this is the correct endpoint.
+                    const response = await axios.get('search/', {
                         params: { q: searchTerm.value }
                     });
                     filteredItems.value = JSON.parse(response.data)

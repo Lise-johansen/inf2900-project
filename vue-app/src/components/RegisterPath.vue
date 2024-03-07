@@ -49,7 +49,7 @@
   
   <script>
   
-  import axiosInstance from '@/axios';
+  import axios from 'axios';
   
   export default {
     data() {

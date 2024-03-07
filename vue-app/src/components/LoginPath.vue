@@ -1,8 +1,10 @@
 <template>
   <div>
-    <input type="text" v-model="username" placeholder="Username">
-    <input type="password" v-model="password" placeholder="Password">
-
+    <form>
+      <input type="text" v-model="username" placeholder="Username">
+      <input type="password" v-model="password" placeholder="Password">
+    </form>
+    
     <button @click="login">Login</button>
     <router-link to="/register" class="button-link">Don't have an account? Register</router-link>
     <router-link to="/reset" class="button-link">Reset Password</router-link>
@@ -11,7 +13,7 @@
 </template>
 
 <script>
-import axiosInstance from '@/axios';
+import axios from 'axios';
 
 export default {
   data() {
@@ -28,19 +30,24 @@ export default {
   methods: {
     login() {
       // Token and auth_user are not present, proceed with login
-      axiosInstance.post('login/', {
+      axios.post('login/', {
         username: this.username,
         password: this.password
       })
       .then(response => {
         document.cookie = `token=${response.data.token}`;
         document.cookie = `auth_user=${response.data.auth_user}`;
+        // emit login event
+        this.$emit('login');
         this.$router.push('/dashboard');
       })
       .catch(error => {
-        console.log("Login failed!");
         this.errorMessage = 'Invalid username or password';
-        console.error('There was an error!', error);
+        // Log the error to the console if not in test mode
+        if (process.env.NODE_ENV !== 'test') {
+          console.log("Login failed!");
+          console.error(error);
+        }
       });
     },
     redirectIfLoggedIn() {
