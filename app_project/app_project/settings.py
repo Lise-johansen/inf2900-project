@@ -182,6 +182,3 @@ EMAIL_HOST_USER = 'emailapikey'  # Your Zoho Mail API key as the username
 # Your Zoho Mail Send Mail Token 1 as the password
 EMAIL_HOST_PASSWORD = 'yA6KbHsMugT+kDpWQ0hs1ZWNoo40qqAwjXm+sX/kdJYuKNnn26E71BJkdNTvJzWLitfX56oDbY5AL4C9vYoLfJZiZ9YEL5TGTuv4P2uV48xh8ciEYNYkgZigCrAVFa9MeBoiDSw2QfgoWA=='
 DEFAULT_FROM_EMAIL = 'dybedahlserver.net'  # Your domain/sender address
-
-
-# Trying to add 
