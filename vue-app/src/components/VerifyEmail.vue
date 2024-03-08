@@ -7,7 +7,7 @@
   </template>
   
   <script>
-  import axiosInstance from '@/axios';
+  import axios from 'axios';
   
   export default {
     data() {
@@ -22,7 +22,7 @@
     methods: {
       verifyEmail() {
         const token = this.$route.query.token; // Get token from URL parameters
-        axiosInstance.get(`verify-email/?token=${token}`)
+        axios.get(`verify-email/?token=${token}`)
           .then(response => {
             console.log(response);
             this.verificationSuccess = true; // Set verification success flag

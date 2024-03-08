@@ -40,13 +40,16 @@
         </div>
         <!-- Submit Button -->
         <button @click="register">Register</button>
+        <div v-if="errorMessage" class="errorMessage">
+          Error: {{ errorMessage }}
+        </div>
       </form>
     </div>
   </template>
   
   <script>
   
-  import axiosInstance from '@/axios';
+  import axios from 'axios';
   
   export default {
     data() {
@@ -71,23 +74,23 @@
               return; // Exit the method early if passwords don't match
             }
             else 
-                this. password = this.password1
-                axiosInstance.post('register/', {
-                firstName: this.firstName,
-                lastName: this.lastName,
-                email: this.email,
-                address: this.address,
-                phone: this.phoneNumber,
-                password1: this.password1,
-                password2: this.password2
+              this. password = this.password1
+              axios.post('register/', {
+              firstName: this.firstName,
+              lastName: this.lastName,
+              email: this.email,
+              address: this.address,
+              phone: this.phoneNumber,
+              password1: this.password1,
+              password2: this.password2,
+              errorMessage: this.errorMessage
             })
             .then(response => {
-                this.$router.push('dashboard/');
-                console.log(response);
+              this.$router.push('dashboard/');
+              console.log(response);
             })
             .catch(error =>  {
-                  alert(this.phoneNumber)
-                  this.errorMessage = error.response.data.error;
+              this.errorMessage = error.response.data.error;
             });  
           },
       },
