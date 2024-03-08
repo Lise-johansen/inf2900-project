@@ -8,12 +8,12 @@
             <div v-if="!loading && filteredItems.length > 0" class="results-container">
                 <ul class="search-results">
                     <!-- Loop through each unique category -->
-                    <li v-for="category in uniqueCategories" :key="category" class="category-item">
+                    <li v-for="category in uniqueCategories" :key="category" class="item-category">
                         <!-- Display the category name -->
                         <div class="category-name">{{ category }}</div>
                         <!-- Display the items under this category -->
                         <ul class="category-items">
-                            <li v-for="item in filteredItemsByCategory(category)" :key="item.pk" class="search-result">
+                            <li v-for="item in filteredItemsByCategory(category)" :key="item.pk" class="item-name">
                                 <!-- Display the item name as a clickable link -->
                                 <router-link :to="'/listings/' + item.pk" class="item-link">
                                     {{ item.fields.name }}
@@ -28,7 +28,6 @@
         </div>
     </div>
 </template>
-
 
 <script>
     import { ref, computed } from 'vue';
@@ -136,14 +135,25 @@
         font-family: 'louis_george_cafe', sans-serif;
         font-weight: bold;
         font-size: 16px;
+        list-style: none;
+        padding-bottom: 5px;
+        padding-top: 5px;
+        margin-right: 40px;
     }
 
     .item-category {
         font-family: 'louis_george_cafe', sans-serif;
         font-style: bold; 
-        font-size: 16px;
-        margin-left: 10px;
+        font-size: 18px;
+        list-style: none;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border-bottom: 2px dashed #ebe0e0;
+        width: 100%;
+    }
 
+    .item-category:last-child {
+        border-bottom: none;
     }
 </style>
 
