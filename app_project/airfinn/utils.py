@@ -76,3 +76,4 @@ def upload_profile_picture(request):
     else:
          print('in else')
          return JsonResponse({'error': 'Failed to upload profile picture'}, status=400)
+    

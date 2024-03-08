@@ -24,6 +24,24 @@ from airfinn.utils import get_user_by_id, email_checks, password_checks
 def index(request):
     return JsonResponse({'message': 'Welcome to Airfinn!'})
 
+def get_user_id_for_token_auth(request):
+    """
+    Pull the token from the request cookies and decode it to get the user info from the database. 
+    Return a JsonResponse object with the user id. 
+    """
+    # Pull token from request cookies and decode it to get the user info
+    token = request.COOKIES.get('token')
+    # Decode the token
+    secret_key = 'St3rkP@ssord'
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+        return user_id
+    
+    except Exception as e:
+        return None
+
+
 """
 Pull the token from the request cookies and decode it to get the user info from the database. 
 Return a JsonResponse object with the user info. 
@@ -313,3 +331,23 @@ def search_items(request):
         items = Item.objects.all()
     data = [{'id': item.id, 'name': item.name} for item in items]
     return JsonResponse(data, safe=False)
+
+def delete_listing(request, item_id):
+    """
+    Function to delete an existing listing
+    ID is the primary key of the item.
+    """
+    try:
+        if request.method != 'DELETE':
+            return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+        
+        item = Item.objects.get(id=item_id)
+        # user_token_id = get_user_id_for_token_auth(request)
+
+                    
+        item.delete()
+        return JsonResponse({'message': 'Listing deleted successfully'}, status = 200)
+    
+    
+    except Item.DoesNotExist:
+        return JsonResponse({'error': 'Item does not exist'}, status=404)

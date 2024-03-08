@@ -35,5 +35,6 @@ urlpatterns = [
     path('api/logout/', views.logout, name='logout'),
     path('api/upload-profile-picture/', utils.upload_profile_picture, name='upload_profile_picture'),
     path('api/verify-email/', views.verify_email, name='verify_email'),
+    path('api/delete_item/<int:item_id>', views.delete_listing, name='delete_listing'),
 ]
 
