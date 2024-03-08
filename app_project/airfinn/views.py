@@ -315,22 +315,27 @@ def search_items(request):
     data = [{'id': item.id, 'name': item.name} for item in items]
     return JsonResponse(data, safe=False)
 
-def create_item_api(request):
+def create_item(request):
+    # Check if the request method is POST
     if request.method != 'POST':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
     try:
+        # Load the JSON data from the request body
         data = json.loads(request.body.decode())
 
-        title = data.get('title'),
-        price_per_day = data.get('price_per_day'),
-        description = data.get('description'),
-        availability = data.get('availability'),
-        condition = data.get('condition'),
-        image = data.get('image'),
-        location = data.get('location'),
-        category = data.get('category'),
+
+        # Get the data from the request body
+        title = data.get('title')
+        price_per_day = data.get('price_per_day')
+        description = data.get('description')
+        availability = data.get('availability')
+        condition = data.get('condition')
+        image = data.get('image')
+        location = data.get('location')
+        category = data.get('category')
         owner_id = data.get('owner_id')
 
+        # Create a new item
         item = Item.objects.create( name=title,
                                     description=description,
                                     availability=True,
@@ -344,5 +349,6 @@ def create_item_api(request):
         # return JsonResponse({'id': item.id})
         return JsonResponse({'message': 'Item created'})
         
+    # Handle invalid JSON
     except json.decoder.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)

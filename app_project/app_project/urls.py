@@ -35,5 +35,5 @@ urlpatterns = [
     path('api/logout/', views.logout, name='logout'),
     path('api/upload-profile-picture/', utils.upload_profile_picture, name='upload_profile_picture'),
     path('api/verify-email/', views.verify_email, name='verify_email'),
-    path('api/create-item/', views.create_item_api, name='create_item'),
+    path('api/create-item/', views.create_item, name='create_item'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

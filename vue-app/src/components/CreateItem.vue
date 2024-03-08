@@ -43,6 +43,7 @@
                 //     category: this.category,
                 // };
 
+                // Send a POST request
                 axios.post('/api/create-item/', {
                     title: this.title,
                     description: this.description,
