@@ -7,7 +7,7 @@
 </template>
   
 <script>
-  import axiosInstance from '@/axios';
+  import axios from 'axios';
   
   export default {
     data() {
@@ -26,7 +26,7 @@
         const uidb64 = this.$route.params.uidb64;
         const token = this.$route.params.token;
 
-        axiosInstance.post(`reset-password/${uidb64}/${token}/`, {
+        axios.post(`reset-password/${uidb64}/${token}/`, {
           new_password1: this.password, // Ensure both new_password1 and new_password2 are provided
           new_password2: this.confirmPassword
         })
