@@ -35,13 +35,8 @@ FRONTEND_URL = 'https://django.dybedahlserver.net'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-<<<<<<< HEAD
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '129.151.210.152',
-                 '2900project.dybedahlserver.net', 'django.dybedahlserver.net']
-=======
 # Use HTTPS for secure connections
 SECURE_SSL_REDIRECT = True
->>>>>>> main
 
 ALLOWED_HOSTS = ['django.dybedahlserver.net']
 
@@ -75,13 +70,8 @@ MIDDLEWARE = [
 
 ]
 
-<<<<<<< HEAD
-CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'http://localhost:8000']
-CORS_ALLOW_ALL_ORIGINS = True  # CORS middleware
-=======
 CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net']
 CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
->>>>>>> main
 CORS_ALLOW_CREDENTIALS = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -129,12 +119,15 @@ WSGI_APPLICATION = 'app_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'St3rkP@ss0rd',
-        'HOST': '129.151.210.152',
-        'PORT': '5432',
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        # 'NAME': 'postgres',
+        # 'USchER': 'postgres',
+        # 'PASSWORD': 'St3rkP@ss0rd',
+        # 'HOST': '129.151.210.152',
+        # 'PORT': '5432',
+
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / '../db.sqlite3',
     }
 }
 
@@ -192,3 +185,6 @@ EMAIL_HOST_USER = 'emailapikey'  # Your Zoho Mail API key as the username
 # Your Zoho Mail Send Mail Token 1 as the password
 EMAIL_HOST_PASSWORD = 'yA6KbHsMugT+kDpWQ0hs1ZWNoo40qqAwjXm+sX/kdJYuKNnn26E71BJkdNTvJzWLitfX56oDbY5AL4C9vYoLfJZiZ9YEL5TGTuv4P2uV48xh8ciEYNYkgZigCrAVFa9MeBoiDSw2QfgoWA=='
 DEFAULT_FROM_EMAIL = 'dybedahlserver.net'  # Your domain/sender address
+
+
+# Trying to add 
