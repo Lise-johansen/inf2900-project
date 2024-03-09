@@ -2,17 +2,17 @@
     <div>
         <input type="text" v-model="searchTerm" @input="handleSearchChange" placeholder="Search here!" class="search-input" style="padding: 0.5em 0.5em;">
         <div v-if="searchTerm.length === 0">
-            <!-- Just so that the no result text doesnt show up before user have written anything. -->
+            <!-- Just so that the no result text doesn't show up before the user has written anything. -->
         </div>
         <div v-else>
             <div v-if="!loading && filteredItems.length > 0" class="results-container">
+                <!-- Loop through each unique category -->
                 <ul class="search-results">
-                    <!-- Loop through each unique category -->
-                    <li v-for="category in uniqueCategories" :key="category" class="item-category">
+                    <li v-for="category in uniqueCategories" :key="category">
                         <!-- Display the category name -->
-                        <div class="category-name">{{ category }}</div>
+                        <div class="item-category">{{ category }}</div>
                         <!-- Display the items under this category -->
-                        <ul class="category-items">
+                        <ul class="item-name">
                             <li v-for="item in filteredItemsByCategory(category)" :key="item.pk" class="item-name">
                                 <!-- Display the item name as a clickable link -->
                                 <router-link :to="'/listings/' + item.pk" class="item-link">
@@ -28,6 +28,7 @@
         </div>
     </div>
 </template>
+
 
 <script>
     import { ref, computed } from 'vue';
@@ -121,7 +122,6 @@
         font-style: italic;
     }
 
-    
     .no-results {
         font-family: 'louis_george_cafe', sans-serif;
         font-size: 20px;
@@ -135,21 +135,21 @@
         font-family: 'louis_george_cafe', sans-serif;
         font-weight: bold;
         font-size: 16px;
-        list-style: none;
         padding-bottom: 5px;
         padding-top: 5px;
-        margin-right: 40px;
     }
 
     .item-category {
         font-family: 'louis_george_cafe', sans-serif;
         font-style: bold; 
         font-size: 18px;
-        list-style: none;
         padding-top: 5px;
         padding-bottom: 5px;
         border-bottom: 2px dashed #ebe0e0;
-        width: 100%;
+        text-align: left; /* Align text to the left */
+        margin-left: 0; /* Remove any left margin */
+        padding-left: 0; /* Remove any left padding */
+        box-sizing: border-box; /* Ensure padding and border are included in width */
     }
 
     .item-category:last-child {
