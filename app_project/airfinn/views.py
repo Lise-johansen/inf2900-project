@@ -367,7 +367,6 @@ def edit_listing(request, item_id):
             item.price_per_day = data.get('price_per_day', item.price_per_day)
             item.location = data.get('location', item.location)
             item.category = data.get('category', item.category)
-            item.owner = data.get('owner_id', item.owner) 
             # Save the changes to the item
             item.save()
 
