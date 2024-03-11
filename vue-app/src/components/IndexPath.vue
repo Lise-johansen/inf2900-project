@@ -7,7 +7,6 @@
 	<div>
 		<h1 class="headline">Find your next rental below:</h1>
 		<search-filter @filter="applyFilter" />
-		<h1></h1>
 		<SmallListing v-for="item in filteredItems" :key="item.id" :imageUrl="item.imageUrl" :title="item.title" :location="item.location" />
 	</div>
 </template>
@@ -15,7 +14,7 @@
 <script>
 	import SearchFilter from './SearchFilter.vue';
 	import SmallListing from './SmallListing.vue';
-	
+
 	export default {
 		name: 'App',
 		components: { SearchFilter, SmallListing },
@@ -33,7 +32,6 @@
 </script>
 
 <style scoped>
-
 	.headline {
 		font-family: 'louis_george_cafe', sans-serif;
 		text-align: center;
@@ -41,7 +39,7 @@
 		-webkit-text-fill-color: transparent;
 		-webkit-background-clip: text;
 	}
-	
+
 	ul {
 		list-style-type: none;
 		padding: 0;
@@ -63,24 +61,12 @@
 		font-style: normal;
 	}
 
-
-        h3 {
-        margin: 40px 0 0;
-        }
-        
-        ul {
-        list-style-type: none;
-        padding: 0;
-        }
-        
-        li {
-        display: inline-block;
-        margin: 0 10px;
-        }
-        
-        a {
-        color: #42b983;
-        }
+	@font-face {
+		font-family: 'louis_george_cafe';
+		src: url('@/assets/louis_george_cafe.ttf') format('truetype');
+		font-weight: normal;
+		font-style: normal;
+	}
 
 </style>
 

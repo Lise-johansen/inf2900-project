@@ -15,6 +15,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
+from django.core.serializers import serialize
 import json
 import jwt
 from airfinn.utils import get_user_by_id, email_checks, password_checks
@@ -23,6 +24,7 @@ from airfinn.utils import get_user_by_id, email_checks, password_checks
 
 def index(request):
     return JsonResponse({'message': 'Welcome to Rentopia!'})
+
 
 """
 Pull the token from the request cookies and decode it to get the user info from the database. 
@@ -77,13 +79,13 @@ def login(request):
     # Check if the request method is POST
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST requests are allowed for login.'}, status=405)
-    
+
     # Process the decrypted payload
     data = json.loads(request.body)
 
     # Encrypt the password
     key = Fernet.generate_key()
-    fernet =  Fernet(key)
+    fernet = Fernet(key)
     encrypted_password = fernet.encrypt(data.get('password').encode())
 
     pword = fernet.decrypt(encrypted_password).decode()
@@ -94,9 +96,9 @@ def login(request):
     # Authentication successful
     if user:
         # Generate an access token
-        secret_key = 'St3rkP@ssord' 
+        secret_key = 'St3rkP@ssord'
         token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
-        
+
         # Set the token as a cookie in the response
         response = JsonResponse({'token': token})
         # Set the auth_user cookie to True    
@@ -104,7 +106,7 @@ def login(request):
 
         # Return the response
         return response
-    
+
     else:
         # Authentication failed
         return JsonResponse({'success': False, 'error': 'Invalid Credentials'}, status=401)
@@ -124,19 +126,27 @@ def register(request):
     data = json.loads(request.body)
     # get username and encrypt password and email.
 
+
     # Check if the email, password and username is empty
     if data.get('email') == '': 
-        return JsonResponse({'error_email': 'Requires email to register an account'}, status=400)
+        return JsonResponse({'error': 'Requires email to register an account'}, status= 400)
     if data.get('password1') == '':
-        return JsonResponse({'error_password': 'Requires password to register an account'}, status=400)
+        return JsonResponse({'error': 'Requires password to register an account'}, status= 400)
     if data.get('password2') == '':
-        return JsonResponse({'error_password': 'Requires password to register an account'}, status=400)
-    if data.get('username') == '':
-        return JsonResponse({'error_username': 'Requires username to register an account'}, status=400)
+        return JsonResponse({'error': 'Requires password to register an account'}, status= 400)
+    if data.get('firstName') == '':
+        return JsonResponse({'error': 'Requires a first name to register an account'}, status= 400)
+    if data.get('lastName') == '':
+        return JsonResponse({'error': 'Requires a last name to register an account'}, status= 400)
+    if data.get('address') == '':
+        return JsonResponse({'error': 'Requires an address to register an account'}, status= 400)
+    if data.get('phone') == '' or data.get('phone') == None:
+        return JsonResponse({'error': 'Requires a phone number to register an account'}, status= 400)
+    
 
     # Encrypt the password 
     key = Fernet.generate_key()
-    fernet =  Fernet(key)
+    fernet = Fernet(key)
     encrypted_password1 = fernet.encrypt(data.get('password1').encode())
     encrypted_password2 = fernet.encrypt(data.get('password2').encode())
 
@@ -154,7 +164,7 @@ def register(request):
     enc_email = fernet.encrypt(data.get('email').encode())
     if email_checks(fernet.decrypt(enc_email).decode()) == False:
         return email_checks(fernet.decrypt(enc_email).decode())
-        
+
     # Check if the username or email is already in use
     if User.objects.filter(email=data.get('email')).exists():
         return JsonResponse({'error': 'Email already exists'}, status=400)
@@ -174,9 +184,9 @@ def register(request):
     if user is not None:
         # Authentication successful
         # Generate an access token
-        secret_key = 'St3rkP@ssord' 
+        secret_key = 'St3rkP@ssord'
         token = jwt.encode({'user_id': user.id}, secret_key, algorithm='HS256')
-        
+
         # Set the token as a cookie in the response
         response = JsonResponse({'token': token})
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
@@ -211,14 +221,15 @@ def register(request):
         # Authentication failed
         return JsonResponse({'success': False, 'error': 'Not able to create user'}, status=401)
 
+
 def send_password_reset_email(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
-        
+
     data = json.loads(request.body)
     email = data.get('email')
     user = User.objects.filter(email=email).first()
-    
+
     if user:
         username = user.username
         token_generator = PasswordResetTokenGenerator()
@@ -241,12 +252,13 @@ def send_password_reset_email(request):
         subject = "Password Reset"
         from_email = "noreply@dybedahlserver.net"
         to_email = email
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+        msg = EmailMultiAlternatives(
+            subject, text_content, from_email, [to_email])
         msg.attach_alternative(html_content, "text/html")
-        
+
         # Send the email
         msg.send()
-        
+
         return JsonResponse({'message': 'Password reset email sent'}, status=200)
     else:
         # Return a custom error message instead of raising a 404 error
@@ -306,10 +318,50 @@ def verify_email(request):
         return JsonResponse({'message': 'Invalid verification token'}, status=400)
  
 def search_items(request):
+    category = request.GET.get('category', '')
     query = request.GET.get('q', '')
+
+    items = Item.objects.all()
+    if category:
+        items = items.filter(category=category)
     if query:
-        items = Item.objects.filter(name__icontains=query)
-    else:
-        items = Item.objects.all()
-    data = [{'id': item.id, 'name': item.name} for item in items]
+        items = items.filter(name__icontains=query)
+
+    # Serialize the queryset of items
+    data = serialize('json', items)
     return JsonResponse(data, safe=False)
+
+def edit_listing(request, item_id):
+    # Use get_object_or_404 to get the item or return a 404 response if not found
+    item = get_object_or_404(Item, id=item_id)
+
+    # Only allow PUT requests
+    if request.method == 'PUT':
+        try:
+            # Load JSON data from the request body
+            data = json.loads(request.body)
+
+            # Update item fields with data from the request
+            item.name = data.get('name', item.name)
+            
+            # Update all fileds
+            item.name = data.get('name', item.name)
+            item.description = data.get('description', item.description)
+            item.price_per_day = data.get('price_per_day', item.price_per_day)
+            item.location = data.get('location', item.location)
+            item.category = data.get('category', item.category)
+            
+            # Save the changes to the item
+            item.save()
+
+            # Return a success response
+            return JsonResponse({'message': 'Item updated successfully'})
+        except json.JSONDecodeError:
+            # Handle JSON decoding error
+            return JsonResponse({'message': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            # Handle other potential errors
+            return JsonResponse({'message': f'Error updating item: {str(e)}'}, status=500)
+    else:
+        # Return a 405 Method Not Allowed response for non-PUT requests
+        return HttpResponseNotAllowed(['PUT'])

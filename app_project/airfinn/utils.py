@@ -2,7 +2,9 @@
 from .models import Item, User
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
+from django.core.serializers import serialize
 import re
+import json
 from django.contrib.auth import get_user_model
 
 def get_user_by_id(user_id):
@@ -51,21 +53,6 @@ def password_checks(password):
         return JsonResponse({'error': 'Password can not be a sequence of numbers'}, status=400)
 
     return True
-
-
-def search_items(request):
-    category = request.GET.get('category', '')
-    query = request.GET.get('q', '')
-
-    items = Item.objects.all()
-    if category:
-        items = items.filter(category=category)
-    if query:
-        items = Item.objects.filter(name__icontains=query)
-    else:
-        items = Item.objects.all()
-    data = [{'id': item.id, 'name': item.name} for item in items]
-    return JsonResponse(data, safe=False)    
 
 
 def upload_profile_picture(request):

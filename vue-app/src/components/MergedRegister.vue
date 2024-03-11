@@ -46,7 +46,7 @@
 
 <script>
 
-import axiosInstance from '@/axios';
+import axios from 'axios';
 
 export default {
   data() {
@@ -66,7 +66,7 @@ export default {
             this.errorMessage = 'Passwords do not match';
             return; // Exit the method early if passwords don't match
           }
-          axiosInstance.post('register/', {
+          axios.post('register/', {
             username: this.username,
             email: this.email,
             password1: this.password1,

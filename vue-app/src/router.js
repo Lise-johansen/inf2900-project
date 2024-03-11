@@ -8,6 +8,8 @@ import UserDashboard from './components/UserDashboard.vue';
 import IndexPath from './components/IndexPath.vue';
 import PasswordResetForm from './components/PasswordResetForm.vue'; // Import Password Reset Form component
 import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email component
+// import Listing from '.components/Listing.vue'; // Import Listing component
+import AboutUs from './components/AboutUs.vue'; // Import About Us component
 // import LogoutScript from './components/LogoutScript.vue';
 
 const routes = [
@@ -56,6 +58,16 @@ const routes = [
     path: '/verify-email',
     name: 'verifyemail',
     component: VerifyEmail,
+  },
+  // {
+  //   path: '/listings/:id',
+  //   name: 'listings',
+  //   component: Listings,
+  // },
+  {
+    path: '/about',
+    name: 'about',
+    component: AboutUs,
   },
   // Other routes
 ];
