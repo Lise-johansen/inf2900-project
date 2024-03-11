@@ -30,20 +30,16 @@ STATICFILES_DIRS = [
 SECRET_KEY = 'django-insecure-&@nmsdwxy*o!l1_r8p@t#&w4n@w3ljbeoqzq4t87q8accy=fdw'
 
 # Change the following to VUE app URL
-FRONTEND_URL = 'https://django.dybedahlserver.net'
+# FRONTEND_URL = 'https://django.dybedahlserver.net'
+FRONTEND_URL = 'localhost:8080'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-<<<<<<< HEAD
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '129.151.210.152',
-                 '2900project.dybedahlserver.net', 'django.dybedahlserver.net']
-=======
 # Use HTTPS for secure connections
 SECURE_SSL_REDIRECT = True
->>>>>>> main
 
-ALLOWED_HOSTS = ['django.dybedahlserver.net']
+ALLOWED_HOSTS = ['django.dybedahlserver.net', 'localhost']
 
 USER_MODEL = 'airfinn.User'
 AUTH_USER_MODEL = 'airfinn.User'
@@ -75,13 +71,8 @@ MIDDLEWARE = [
 
 ]
 
-<<<<<<< HEAD
-CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'http://localhost:8000']
-CORS_ALLOW_ALL_ORIGINS = True  # CORS middleware
-=======
-CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net']
+CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net', 'localhost']
 CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
->>>>>>> main
 CORS_ALLOW_CREDENTIALS = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
