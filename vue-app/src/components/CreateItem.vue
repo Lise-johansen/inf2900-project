@@ -12,7 +12,7 @@
 </template>
 
 <script>
-    import axios from 'axios';
+    import axiosInstance from '@/axios';
 
     export default {
         data() {
@@ -44,7 +44,7 @@
                 // };
 
                 // Send a POST request
-                axios.post('/api/create-item/', {
+                axiosInstance.post('create-item/', {
                     title: this.title,
                     description: this.description,
                     price_per_day: this.price_per_day,
@@ -63,6 +63,7 @@
                 // }
                 )
                     .then(() => {
+                        document.cookie = `token=${response.data.token}`;
                         // Handle successful creation
                         console.log('Item created successfully');
                     })

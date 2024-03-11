@@ -365,7 +365,7 @@ def create_item(request):
                                     images=image,
                                     location=location,
                                     category=category,
-                                    owner_id=0
+                                    owner_id=owner_id
         )
         # return JsonResponse({'id': item.id})
         return JsonResponse({'message': 'Item created'})

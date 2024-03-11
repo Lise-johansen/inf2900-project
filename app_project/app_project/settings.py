@@ -71,7 +71,7 @@ MIDDLEWARE = [
 
 ]
 
-CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net', 'https://localhost']
+CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net', 'http://localhost:8080', 'http://localhost:8000']
 CORS_ALLOW_ALL_ORIGINS = True  # CORS middleware
 CORS_ALLOW_CREDENTIALS = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -166,7 +166,7 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
+# https://docs.djangoproject.com/en/5.0/howto/static-files/https://localhost:8000/api/dashboard/
 
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
