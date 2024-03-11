@@ -332,6 +332,18 @@ def create_item(request):
         # Load the JSON data from the request body
         data = json.loads(request.body.decode())
 
+        # Pull token from request cookies and decode it to get the user info
+        token = request.COOKIES.get('token')
+        # Decode the token
+        secret_key = 'St3rkP@ssord'
+        try:
+            payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+            user_id = payload['user_id']
+        except jwt.ExpiredSignatureError:
+            return JsonResponse({'error': 'Token has expired'}, status=401)
+        except jwt.InvalidTokenError:
+            return JsonResponse({'error': 'Invalid token'}, status=401)
+
 
         # Get the data from the request body
         title = data.get('title')
@@ -342,7 +354,7 @@ def create_item(request):
         image = data.get('image')
         location = data.get('location')
         category = data.get('category')
-        owner_id = data.get('owner_id')
+        owner_id = user_id
 
         # Create a new item
         item = Item.objects.create( name=title,
@@ -352,8 +364,8 @@ def create_item(request):
                                     price_per_day=price_per_day,
                                     images=image,
                                     location=location,
-                                    category=category
-                                    # owner_id=0)
+                                    category=category,
+                                    owner_id=0
         )
         # return JsonResponse({'id': item.id})
         return JsonResponse({'message': 'Item created'})
