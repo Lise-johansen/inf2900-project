@@ -366,3 +366,22 @@ def edit_listing(request, item_id):
     else:
         # Return a 405 Method Not Allowed response for non-PUT requests
         return HttpResponseNotAllowed(['PUT'])
+    
+def delete_listing(request, item_id):
+    """
+    Function to delete an existing listing
+    ID is the primary key of the item.
+    """
+    try:
+        if request.method != 'DELETE':
+            return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+        
+        item = Item.objects.get(id=item_id)
+        # user_token_id = get_user_id_for_token_auth(request)
+        item.delete()
+        return JsonResponse({'message': 'Listing deleted successfully'}, status = 200)
+    
+    
+    except Item.DoesNotExist:
+        return JsonResponse({'error': 'Item does not exist'}, status=404)
+    
