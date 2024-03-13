@@ -22,7 +22,7 @@ from airfinn.utils import get_user_by_id, email_checks, password_checks
 
 
 def index(request):
-    return JsonResponse({'message': 'Welcome to Airfinn!'})
+    return JsonResponse({'message': 'Welcome to Rentopia!'})
 
 def get_user_id_for_token_auth(request):
     """
@@ -326,30 +326,11 @@ def verify_email(request):
 def search_items(request):
     query = request.GET.get('q', '')
     if query:
-        items = Item.objects.filter(name__icontains=query)
-    else:
-        items = Item.objects.all()
-    data = [{'id': item.id, 'name': item.name} for item in items]
-    return JsonResponse(data, safe=False)
+        items = items.filter(name__icontains=query)
 
-def delete_listing(request, item_id):
-    """
-    Function to delete an existing listing
-    ID is the primary key of the item.
-    """
-    try:
-        if request.method != 'DELETE':
-            return JsonResponse({'error': 'Method Not Allowed'}, status=405)
-        
-        item = Item.objects.get(id=item_id)
-        # user_token_id = get_user_id_for_token_auth(request)
-        item.delete()
-        return JsonResponse({'message': 'Listing deleted successfully'}, status = 200)
-    
-    
-    except Item.DoesNotExist:
-        return JsonResponse({'error': 'Item does not exist'}, status=404)
-    
+    # Serialize the queryset of items
+    data = serialize('json', items)
+    return JsonResponse(data, safe=False)
 
 def edit_listing(request, item_id):
     # Use get_object_or_404 to get the item or return a 404 response if not found
@@ -363,21 +344,25 @@ def edit_listing(request, item_id):
 
             # Update item fields with data from the request
             item.name = data.get('name', item.name)
+            
+            # Update all fileds
+            item.name = data.get('name', item.name)
             item.description = data.get('description', item.description)
             item.price_per_day = data.get('price_per_day', item.price_per_day)
             item.location = data.get('location', item.location)
             item.category = data.get('category', item.category)
+            
             # Save the changes to the item
             item.save()
 
             # Return a success response
-            return JsonResponse({'message': 'Item updated successfully'}, status=200)
+            return JsonResponse({'message': 'Item updated successfully'})
         except json.JSONDecodeError:
             # Handle JSON decoding error
-            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+            return JsonResponse({'message': 'Invalid JSON data'}, status=400)
         except Exception as e:
             # Handle other potential errors
-            return JsonResponse({'error': f'Error updating item: {str(e)}'}, status=500)
+            return JsonResponse({'message': f'Error updating item: {str(e)}'}, status=500)
     else:
         # Return a 405 Method Not Allowed response for non-PUT requests
         return HttpResponseNotAllowed(['PUT'])

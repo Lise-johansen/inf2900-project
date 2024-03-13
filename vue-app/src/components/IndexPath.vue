@@ -9,40 +9,24 @@
 		<search-filter @filter="applyFilter" />
 		<SmallListing v-for="item in filteredItems" :key="item.id" :imageUrl="item.imageUrl" :title="item.title" :location="item.location" />
 	</div>
-    <div>
-		<input type="number" v-model="inputNumber" placeholder="Enter a number" />
-		<button @click="handleButtonClick">Submit</button>
-	</div>    
 </template>
 
 <script>
 	import SearchFilter from './SearchFilter.vue';
 	import SmallListing from './SmallListing.vue';
-    import axios from 'axios';
-
 
 	export default {
 		name: 'App',
 		components: { SearchFilter, SmallListing },
 		data() {
 			return {
-				filteredItems: [],
-                inputNumber: null
+				filteredItems: []
 			};
 		},
 		methods: {
 			applyFilter(filteredItems) {
 				this.filteredItems = filteredItems;
 			},
-            handleButtonClick(){
-                axios.delete(`http://localhost:8080/api/delete_item/${this.inputNumber}`)
-                .then(response => {
-                    console.log(response);
-                })
-                .catch(error => {
-                    console.log(error);
-                }); 
-            }
 		},
 	};
 </script>
