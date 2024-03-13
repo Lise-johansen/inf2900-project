@@ -3,16 +3,19 @@
 		<header>
 			<RentopiaHeader />
 		</header>
+		<footer>
+			<RentopiaFooter />
+		</footer>
 		<router-view/>
 	</div>
 </template>
   
 <script>
 	import RentopiaHeader from './components/RentopiaHeader.vue';
-  
+	import RentopiaFooter from './components/RentopiaFooter.vue';
 	export default {
 		name: 'App',
-		components: { RentopiaHeader }
+		components: { RentopiaHeader, RentopiaFooter}
 	};
 </script>
   

@@ -1,9 +1,11 @@
 <template>
     <div>
-        <input type="text" v-model="searchTerm" @input="handleSearchChange">
+        <input type="text" v-model="searchTerm" @input="handleSearchChange" placeholder="Search here!" class="search-input">
         <ul v-if="!loading">
-            <li v-for="item in filteredItems" :key="item.pk">
-                {{ item.fields.name }}
+            <li v-for="item in filteredItems" :key="item.pk" class="search-result">
+                <router-link v-if="item.fields" :to="'/listings/' + item.pk">
+                    {{ item.fields.name }}
+                </router-link>
             </li>
         </ul>
         <div v-else class="loading-text">
@@ -16,19 +18,17 @@
     import { ref } from 'vue';
     import axios from 'axios';
     
+    
     export default {
         setup() {
             const searchTerm = ref('');
             const loading = ref(false);
             const filteredItems = ref([])
             let timeoutId = null;
-
-            // v-for="item in filteredItems" :key="item.pk"
-
+            
             const fetchData = async () => {
                 try {
-                    // Maybe update the API endpoint URL , idk if this is the correct endpoint.
-                    const response = await axios.get('/api/search', {
+                    const response = await axios.get('search/', {
                         params: { q: searchTerm.value }
                     });
                     filteredItems.value = JSON.parse(response.data)
@@ -45,8 +45,9 @@
                 loading.value = true;
                 timeoutId = setTimeout(fetchData, 1000);
             };
-
+            
             return { searchTerm, loading, filteredItems, handleSearchChange };
+
         }
     };
 </script>
@@ -74,6 +75,24 @@
         font-weight: bold;
         font-style: italic;
         color: #ffa500; /* Match the color of the gradient */
+    }
+
+    .search-input::placeholder {
+        opacity: 0.4;
+        font-style: italic;
+    }
+
+    .search-result {
+        cursor: pointer;
+        color:blue;
+        text-decoration: underline;
+        list-style: none;
+        padding: 0;
+        margin-bottom: 10px;
+    }
+
+    .search-result:hover {
+        color: #ffa500;
     }
     
 </style>

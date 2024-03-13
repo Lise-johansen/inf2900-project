@@ -8,7 +8,7 @@
 <script>
 	import SearchFilter from './SearchFilter.vue';
 	import SmallListing from './SmallListing.vue';
-	
+
 	export default {
 		name: 'App',
 		components: { SearchFilter, SmallListing },

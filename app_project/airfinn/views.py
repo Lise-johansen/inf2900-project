@@ -127,15 +127,23 @@ def register(request):
     data = json.loads(request.body)
     # get username and encrypt password and email.
 
+
     # Check if the email, password and username is empty
     if data.get('email') == '': 
-        return JsonResponse({'error_email': 'Requires email to register an account'}, status=400)
+        return JsonResponse({'error': 'Requires email to register an account'}, status= 400)
     if data.get('password1') == '':
-        return JsonResponse({'error_password': 'Requires password to register an account'}, status=400)
+        return JsonResponse({'error': 'Requires password to register an account'}, status= 400)
     if data.get('password2') == '':
-        return JsonResponse({'error_password': 'Requires password to register an account'}, status=400)
-    if data.get('username') == '':
-        return JsonResponse({'error_username': 'Requires username to register an account'}, status=400)
+        return JsonResponse({'error': 'Requires password to register an account'}, status= 400)
+    if data.get('firstName') == '':
+        return JsonResponse({'error': 'Requires a first name to register an account'}, status= 400)
+    if data.get('lastName') == '':
+        return JsonResponse({'error': 'Requires a last name to register an account'}, status= 400)
+    if data.get('address') == '':
+        return JsonResponse({'error': 'Requires an address to register an account'}, status= 400)
+    if data.get('phone') == '' or data.get('phone') == None:
+        return JsonResponse({'error': 'Requires a phone number to register an account'}, status= 400)
+    
 
     # Encrypt the password 
     key = Fernet.generate_key()
@@ -373,3 +381,38 @@ def create_item(request):
     # Handle invalid JSON
     except json.decoder.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+
+def edit_listing(request, item_id):
+    # Use get_object_or_404 to get the item or return a 404 response if not found
+    item = get_object_or_404(Item, id=item_id)
+
+    # Only allow PUT requests
+    if request.method == 'PUT':
+        try:
+            # Load JSON data from the request body
+            data = json.loads(request.body)
+
+            # Update item fields with data from the request
+            item.name = data.get('name', item.name)
+            
+            # Update all fileds
+            item.name = data.get('name', item.name)
+            item.description = data.get('description', item.description)
+            item.price_per_day = data.get('price_per_day', item.price_per_day)
+            item.location = data.get('location', item.location)
+            item.category = data.get('category', item.category)
+            
+            # Save the changes to the item
+            item.save()
+
+            # Return a success response
+            return JsonResponse({'message': 'Item updated successfully'})
+        except json.JSONDecodeError:
+            # Handle JSON decoding error
+            return JsonResponse({'message': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            # Handle other potential errors
+            return JsonResponse({'message': f'Error updating item: {str(e)}'}, status=500)
+    else:
+        # Return a 405 Method Not Allowed response for non-PUT requests
+        return HttpResponseNotAllowed(['PUT'])
