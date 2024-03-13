@@ -64,7 +64,7 @@ const routes = [
     path: '/create-listing',
     name: 'create-listing',
     component: CreateItem
-  }
+  },
   // {
   //   path: '/listings/:id',
   //   name: 'listings',
