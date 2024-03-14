@@ -35,6 +35,10 @@
         methods: {
             createItem() {
                 // Create a new item
+                
+                // Get the user ID from the cookies
+                const user_id = this.getUserIDFromCookies();
+
                 // Send a POST request
                 axios.post('create-item/', {
                     title: this.title,
@@ -43,7 +47,7 @@
                     location: this.location,
                     availability: this.availability,
                     image: this.image,
-                    owner_id: this.owner_id,
+                    owner_id: user_id,
                     condition: this.condition,
                     category: this.category,
                 }
@@ -59,26 +63,17 @@
                 });
             },
             redirectIfLoggedIn() {
-                console.log('Checking if user is logged in...')
-                const token = this.getTokenFromCookies();
-                if (token === null) {
-                    if (confirm('You must be logged in to view this page.')) {
-                        this.$router.push('/login'); 
-                    }
-                }
-            },
-            redirectIfLoggedIn() {
-                // Strange error with the cookies here. Access is granted if user is not logged in but cookies are present where the user previously was
-                // logged in. Possible solution is to clear the cookies when the user logs out?
+                // Redirect to login page if user is not logged in
                 console.log('Checking if user is logged in...');
                 const token = this.getTokenFromCookies();
-                if (token === null) {
+                if (token === 'undefined') {
                     // Token is not found in cookies (user is not logged in)
                     if (confirm('You must be logged in to view this page.')) {
                         this.$router.push('/login'); 
                     }
                 }
             },
+            // Get the token from the cookies
             getTokenFromCookies() {
                 const cookies = document.cookie.split('; ');
                 for (const cookie of cookies) {
@@ -89,6 +84,17 @@
                 }
                 return null; // Token not found in cookies
                 },
+            // Get the user ID from the cookies
+            getUserIDFromCookies() {
+                const cookies = document.cookie.split('; ');
+                for (const cookie of cookies) {
+                    const [name, value] = cookie.split('=');
+                    if (name === 'id') {
+                    return value;
+                    }
+                }
+                return null; // User ID not found in cookies
+                }
         }
     }
 </script>
