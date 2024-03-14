@@ -38,7 +38,7 @@ DEBUG = True
 # Use HTTPS for secure connections
 SECURE_SSL_REDIRECT = True
 
-ALLOWED_HOSTS = ['django.dybedahlserver.net']
+ALLOWED_HOSTS = ['django.dybedahlserver.net', 'localhost']
 
 USER_MODEL = 'airfinn.User'
 AUTH_USER_MODEL = 'airfinn.User'
@@ -118,12 +118,13 @@ WSGI_APPLICATION = 'app_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
+    # Use the following configuration for PostgreSQL:
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'St3rkP@ss0rd',
-        'HOST': '129.151.210.152',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
