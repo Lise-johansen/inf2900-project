@@ -18,7 +18,7 @@ class UserTestCase(TestCase):
             'phone': '12345678'
         }
         
-        self.user = User.objects.create_user(self.credentials['email'], self.credentials['username'], self.credentials['password'], first_name=self.credentials['first_name'], last_name=self.credentials['last_name'], address=self.credentials['address'], phone=self.credentials['phone'])
+        self.user = User.objects.create_user(**self.credentials)
         
         # Create a test item
         self.item = Item.objects.create(name="Test Item", description="This is a test item", availability=True, condition="New", price_per_day=5.00, images="images/default.jpg", owner=self.user, location="Test Location")
