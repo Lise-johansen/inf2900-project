@@ -93,6 +93,12 @@
         .inbox-icon img {
             max-width: 50px; /* Set a maximum width for the image */
             height: auto; /* Allow the height to adjust proportionally */
+            transition: transform 1s ease;
+        }
+
+        .login-icon:hover img,
+        .inbox-icon:hover img {
+            transform: scale(1.2,1.2);
         }
 
         @font-face {
@@ -108,5 +114,4 @@
             font-weight: normal;
             font-style: normal;
         }
-
 </style>
