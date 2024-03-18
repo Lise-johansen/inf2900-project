@@ -5,7 +5,6 @@
 
  <template>
 	<div>
-		<h1 class="headline">Find your next rental below:</h1>
 		<search-filter @filter="applyFilter" />
 		<SmallListing v-for="item in filteredItems" :key="item.id" :imageUrl="item.imageUrl" :title="item.title" :location="item.location" />
 	</div>
