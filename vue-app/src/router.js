@@ -11,6 +11,7 @@ import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email c
 // import Listing from '.components/Listing.vue'; // Import Listing component
 import AboutUs from './components/AboutUs.vue'; // Import About Us component
 // import LogoutScript from './components/LogoutScript.vue';
+import EditListing from './components/EditListing.vue'; // Import Edit Listing component
 
 const routes = [
   {
@@ -68,6 +69,12 @@ const routes = [
     path: '/about',
     name: 'about',
     component: AboutUs,
+  },
+
+  {
+    path: '/EditListing',
+    name: 'EditListing',
+    component: EditListing,
   },
   // Other routes
 ];

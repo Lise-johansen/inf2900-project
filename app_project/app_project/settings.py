@@ -31,15 +31,15 @@ SECRET_KEY = 'django-insecure-&@nmsdwxy*o!l1_r8p@t#&w4n@w3ljbeoqzq4t87q8accy=fdw
 
 # Change the following to VUE app URL
 # FRONTEND_URL = 'https://django.dybedahlserver.net'
-FRONTEND_URL = 'localhost:8080'
+FRONTEND_URL = 'localhost:8080/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # Use HTTPS for secure connections
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 
-ALLOWED_HOSTS = ['django.dybedahlserver.net', 'localhost']
+ALLOWED_HOSTS = ['localhost:8080', '127.0.0.1', '129.151.210.152','django.dybedahlserver.net', 'localhost']
 
 USER_MODEL = 'airfinn.User'
 AUTH_USER_MODEL = 'airfinn.User'
@@ -60,18 +60,18 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # CORS middleware
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # CORS middleware
     # Other middleware classes...
 
 ]
 
-CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net', 'https://localhost']
+CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net', 'http://localhost:8080', 'http://localhost:8000']
 CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
 CORS_ALLOW_CREDENTIALS = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -119,13 +119,17 @@ WSGI_APPLICATION = 'app_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'postgres',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'St3rkP@ss0rd',
+    #     'HOST': '129.151.210.152',
+    #     'PORT': '5432',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'St3rkP@ss0rd',
-        'HOST': '129.151.210.152',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / '../db.sqlite3',
     }
 }
 
@@ -162,7 +166,7 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
+# https://docs.djangoproject.com/en/5.0/howto/static-files/https://localhost:8000/api/dashboard/
 
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
@@ -182,4 +186,4 @@ EMAIL_USE_TLS = False  # No need for TLS if using SSL
 EMAIL_HOST_USER = 'emailapikey'  # Your Zoho Mail API key as the username
 # Your Zoho Mail Send Mail Token 1 as the password
 EMAIL_HOST_PASSWORD = 'yA6KbHsMugT+kDpWQ0hs1ZWNoo40qqAwjXm+sX/kdJYuKNnn26E71BJkdNTvJzWLitfX56oDbY5AL4C9vYoLfJZiZ9YEL5TGTuv4P2uV48xh8ciEYNYkgZigCrAVFa9MeBoiDSw2QfgoWA=='
-DEFAULT_FROM_EMAIL = 'dybedahlserver.net'  # Your domain/sender address
+DEFAULT_FROM_EMAIL = 'dybedahlserver.net'  # Your domain/sender address 
