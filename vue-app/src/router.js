@@ -11,6 +11,7 @@ import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email c
 import AboutUs from './components/AboutUs.vue'; // Import About Us component
 import DeleteListing from './components/DeleteListing.vue'; // Import Delete Listing component
 // import LogoutScript from './components/LogoutScript.vue';
+import EditListing from './components/EditListing.vue'; // Import Edit Listing component
 import CreateItem from './components/CreateItem.vue';
 
 const routes = [
@@ -74,6 +75,12 @@ const routes = [
     path: '/about',
     name: 'about',
     component: AboutUs,
+  },
+
+  {
+    path: '/EditListing',
+    name: 'EditListing',
+    component: EditListing,
   },
   {
     path: '/delete',

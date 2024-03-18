@@ -330,91 +330,7 @@ def search_items(request):
     data = serialize('json', items)
     return JsonResponse(data, safe=False)
 
-def create_item(request):
-    # Check if the request method is POST
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
-    try:
-        # Load the JSON data from the request body
-        data = json.loads(request.body.decode())
 
-        # Pull token from request cookies and decode it to get the user info
-        token = request.COOKIES.get('token')
-        # Decode the token
-        secret_key = 'St3rkP@ssord'
-        try:
-            payload = jwt.decode(token, secret_key, algorithms=['HS256'])
-            user_id = payload['user_id']
-        except jwt.ExpiredSignatureError:
-            return JsonResponse({'error': 'Token has expired'}, status=401)
-        except jwt.InvalidTokenError:
-            return JsonResponse({'error': 'Invalid token'}, status=401)
-
-
-        # Get the data from the request body
-        title = data.get('title')
-        price_per_day = data.get('price_per_day')
-        description = data.get('description')
-        availability = data.get('availability')
-        condition = data.get('condition')
-        image = data.get('image')
-        location = data.get('location')
-        category = data.get('category')
-        owner_id = user_id
-
-        # Create a new item
-        item = Item.objects.create( name=title,
-                                    description=description,
-                                    availability=True,
-                                    condition=condition,
-                                    price_per_day=price_per_day,
-                                    images=image,
-                                    location=location,
-                                    category=category,
-                                    owner_id=owner_id
-        )
-        # return JsonResponse({'id': item.id})
-        return JsonResponse({'message': 'Item created'})
-        
-    # Handle invalid JSON
-    except json.decoder.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
-
-def edit_listing(request, item_id):
-    # Use get_object_or_404 to get the item or return a 404 response if not found
-    item = get_object_or_404(Item, id=item_id)
-
-    # Only allow PUT requests
-    if request.method == 'PUT':
-        try:
-            # Load JSON data from the request body
-            data = json.loads(request.body)
-
-            # Update item fields with data from the request
-            item.name = data.get('name', item.name)
-            
-            # Update all fileds
-            item.name = data.get('name', item.name)
-            item.description = data.get('description', item.description)
-            item.price_per_day = data.get('price_per_day', item.price_per_day)
-            item.location = data.get('location', item.location)
-            item.category = data.get('category', item.category)
-            
-            # Save the changes to the item
-            item.save()
-
-            # Return a success response
-            return JsonResponse({'message': 'Item updated successfully'})
-        except json.JSONDecodeError:
-            # Handle JSON decoding error
-            return JsonResponse({'message': 'Invalid JSON data'}, status=400)
-        except Exception as e:
-            # Handle other potential errors
-            return JsonResponse({'message': f'Error updating item: {str(e)}'}, status=500)
-    else:
-        # Return a 405 Method Not Allowed response for non-PUT requests
-        return HttpResponseNotAllowed(['PUT'])
-    
 def delete_listing(request, item_id):
     """
     Function to delete an existing listing
@@ -458,3 +374,63 @@ def delete_listing(request, item_id):
     
     except Item.DoesNotExist:
         return JsonResponse({'error': 'Item does not exist'}, status=404)
+
+
+"""
+Function to eddid an existing listing/database entry. Uses the PUT method to update the item fields with data from the request. 
+And get the item id from the request path. 
+"""
+def edit_listing(request, item_id):
+    # Use get_object_or_404 to get the item or return a 404 response if not found
+    item = get_object_or_404(Item, id=item_id)
+
+    # Only allow PUT requests
+    if request.method != 'PUT':
+        # Return a 405 Method Not Allowed response for non-PUT requests
+        return HttpResponseNotAllowed(['PUT'])
+            
+    # Get session token and decode it.
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+  
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+
+    # Check if the user is the owner of the item and  
+    if item.owner.id != user_id:
+        return JsonResponse({'error': 'You are not the owner of this item'}, status=403)
+                    
+    try:
+        # Load JSON data from the request body
+        data = json.loads(request.body)
+
+        # Update item fields with data from the request
+        item.name = data.get('name', item.name)
+        
+        # Update all fileds
+        item.name = data.get('name', item.name)
+        item.description = data.get('description', item.description)
+        item.price_per_day = data.get('price_per_day', item.price_per_day)
+        item.location = data.get('location', item.location)
+        item.category = data.get('category', item.category)
+        
+        # Save the changes to the item
+        item.save()
+
+        # Return a success response
+        return JsonResponse({'message': 'Item updated successfully'})
+    except json.JSONDecodeError:
+        # Handle JSON decoding error
+        return JsonResponse({'message': 'Invalid JSON data'}, status=400)
+    except Exception as e:
+        # Handle other potential errors
+        return JsonResponse({'message': f'Error updating item: {str(e)}'}, status=500)
+    
