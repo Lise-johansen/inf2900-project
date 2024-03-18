@@ -19,6 +19,7 @@ import json
 import jwt
 from airfinn.utils import get_user_by_id, email_checks, password_checks
 
+from airfinn.models import Item
 
 def index(request):
     return JsonResponse({'message': 'Welcome to Rentopia!'})
@@ -328,6 +329,56 @@ def search_items(request):
     # Serialize the queryset of items
     data = serialize('json', items)
     return JsonResponse(data, safe=False)
+
+def create_item(request):
+    # Check if the request method is POST
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    try:
+        # Load the JSON data from the request body
+        data = json.loads(request.body.decode())
+
+        # Pull token from request cookies and decode it to get the user info
+        token = request.COOKIES.get('token')
+        # Decode the token
+        secret_key = 'St3rkP@ssord'
+        try:
+            payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+            user_id = payload['user_id']
+        except jwt.ExpiredSignatureError:
+            return JsonResponse({'error': 'Token has expired'}, status=401)
+        except jwt.InvalidTokenError:
+            return JsonResponse({'error': 'Invalid token'}, status=401)
+
+
+        # Get the data from the request body
+        title = data.get('title')
+        price_per_day = data.get('price_per_day')
+        description = data.get('description')
+        availability = data.get('availability')
+        condition = data.get('condition')
+        image = data.get('image')
+        location = data.get('location')
+        category = data.get('category')
+        owner_id = user_id
+
+        # Create a new item
+        item = Item.objects.create( name=title,
+                                    description=description,
+                                    availability=True,
+                                    condition=condition,
+                                    price_per_day=price_per_day,
+                                    images=image,
+                                    location=location,
+                                    category=category,
+                                    owner_id=owner_id
+        )
+        # return JsonResponse({'id': item.id})
+        return JsonResponse({'message': 'Item created'})
+        
+    # Handle invalid JSON
+    except json.decoder.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
 
 def edit_listing(request, item_id):
     # Use get_object_or_404 to get the item or return a 404 response if not found

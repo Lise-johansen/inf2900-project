@@ -11,6 +11,7 @@ import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email c
 import AboutUs from './components/AboutUs.vue'; // Import About Us component
 import DeleteListing from './components/DeleteListing.vue'; // Import Delete Listing component
 // import LogoutScript from './components/LogoutScript.vue';
+import CreateItem from './components/CreateItem.vue';
 
 const routes = [
   {
@@ -58,6 +59,11 @@ const routes = [
     path: '/verify-email',
     name: 'verifyemail',
     component: VerifyEmail,
+  },
+  {
+    path: '/create-listing',
+    name: 'create-listing',
+    component: CreateItem
   },
   // {
   //   path: '/listings/:id',

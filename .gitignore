@@ -7,3 +7,4 @@
 /db.sqlite3
 .db.sqlite3
 /app_project/airfinn/migrations/*
+/node_modules

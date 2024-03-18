@@ -1,6 +1,7 @@
 
 from .models import Item, User
 from django.http import JsonResponse, HttpResponseNotAllowed
+from django.core.serializers import serialize
 from django.views.decorators.csrf import csrf_exempt
 from django.core.serializers import serialize
 import re
@@ -53,7 +54,6 @@ def password_checks(password):
         return JsonResponse({'error': 'Password can not be a sequence of numbers'}, status=400)
 
     return True
-
 
 def upload_profile_picture(request):
     print('upload_profile_picture')
