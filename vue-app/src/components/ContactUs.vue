@@ -1,23 +1,28 @@
 <template>
     <div v-if="userLoggedIn" class="contact-form">
-    <h2 class='encouraging-text'>Your thoughts matter! We're here to listen and eager to hear from you. Feel free to share your ideas, questions, or any feedback you have.</h2>
-    <div>
-        <p><strong>Name:</strong> {{ user.firstName + ' ' + user.lastName }}</p>
+            <h1 class="form-title">Fill the form. <br/>It's easy.</h1>
+        <div class="form-wrapper">
+            <div class="form-container">
+                <!-- <div class="credentials-container">
+                <p><strong>Name:</strong> {{ user.firstName + ' ' + user.lastName }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                </div> -->
+        
+                <textarea id="subject" v-model="subject" rows="1" cols="50" class="message-box" placeholder="Subject"/>
+                <textarea id="message" v-model="message" rows="4" cols="50" class="message-box" placeholder="Write your message..."/>
+                <button @click="sendMessage" class="btn">Send Message</button>
+            </div>
+
+            <div class="encouraging-container">
+            <h2 class="encouraging-title">Let's talk about everything.</h2>
+            <h2 class='encouraging-text'> Your thoughts matter! We're here to listen and eager to hear from you. Feel free to share your ideas, questions, or any feedback you have.</h2> 
+            </div>
+        </div>
     </div>
-    <div>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-    </div>
-    <div>
-        <label for="subject">Subject:</label>
-        <textarea id="subject" v-model="subject" rows="1" cols="50" class="message-box"></textarea>
-        <label for="message">Message:</label>
-        <textarea id="message" v-model="message" rows="4" cols="50" class="message-box"></textarea>
-    </div>
-        <button @click="sendMessage">Send Message</button>
-    </div>
+
     <div v-else>
-        <p>Please log in first to contact us.</p>
         <router-link to="/login" class="login-link">Log In</router-link>
+        <p>Please log in first to contact us.</p>
     </div>
 </template>
   
@@ -60,87 +65,85 @@
 </script>
   
 <style scoped>
-.contact-form {
-        font-family: 'louis_george_cafe', sans-serif;
-        max-width: 500px;
+    .contact-form {
+        width: 50%;
         margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        display: flex;
-        flex-direction: column;
+        }
+   .form-wrapper{
+         display: flex;
+    }
+    .encouraging-title,
+    .encouraging-text,
+    .form-title{
+        text-align: start;
     }
 
-    .contact-form h2 {
-        margin-bottom: 10px;
+    .encouraging-title{
+        align-self: flex-start;
+        margin: 0;
+        
     }
-
     .encouraging-text {
-       font-size: x-large;
-       margin-top: 0px;
+        font-family: 'louis_george_cafe', sans-serif;
     }
-
-    .contact-form label {
-        display: block;
-        margin-top: 40px;
-        margin-bottom: 5px;
-        font-size: x-large;
-    }
-
-    #subject {
-        width: 100%;
-        height: auto; /* Allow height to adjust based on content */
-        max-height: 30px; /* Limit the height to one line */
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        resize: none; /* Disable resizing */
-        overflow: hidden; /* Hide overflow content */
+    .encouraging-title,
+     .form-title{
+        font-size: 3.5rem;
+        background: linear-gradient(to right, #ff5733 0%, #ffa500 25%, #ffa500 50%, #4169e1 75%);
+        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text;
     }
     
-    .contact-form textarea {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        margin-bottom: 10px;
-        font-family: 'monospace', sans-serif;
-    }
-
-    .contact-form button {
-        font-family: 'louis_george_cafe', sans-serif;
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: #ffffff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: large;
-    }
-
-    .contact-form button:hover {
-        background-color: #0056b3;
-    }
-
-    div{
-    display:flex;
-    justify-content:center;
-    align-items: center;
-    flex-direction: column;
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2em;
+        border-right: 1px solid rgb(177, 175, 175);
+        padding-right: 2em;
+        flex-basis: 50%;
     }
 
     .message-box {
-        max-width: 540px;
-        height: 150px; /* Fixed height */
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        resize: none; /* Disable resizing */   
+        resize: none;
+        outline: none;
+        font-size: 1rem;
+        padding: 1em 0 1em 0; 
+        border: none;
+        border-bottom: 1px solid rgb(177, 175, 175);
+        font-family: fantasy;
     }
 
-    .login-link {
-        color: #007bff;
-        text-decoration: underline;
-        cursor: pointer;
+    #message {
+        min-height: 10em;
+        resize: vertical;
     }
+
+    .credentials-container {
+        display: flex;
+        gap: 2em;
+        
+    }
+
+    .encouraging-container{
+        flex-basis: 50%;
+        display: flex;
+        padding-left: 2em;
+        flex-direction: column
+    }
+
+    .btn{
+        padding: 1em 2em;
+        align-self: flex-start;
+        border: none;
+        font-family: 'louis_george_cafe', sans-serif;
+        background-color: #ff5733;
+        color: whitesmoke;
+    }
+
+    .btn:hover{
+        background: linear-gradient(to right,#ffa500 0, #ff5733 50%, #ffa500 100%);
+    }
+
 </style>
 
   
