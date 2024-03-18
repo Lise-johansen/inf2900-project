@@ -76,7 +76,7 @@
     "transformIgnorePatterns": [
       "/node_modules/",
       "\\.pnp\\.[^\\\/]+$",
-      "\\.png$"
+      "\\.(png|jpg|jpeg|gif|svg)$"
     ],
     "testEnvironment": "jsdom"
   }
