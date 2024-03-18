@@ -331,6 +331,51 @@ def search_items(request):
     return JsonResponse(data, safe=False)
 
 
+def delete_listing(request, item_id):
+    """
+    Function to delete an existing listing
+    ID is the primary key of the item.
+    """
+    item = get_object_or_404(Item, id=item_id)
+
+    if request.method != 'DELETE':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'Not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    # user = authenticate(request, username=tokenUser., password=pw)
+    
+    # if user is None:
+    #     return JsonResponse({'error': 'Invalid token'}, status=401)
+
+    # Check if the user is the owner of the item
+    if item.owner.id != user_id:
+        return JsonResponse({'error': 'You are not the owner of this item'}, status=403)
+    
+    try:
+        # item = Item.objects.get(id=item_id)
+        # user_token_id = get_user_id_for_token_auth(request)
+        item.delete()
+        return JsonResponse({'message': 'Listing deleted successfully'}, status = 200)
+    
+    
+    except Item.DoesNotExist:
+        return JsonResponse({'error': 'Item does not exist'}, status=404)
+
+
 """
 Function to eddid an existing listing/database entry. Uses the PUT method to update the item fields with data from the request. 
 And get the item id from the request path. 
