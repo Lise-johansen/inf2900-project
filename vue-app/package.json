@@ -31,7 +31,9 @@
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "http-proxy-middleware": "^2.0.6",
-    "jest": "^27.0.5"
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^27.0.5",
+    "jest-transform-stub": "^2.0.0"
   },
   "eslintConfig": {
     "root": true,
@@ -67,17 +69,14 @@
   "jest": {
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1",
-      "^axios$": "<rootDir>/node_modules/axios/dist/node/axios.cjs"
+      "^axios$": "<rootDir>/node_modules/axios/dist/node/axios.cjs",
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+      "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/__mocks__/fileMock.js"
     },
     "transform": {
       "^.+\\.vue$": "@vue/vue3-jest",
       "^.+\\js$": "babel-jest"
     },
-    "transformIgnorePatterns": [
-      "/node_modules/",
-      "\\.pnp\\.[^\\\/]+$",
-      "\\.(png|jpg|jpeg|gif|svg)$"
-    ],
     "testEnvironment": "jsdom"
   }
 }
