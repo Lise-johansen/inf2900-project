@@ -10,6 +10,7 @@ import PasswordResetForm from './components/PasswordResetForm.vue'; // Import Pa
 import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email component
 // import Listing from '.components/Listing.vue'; // Import Listing component
 import AboutUs from './components/AboutUs.vue'; // Import About Us component
+import DeleteListing from './components/DeleteListing.vue'; // Import Delete Listing component
 // import LogoutScript from './components/LogoutScript.vue';
 
 const routes = [
@@ -69,7 +70,11 @@ const routes = [
     name: 'about',
     component: AboutUs,
   },
-  // Other routes
+  {
+    path: '/delete',
+    name: 'delete',
+    component: DeleteListing,
+  },
 ];
 
 const router = createRouter({

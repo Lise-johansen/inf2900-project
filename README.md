@@ -28,4 +28,4 @@
     -$ npm run serve
 
 # 5.2 Build app for development
-    -$ npm run buildaaaa
+    -$ npm run build
