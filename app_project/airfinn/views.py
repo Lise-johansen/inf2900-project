@@ -429,7 +429,7 @@ def delete_listing(request, item_id):
     if not token:
         return JsonResponse({'error': 'Not authenticated'}, status=401)
     
-    secret_key = "St3rkP@ssord"
+    secret_key = settings.SECRET_KEY
 
     try:
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
