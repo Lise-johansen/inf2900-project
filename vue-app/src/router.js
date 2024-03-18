@@ -9,6 +9,7 @@ import PasswordResetForm from './components/PasswordResetForm.vue'; // Import Pa
 import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email component
 // import Listing from '.components/Listing.vue'; // Import Listing component
 import AboutUs from './components/AboutUs.vue'; // Import About Us component
+import ContactUs from './components/ContactUs.vue'; // Import Contact Us component
 // import LogoutScript from './components/LogoutScript.vue';
 
 const routes = [
@@ -68,6 +69,11 @@ const routes = [
     name: 'about',
     component: AboutUs,
   },
+  {
+    path: '/contact',
+    name: 'contact',
+    component: ContactUs,
+  }
   // Other routes
 ];
 
