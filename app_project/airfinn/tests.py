@@ -55,6 +55,34 @@ class UserTestCase(TestCase):
 
 
 
+class EditListingTestCase(TestCase):
+    def setUp(self):
+        # Create a test user with create_user method
+        # Credentials of test user:
+        self.credentials = {
+            'username': 'tester@testing.mail.com',
+            'email': 'tester@testing.mail.com',
+            'password': 'password',
+            'first_name': 'testy',
+            'last_name': 'testington',
+            'address': '1234 Test St.',
+            'phone': '12345678'
+        }
+        
+        self.user = User.objects.create_user(**self.credentials)
+        
+        # Create a test item
+        self.item = Item.objects.create(name="Test Item", description="This is a test item", availability=True, condition="New", price_per_day=5.00, images="images/default.jpg", owner=self.user, location="Test Location")
+
+
+
+    # All the test cases
+        # Autheraist user that can delete
+        # Authorized user but can not delete
+        # Unathirized (not logedinn) user and can not do anything
+        # Filed inn all llfiled with correct input
+
+
                 
       
      
