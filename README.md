@@ -1,3 +1,4 @@
+[![Django CI](https://github.com/uit-inf-2900/Team11/actions/workflows/django.yml/badge.svg)](https://github.com/uit-inf-2900/Team11/actions/workflows/django.yml)[![VUE App CI](https://github.com/uit-inf-2900/Team11/actions/workflows/node.js.yml/badge.svg)](https://github.com/uit-inf-2900/Team11/actions/workflows/node.js.yml)
 # Step-by-step instruction for how to setup virtual env and start.
 
 
