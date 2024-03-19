@@ -13,6 +13,7 @@ from django.utils.encoding import force_bytes, force_str
 from .models import Item, User
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
 import json
@@ -322,7 +323,12 @@ def verify_email(request):
  
  
 def search_items(request):
+    category = request.GET.get('category', '')
     query = request.GET.get('q', '')
+
+    items = Item.objects.all()
+    if category:
+        items = items.filter(category=category)
     if query:
         items = items.filter(name__icontains=query)
 
