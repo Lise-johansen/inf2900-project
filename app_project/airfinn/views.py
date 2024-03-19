@@ -1,18 +1,13 @@
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from django.contrib.sites.shortcuts import get_current_site
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.http import JsonResponse, HttpResponseNotAllowed
-from django.views.decorators.csrf import csrf_exempt
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from .models import Item, User
-from django.core.mail import send_mail, EmailMultiAlternatives
-from django.template.loader import render_to_string
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
 from django.core.serializers import serialize
@@ -361,3 +356,60 @@ def edit_listing(request, item_id):
     else:
         # Return a 405 Method Not Allowed response for non-PUT requests
         return HttpResponseNotAllowed(['PUT'])
+    
+    
+def contact_us_message(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    data = json.loads(request.body)
+    subject = data.get('subject')
+    message = data.get('message')
+    user_data = data.get('user')
+    first_name = user_data.get('firstName')
+    from_email = user_data.get('email')
+    
+    sender_email = "support@dybedahlserver.net"
+    
+    if not subject or not message:
+        return JsonResponse({'error': 'All fields are required'}, status=400)
+    
+    try:
+        # Load the contact us email template
+        contact_html_content = render_to_string('contact_us_email.html', {'subject': subject, 'message': message, 'sender_email': from_email})
+        
+        # Load plain text content from contact us template
+        contact_text_content = render_to_string('contact_us_email.txt', {'subject': subject, 'message': message, 'sender_email': from_email})
+    
+        email_to_support = EmailMultiAlternatives(
+            subject=subject,
+            body=contact_text_content,
+            from_email=sender_email,
+            to=["support@dybedahlserver.net"],
+            reply_to=[from_email]
+        )
+        
+        email_to_support.attach_alternative(contact_html_content, "text/html")
+        
+        email_to_support.send()
+        
+        # Load the autoresponse email template
+        autoresponse_html_content = render_to_string('contact_us_autoresponse.html', {'first_name': first_name})
+        
+        # Load plain text content from autoresponse template
+        autoresponse_text_content = render_to_string('contact_us_autoresponse.txt', {'first_name': first_name})
+        
+        email_to_user = EmailMultiAlternatives(
+            subject="Thank You for Contacting Us!",
+            body=autoresponse_text_content,
+            from_email=sender_email,
+            to=[from_email]
+        )
+        
+        email_to_user.attach_alternative(autoresponse_html_content, "text/html")
+        
+        email_to_user.send()
+        
+        return JsonResponse({'message': 'Message sent successfully'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
