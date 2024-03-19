@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --dest /var/www/Rentopia",
+    "test:build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
@@ -69,9 +70,7 @@
   "jest": {
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1",
-      "^axios$": "<rootDir>/node_modules/axios/dist/node/axios.cjs",
-      "\\.(css|less|scss|sass)$": "identity-obj-proxy",
-      "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/__mocks__/fileMock.js"
+      "^axios$": "<rootDir>/node_modules/axios/dist/node/axios.cjs"
     },
     "transform": {
       "^.+\\.vue$": "@vue/vue3-jest",
