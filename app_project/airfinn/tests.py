@@ -48,8 +48,13 @@ class UserTestCase(TestCase):
         # Make authenticated request
         response = self.client.get(reverse('dashboard'), **headers)
 
-        
         # Test with incorrect credentials
         response = self.client.post(reverse('login'), data=json.dumps(wrong_login_data), content_type='application/json')
         
         self.assertEqual(response.status_code, 401)
+
+
+
+                
+      
+     

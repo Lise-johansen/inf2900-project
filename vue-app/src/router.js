@@ -9,8 +9,11 @@ import PasswordResetForm from './components/PasswordResetForm.vue'; // Import Pa
 import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email component
 // import Listing from '.components/Listing.vue'; // Import Listing component
 import AboutUs from './components/AboutUs.vue'; // Import About Us component
+import DeleteListing from './components/DeleteListing.vue'; // Import Delete Listing component
 import ContactUs from './components/ContactUs.vue'; // Import Contact Us component
 // import LogoutScript from './components/LogoutScript.vue';
+import EditListing from './components/EditListing.vue'; // Import Edit Listing component
+import CreateItem from './components/CreateItem.vue';
 
 const routes = [
   {
@@ -59,6 +62,11 @@ const routes = [
     name: 'verifyemail',
     component: VerifyEmail,
   },
+  {
+    path: '/create-listing',
+    name: 'create-listing',
+    component: CreateItem
+  },
   // {
   //   path: '/listings/:id',
   //   name: 'listings',
@@ -68,6 +76,16 @@ const routes = [
     path: '/about',
     name: 'about',
     component: AboutUs,
+  },
+  {
+    path: '/EditListing',
+    name: 'EditListing',
+    component: EditListing,
+  },
+  {
+    path: '/delete',
+    name: 'delete',
+    component: DeleteListing,
   },
   {
     path: '/contact',
