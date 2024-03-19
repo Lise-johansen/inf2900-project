@@ -13,6 +13,7 @@ from django.utils.encoding import force_bytes, force_str
 from .models import Item, User
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
 import json
@@ -322,13 +323,63 @@ def verify_email(request):
  
  
 def search_items(request):
+    category = request.GET.get('category', '')
     query = request.GET.get('q', '')
+
+    items = Item.objects.all()
+    if category:
+        items = items.filter(category=category)
     if query:
         items = items.filter(name__icontains=query)
 
     # Serialize the queryset of items
     data = serialize('json', items)
     return JsonResponse(data, safe=False)
+
+
+def delete_listing(request, item_id):
+    """
+    Function to delete an existing listing
+    ID is the primary key of the item.
+    """
+    item = get_object_or_404(Item, id=item_id)
+
+    if request.method != 'DELETE':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'Not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    # user = authenticate(request, username=tokenUser., password=pw)
+    
+    # if user is None:
+    #     return JsonResponse({'error': 'Invalid token'}, status=401)
+
+    # Check if the user is the owner of the item
+    if item.owner.id != user_id:
+        return JsonResponse({'error': 'You are not the owner of this item'}, status=403)
+    
+    try:
+        # item = Item.objects.get(id=item_id)
+        # user_token_id = get_user_id_for_token_auth(request)
+        item.delete()
+        return JsonResponse({'message': 'Listing deleted successfully'}, status = 200)
+    
+    
+    except Item.DoesNotExist:
+        return JsonResponse({'error': 'Item does not exist'}, status=404)
 
 
 """
