@@ -10,6 +10,7 @@ import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email c
 // import Listing from '.components/Listing.vue'; // Import Listing component
 import AboutUs from './components/AboutUs.vue'; // Import About Us component
 import DeleteListing from './components/DeleteListing.vue'; // Import Delete Listing component
+import ContactUs from './components/ContactUs.vue'; // Import Contact Us component
 // import LogoutScript from './components/LogoutScript.vue';
 import EditListing from './components/EditListing.vue'; // Import Edit Listing component
 import CreateItem from './components/CreateItem.vue';
@@ -76,7 +77,6 @@ const routes = [
     name: 'about',
     component: AboutUs,
   },
-
   {
     path: '/EditListing',
     name: 'EditListing',
@@ -87,6 +87,12 @@ const routes = [
     name: 'delete',
     component: DeleteListing,
   },
+  {
+    path: '/contact',
+    name: 'contact',
+    component: ContactUs,
+  }
+  // Other routes
 ];
 
 const router = createRouter({

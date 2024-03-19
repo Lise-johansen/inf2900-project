@@ -1,12 +1,10 @@
 <template>
 	<div id="app">
-		<header>
-			<RentopiaHeader />
-		</header>
-		<footer>
-			<RentopiaFooter />
-		</footer>
-		<router-view/>
+		<RentopiaHeader />
+		<main>
+			<router-view/>
+		</main>
+		<RentopiaFooter />
 	</div>
 </template>
   
