@@ -38,7 +38,8 @@
                     email: ''
                 },
                 userLoggedIn: false,
-                message: ''
+                message: '',
+                subject: ''
             };
         },
         mounted() {
@@ -54,11 +55,30 @@
         },
         methods: {
             async sendMessage() {
-                // Logic to send message
-                console.log('Message sent:', this.message);
-                console.log('User:', this.user);
-                // You can implement the logic to send the message to the backend here
-                // Include the user's information (this.user) in the request if needed
+                // Create message object
+                const message = {
+                    subject: this.subject,
+                    message: this.message,
+                    user: this.user
+                };
+
+                try {
+                    // Send message to the server
+                    const response = await axios.post('contact_us_message/', message);
+
+                    console.log('Message sent:', response.data);
+
+                    alert('Message sent successfully: ' + response.data.message);
+                    
+                    // Clear form fields
+                    this.subject = '';
+                    this.message = '';
+                    
+                }
+                catch (error) {
+                    console.error('Error sending message:', error);
+                    alert('Error sending message: ' + error.response.data.error);
+                }
             }
         }
     };
