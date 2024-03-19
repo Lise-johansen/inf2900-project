@@ -1,88 +1,83 @@
 <template>
-    <div class="about-us-container">
-      <!-- Top middle picture -->
-      <img class="about-us-image" src="@/assets/about_us.png" alt="About Us Image">
-  
-        <!-- Project vision -->
-        <div class="project-vision">
-            <h2>Project Vision</h2>
-            <p>
-            FOR outdoor enthusiasts and individuals with occasional needs <br>
-            WHO seek an affordable and sustainable way to access specialized gear, <br>
-            The Rentopia is a comprehensive online platform <br>
-            THAT facilitates seamless renting and lending of various items, <br>
-            UNLIKE traditional marketplaces such as Finn.no, <br>
-            OUR PRODUCT prioritizes the shared economy, 
-            offering a hassle-free and community-driven <br>
-            experience for users to easily rent or rent out gear, <br>
-            fostering a sense of accessibility, affordability, and environmental responsibility <br>
-            </p>
-        </div>
-  
-        <!-- Line separator -->
-        <hr class="separator">
-        <div class="developer-names">
-            <h2>Developers</h2>
-            <p></p>    
-            <!-- Developer names -->
-            <div class="developer-names">
-                <ul class="developer-list">
-                    <li>Adrian Dybdhal</li>
-                    <li>Lise Johansen</li>
-                    <li>Johansen Figenschou</li>
-                    <li>Heine Lysfjord</li>
-                    <li>Paal Brudevold</li>
-                    <li>Haakon Solheim</li>
-                </ul>
-            </div>  
-        </div>    
+  <div class="about-us">
+    <h1 class="page-title animated-fade-in">About us</h1>
+    <div class="about-content">
+      <p class="about-text divider">
+        <strong>Our Team:</strong><br>
+        We are a group of passionate computer science students from UiT, the Arctic University of Norway, 
+        working together on a project for our INF-2900 course. Our team consists of six members:
+        Adrian Dybdal, Haakon Solheim, Heine Lysfjord, Johannes Figenschou, Lise Johansen, and Paal Brudevold.
+      </p>
+      <p class="about-text">
+        <strong>Our Mission:</strong><br>
+        Here at Rentopia, Our mission is to provide an affordable and sustainable solution for accessing a wide range of items through our comprehensive online platform.
+        Unlike traditional marketplaces, Rentopia prioritizes the shared economy. We believe in fostering a sense of accessibility, 
+        affordability, and environmental responsibility in everything we do. Our platform facilitates seamless renting and lending experiences, 
+        connecting users in a community-driven environment. Whether you're looking to rent or rent out gear, 
+        we strive to offer a hassle-free experience that empowers our users to explore the outdoors while minimizing their environmental impact.
+        Join us at Rentopia and embark on your next adventure with confidence!
+      </p>
     </div>
+  </div>
 </template>
-  
-<style scoped>
-  .about-us-container {
-    text-align: center;
-    padding: 20px;
-  }
-  
-  .about-us-image {
-    max-width: 100%;
-    margin-top: 20px;
-  }
-  
-  .project-vision {
-        margin-top: 20px;
-        border: 1px solid #ccc;
-    }
 
-  .project-vision {
-    margin-top: 20px;
+<script>
+export default {
+  name: "AboutUs",
+};
+</script>
+
+<style scoped>
+.about-us {
+  width: 70%;
+  margin: 0 auto;
+}
+
+.animated-fade-in {
+  opacity: 0;
+  animation: fadeIn 3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .project-vision h2 {
-    font-size: 24px;
+  to {
+    opacity: 1;
   }
-  
-  .separator {
-    margin: 20px 0;
-    border: 1px solid #ccc;
-  }
-  
-  .developer-names {
-    margin-top: 20px;
-  }
-  
-  .developer-names h2 {
-    font-size: 24px;
-  }
-  
-  .developer-names ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .developer-names li {
-    font-size: 18px;
-    margin-bottom: 10px;
-  }
-  </style>
+}
+
+.page-title {
+  font-size: 3.5rem;
+  color: orange;
+}
+
+.about-content {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  min-width: 50%; /* Set a minimum width for the container */
+}
+
+.about-text {
+  font-family: 'louis_george_cafe', sans-serif;
+  font-weight: bold;
+  font-size: 1.5rem;
+  line-height: 1.6;
+  text-align: justify;
+  padding: 1em;
+  text-justify: inter-word;
+  flex-basis: 60%;
+  overflow-wrap: anywhere
+}
+
+.about-text strong {
+  background: linear-gradient(to right, #ff5733 0%, #ffa500 25%, #4169e1 75%);
+  -webkit-text-fill-color: transparent; 
+  -webkit-background-clip: text;
+  animation: fadeIn 4s ease forwards;
+}
+.divider {
+  border-right: 1px solid grey;
+}
+</style>
