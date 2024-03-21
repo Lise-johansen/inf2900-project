@@ -2,27 +2,24 @@
     <div v-if="userLoggedIn" class="contact-form">
             <h1 class="form-title">Fill the form. <br/>It's easy.</h1>
         <div class="form-wrapper">
-            <div class="form-container">
-                <!-- <div class="credentials-container">
-                <p><strong>Name:</strong> {{ user.firstName + ' ' + user.lastName }}</p>
-                <p><strong>Email:</strong> {{ user.email }}</p>
-                </div> -->
-        
+            <div class="form-container">        
                 <textarea id="subject" v-model="subject" rows="1" cols="50" class="message-box" placeholder="Subject"/>
                 <textarea id="message" v-model="message" rows="4" cols="50" class="message-box" placeholder="Write your message..."/>
                 <button @click="sendMessage" class="btn">Send Message</button>
             </div>
 
             <div class="encouraging-container">
-            <h2 class="encouraging-title">Let's talk about everything.</h2>
-            <h2 class='encouraging-text'> Your thoughts matter! We're here to listen and eager to hear from you. Feel free to share your ideas, questions, or any feedback you have.</h2> 
+                <h2 class="encouraging-title">Let's talk about everything.</h2>
+                <h2 class="encouraging-text"> Your thoughts matter! We're here to listen and eager to hear from you. Feel free to share your ideas, questions, or any feedback you have.</h2> 
             </div>
         </div>
-    </div>
+    </div>  
 
     <div v-else>
-        <router-link to="/login" class="login-link">Log In</router-link>
-        <p>Please log in first to contact us.</p>
+        <div class="login-container">
+            <h2 class="encouraging-title login-title animated-fade-in">Please log in first to contact us.</h2>
+            <router-link to="/login" class="login-btn btn">Log In</router-link>
+        </div>
     </div>
 </template>
   
@@ -96,15 +93,23 @@
     .encouraging-text,
     .form-title{
         text-align: start;
+        opacity: 0;
+        animation: fadeIn 1.5s ease forwards;
     }
 
     .encouraging-title{
         align-self: flex-start;
         margin: 0;
+        opacity: 0;
+        animation: fadeIn 1.5s ease forwards;
+        animation-delay: 0.5s; /* Add a delay of 2 seconds */
         
     }
     .encouraging-text {
         font-family: 'louis_george_cafe', sans-serif;
+        opacity: 0;
+        animation: fadeIn 1.5s ease forwards;
+        animation-delay: 1.5s; /* Add a delay of 2 seconds */
     }
     .encouraging-title,
      .form-title{
@@ -164,6 +169,28 @@
         background: linear-gradient(to right,#ffa500 0, #ff5733 50%, #ffa500 100%);
     }
 
+    .login-container {
+        margin-top: 2em;
+    }
+
+    .login-title {
+        text-align: center;
+        margin-bottom: 1em  ;
+    }
+
+    .animated-fade-in {
+        opacity: 0;
+        animation: fadeIn 1.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
 </style>
 
   
