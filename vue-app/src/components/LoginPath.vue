@@ -15,9 +15,8 @@
 
         <button type="submit"> Log In </button>
         <div class="register-and-reset">
-            <router-link to="/register" class="button-link"> Register here </router-link>
-        <div class="spacer"></div>
-            <router-link to="/reset" class="button-link">Reset Password </router-link>
+            <button class="button-link" @click="redirectToRegister"> Register here </button>
+            <button class="button-link" @click="redirectToReset"> Reset Password </button>
         </div>
     </form>
 
@@ -79,6 +78,14 @@ export default {
       }
       return null; // Token not found in cookies
     },
+
+    redirectToRegister() {
+      this.$router.push('/register');
+    },
+
+    redirectToReset() {
+      this.$router.push('/reset');
+    },
   }
 };
 </script>
@@ -105,6 +112,7 @@ export default {
     width: 200px;
     position: absolute;
     border-radius: 50%;
+    opacity: 0.8;
   }
   .shape:first-child {
     background: linear-gradient(
@@ -145,15 +153,14 @@ export default {
     border: none;
   }
   form h3 {
-    font-size: 32px;
-    font-weight: 500;
+    font-size: 35px;
+    font-weight: bolder;
     line-height: 42px;
     text-align: center;
     font-family: 'louis_george_cafe', sans-serif;
     background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
     -webkit-text-fill-color: transparent;
     -webkit-background-clip: text;
-    font-weight: bolder;
   }
   label {
     display: block;
@@ -176,7 +183,11 @@ export default {
     font-weight: 300;
   }
   ::placeholder {
-    color: #e5e5e5;
+    background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    opacity: 0.7;
+    font-weight: bolder;
   }
   button {
     margin-top: 50px;
@@ -189,33 +200,15 @@ export default {
     border-radius: 5px;
     cursor: pointer;
   }
-  .register-and-reset {
-    margin-top: 30px;
+
+  .button-link {
+    /* How do i add space between the buttons? GIGA annoying.*/
+  }
+  .register-and-reset { 
     display: flex;
   }
-  .register-and-reset div {
-    background: red;
-    width: 150px;
-    border-radius: 3px;
-    padding: 5px 10px 10px 5px;
-    background-color: rgba(255,255,255,0.27);
-    color: #eaf0fb;
-    text-align: center;
-  }
-  .register-and-reset div:hover {
-    background-color: rgba(255,255,255,0.47);
-  }
-  .button-link {
-    background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
-    -webkit-text-fill-color: transparent;
-    -webkit-background-clip: text;
-  }
-
+  
   #username, #password {
-    font-family: 'louis_george_cafe', sans-serif;
-    background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
-    -webkit-text-fill-color: transparent;
-    -webkit-background-clip: text;
     padding: 1em .5em;
     border: 3px solid #a4a3a3;
     border-radius: 99999999px;
@@ -233,8 +226,5 @@ export default {
     to {
       opacity: 1;
     }
-  }
-  .spacer {
-    flex: 1;
   }
 </style>
