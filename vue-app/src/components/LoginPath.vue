@@ -81,15 +81,12 @@ export default {
       }
       return null; // Token not found in cookies
     },
-
     redirectToRegister() {
       this.$router.push('/register');
     },
-
     redirectToReset() {
       this.$router.push('/reset');
     },
-
     showRetryPopup() {
       this.showPopup = true;
     },
