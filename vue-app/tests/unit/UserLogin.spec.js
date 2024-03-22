@@ -6,6 +6,7 @@ import axios from 'axios';
 // Mock axios to avoid making real requests
 jest.mock('axios');
 jest.mock('@/assets/about_us.png', () => 'test-file-stub');
+jest.mock('@/assets/logo.png', () => 'test-file-stub');
 
 describe('LoginPath.vue', () => {
   it('shows login form', () => {
