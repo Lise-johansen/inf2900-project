@@ -53,6 +53,7 @@
             align-items: center;
             justify-content: space-between;
             height: 60px;
+            z-index: 1;
         }
 
         .logo-container,
