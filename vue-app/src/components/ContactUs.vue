@@ -149,14 +149,14 @@
         
     }
 
-    .encouraging-container{
+    .encouraging-container {
         flex-basis: 50%;
         display: flex;
         padding-left: 2em;
         flex-direction: column
     }
 
-    .btn{
+    .btn {
         padding: 1em 2em;
         align-self: flex-start;
         border: none;
@@ -164,7 +164,7 @@
         background-color: #ff5733;
         color: whitesmoke;
     }
-
+    
     .btn:hover{
         background: linear-gradient(to right,#ffa500 0, #ff5733 50%, #ffa500 100%);
     }
