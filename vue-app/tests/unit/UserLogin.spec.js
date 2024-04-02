@@ -29,7 +29,7 @@ describe('LoginPath.vue', () => {
     });
 
     // Simulate user input
-    await wrapper.find('input[type="text"]').setValue('invalidUsername');
+    await wrapper.find('input[type="username"]').setValue('invalidUsername');
     await wrapper.find('input[type="password"]').setValue('invalidPassword');
 
     // Simulate login button click
@@ -42,9 +42,6 @@ describe('LoginPath.vue', () => {
 
     // Assert that popup is displayed
     expect(popup.exists()).toBe(true);
-
-    // Log the HTML content of the popup element
-    console.log('Popup Content:', popup.text());
 
     // Assert that error message is displayed
     expect(popup.find('p').text()).toBe('Invalid username or password. Please try again.');
@@ -61,7 +58,7 @@ describe('LoginPath.vue', () => {
     });
 
     // Simulate user input
-    await wrapper.find('input[type="text"]').setValue('validUsername');
+    await wrapper.find('input[type="username"]').setValue('validUsername');
     await wrapper.find('input[type="password"]').setValue('validPassword');
 
     // Simulate login button click
