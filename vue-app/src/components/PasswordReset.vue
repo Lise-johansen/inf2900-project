@@ -1,18 +1,3 @@
-<!-- <template>
-    <div class="reset-container">
-        <div class="reset-box">
-            <div class="logo-container">
-                <img src="@/assets/logo.png" alt="Company Logo" class="company-logo">
-            </div>
-            <h2 class="reset-title">Reset Password</h2>
-            <p class="reset-body">Do you wish to reset your password? If so, enter your email address and follow the instructions.</p>
-            <input type="email" v-model="email" placeholder="Your email..." :class="{ 'is-invalid': emailError }">
-            <div class="invalid-feedback" v-if="emailError">{{ emailError }}</div>
-            <button @click="passwordreset" :disabled="isSubmitting">Send Password Reset Email</button>
-        </div>
-    </div>
-</template> -->
-
 <template>
     <div>
       <div class="background">
