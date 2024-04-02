@@ -19,7 +19,7 @@
     </form>
     <div v-if="showPopup" class="popup">
       <div class="popup-content">
-        <p>Incorrect username or password. Please try again.</p>
+        <p class="error-message">{{ errorMessage }}</p>
         <button @click="hidePopup">OK</button>
       </div>
     </div>
@@ -57,7 +57,7 @@ export default {
         this.$router.push('/dashboard');
       })
       .catch(error => {
-        this.errorMessage = 'Invalid username or password!';
+        this.errorMessage = 'Invalid username or password. Please try again.';
         // Log the error to the console if not in test mode
         if (process.env.NODE_ENV !== 'test') {
           console.log("Login failed!");
@@ -81,15 +81,12 @@ export default {
       }
       return null; // Token not found in cookies
     },
-
     redirectToRegister() {
       this.$router.push('/register');
     },
-
     redirectToReset() {
       this.$router.push('/reset');
     },
-
     showRetryPopup() {
       this.showPopup = true;
     },
