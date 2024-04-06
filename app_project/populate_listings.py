@@ -12,9 +12,8 @@ def populate_listings():
     categories = ['Electronics', 'Clothing', 'Books', 'Furniture', 'Sports Equipment']
     conditions = ['New', 'Used', 'Refurbished']
     locations = ['Langneset', 'Mobekken', 'Gruben']
-    user = User.objects.get(id=1)
-
-    user = User.objects.get(id=1)
+    # Get all users from the database
+    users = User.objects.all()
 
     for _ in range(5):  # Create five random listings
         data = {
@@ -25,11 +24,7 @@ def populate_listings():
             'price_per_day': round(random.uniform(5.0, 50.0), 2),
             'location': random.choice(locations),
             'category': random.choice(categories),
-            'owner': user
-
-            'category': random.choice(categories),
-            'owner': user
-
+            'owner': random.choice(users),
         }
         Item.objects.create(**data)
 
