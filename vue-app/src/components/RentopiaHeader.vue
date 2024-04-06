@@ -12,7 +12,7 @@
             </div>
 
         <div class='icon-container'>
-            <div class="inbox-icon">
+            <div class="inbox-icon" @click="redirectToInbox">
                 <img src="@/assets/inbox.png" alt="Inbox Icon">
             </div>
             <div class="login-icon" @click="redirectToLogin">
@@ -33,6 +33,9 @@
             },
             redirectToHomepage() {
             this.$router.push('/');
+            },
+            redirectToInbox() {
+            this.$router.push('/inbox');
             }
         }
     }
