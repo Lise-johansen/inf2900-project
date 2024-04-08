@@ -15,6 +15,8 @@ import ContactUs from './components/ContactUs.vue'; // Import Contact Us compone
 import EditListing from './components/EditListing.vue'; // Import Edit Listing component
 import CreateItem from './components/CreateItem.vue';
 import MyAccount from './components/MyAccount.vue';
+import SearchPage from './components/SearchPage.vue';
+
 
 const routes = [
   {
