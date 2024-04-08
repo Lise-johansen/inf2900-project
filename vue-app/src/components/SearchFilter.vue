@@ -40,7 +40,6 @@
 
 
 
-
 <script>
     import { ref, computed } from 'vue';
     import axios from 'axios';
@@ -56,7 +55,7 @@
                 }
             },
         },
-        
+
         setup() {
             const searchTerm = ref('');
             const loading = ref(false);
