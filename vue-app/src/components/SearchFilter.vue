@@ -3,7 +3,13 @@
         <div class="spacer">
             <!-- Add a spacer to push the content below the header -->
         </div>
-        <input type="text" v-model="searchTerm" @input="handleSearchChange" placeholder="Search here!" class="search-input" style="padding: 0.5em 0.5em;">
+        <input type="text" 
+        v-model="searchTerm" 
+        @input="handleSearchChange" 
+        placeholder="Search here!" 
+        class="search-input" 
+        @keyup.enter="redirectToSearchPage"
+        style="padding: 0.5em 0.5em;">
         <div v-if="searchTerm.length === 0">
             <!-- Just so that the no result text doesn't show up before the user has written anything. -->
         </div>
@@ -33,11 +39,24 @@
 </template>
 
 
+
+
 <script>
     import { ref, computed } from 'vue';
     import axios from 'axios';
 
     export default {
+        methods: {
+            redirectToSearchPage() {
+                if (this.searchTerm) {
+                    this.$router.push({ name: 'searchPage', query: { q: this.searchTerm } });
+                } else {
+                // If there's no searchTerm, just go to the search page without any query
+                    this.$router.push('/search-page/');
+                }
+            },
+        },
+        
         setup() {
             const searchTerm = ref('');
             const loading = ref(false);
