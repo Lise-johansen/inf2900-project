@@ -14,6 +14,7 @@ from fernet import Fernet
 import json
 import jwt
 from airfinn.utils import get_user_by_id, email_checks, password_checks
+from django.db.models import Q
 
 from airfinn.models import Item
 
