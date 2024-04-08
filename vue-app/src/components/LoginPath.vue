@@ -263,14 +263,9 @@ export default {
 
   .error-message {
     font-family: 'louis_george_cafe', sans-serif;
-    font-size: 50px;
+    font-size: 30px;
     font-weight: bold;
-    font-style: italic;
     padding: 10px;
-    background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
-    -webkit-text-fill-color: transparent;
-    -webkit-background-clip: text;
-
   }
 
   .popup {
@@ -294,5 +289,7 @@ export default {
 
   .popup button {
     margin-top: 10px;
+    font-size: 20px;
+    padding: 10px;
   }
 </style>
