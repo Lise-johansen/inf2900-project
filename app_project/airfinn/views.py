@@ -550,3 +550,20 @@ def delete_user(request):
     user.delete()
     
     return JsonResponse({'message': 'User deleted successfully'}, status=200)
+
+def search_page(request):
+    category = request.GET.get('category', '')
+    query = request.GET.get('q', '')
+
+    items = Item.objects.all()
+    if category:
+        items = items.filter(category=category)
+    if query:
+        items = items.filter(
+            Q(name__icontains=query) | 
+            Q(description__icontains=query)
+            # Add any other fields you'd like to search by
+        ).distinct()  # Use distinct() to avoid duplicate results
+
+    data = serialize('json', items)
+    return JsonResponse(data, safe=False)
