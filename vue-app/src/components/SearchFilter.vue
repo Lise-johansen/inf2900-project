@@ -1,5 +1,8 @@
 <template>
     <div>
+        <div class="spacer">
+            <!-- Add a spacer to push the content below the header -->
+        </div>
         <input type="text" v-model="searchTerm" @input="handleSearchChange" placeholder="Search here!" class="search-input" style="padding: 0.5em 0.5em;">
         <div v-if="searchTerm.length === 0">
             <!-- Just so that the no result text doesn't show up before the user has written anything. -->
@@ -94,7 +97,7 @@
         width: 100%;
         max-width: 400px; /* Adjust as needed */
         padding: 1em .5em;
-        border: 1px solid #ccc;
+        border: 3px solid #ccc;
         border-radius: 99999999px;
         box-sizing: border-box;
     }
@@ -157,6 +160,9 @@
 
     .item-category:last-child {
         border-bottom: none;
+    }
+    .spacer {
+        height: 30px; /* Set the height of the spacer */
     }
 </style>
 
