@@ -54,33 +54,65 @@ class UserTestCase(TestCase):
         self.assertEqual(response.status_code, 401)
 
 
-
 class EditListingTestCase(TestCase):
     def setUp(self):
-        # Create a test user with create_user method
-        # Credentials of test user:
-        self.credentials = {
-            'username': 'tester@testing.mail.com',
-            'email': 'tester@testing.mail.com',
-            'password': 'password',
-            'first_name': 'testy',
-            'last_name': 'testington',
-            'address': '1234 Test St.',
-            'phone': '12345678'
-        }
-        
-        self.user = User.objects.create_user(**self.credentials)
-        
+        # Create a test user
+        self.user = User.objects.create_user(username='testuser', password='password')
+
         # Create a test item
-        self.item = Item.objects.create(name="Test Item", description="This is a test item", availability=True, condition="New", price_per_day=5.00, images="images/default.jpg", owner=self.user, location="Test Location")
+        self.item = Item.objects.create(name="Test Item", description="This is a test item", price_per_day=5.00, location="Test Location", category="Test Category",  owner=self.user)
+
+    def test_edit_listing_authenticated_owner(self):
+        # update request data
+        updated_data = {
+            'name': 'Updated Item',
+            'description': 'This is an updated item',
+            'price_per_day': 10.00,
+            'location': 'Updated Location',
+            'category': 'Updated Category'
+        }
+
+        # Make PUT request to edit the item
+        response = self.client.put(reverse('edit_listing', args=[self.item.id]), data=json.dumps(updated_data), content_type='application/json')
+
+        # Check if the item is updated successfully
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Item.objects.get(id=self.item.id).name, updated_data['name'])
+        self.assertEqual(Item.objects.get(id=self.item.id).description, updated_data['description'])
+        self.assertEqual(Item.objects.get(id=self.item.id).price_per_day, updated_data['price_per_day'])
+        self.assertEqual(Item.objects.get(id=self.item.id).location, updated_data['location'])
+        self.assertEqual(Item.objects.get(id=self.item.id).category, updated_data['category'])
+        
+    def test_edit_listing_authenticated_non_owner(self):
+        # Create another user who is not the owner
+        non_owner = User.objects.create_user(username='nonowner', password='password')
+
+        # update request data
+        updated_data = {
+            'name': 'Updated Item',
+            'description': 'This is an updated item',
+            'price_per_day': 10.00,
+            'location': 'Updated Location',
+            'category': 'Updated Category'
+        }
+
+        # Authenticate as non-owner user
+        self.client.login(username='nonowner', password='password')
+
+        # Make PUT request to edit the item
+        response = self.client.put(reverse('edit_listing', args=[self.item.id]), data=json.dumps(updated_data), content_type='application/json')
+
+        # Check if the non-owner is not allowed to edit the item
+        self.assertEqual(response.status_code, 403)
+
+    def test_edit_listing_unauthenticated_user(self):
+        # Make PUT request without authentication
+        response = self.client.put(reverse('edit_listing', args=[self.item.id]), data={}, content_type='application/json')
+
+        self.assertEqual(response.status_code, 401)
 
 
 
-    # All the test cases
-        # Autheraist user that can delete
-        # Authorized user but can not delete
-        # Unathirized (not logedinn) user and can not do anything
-        # Filed inn all llfiled with correct input
 
 
                 
