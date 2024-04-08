@@ -1,62 +1,46 @@
 <template>
-    <div class = button-row>
-        <button class = "filter-button red" @click="handleButtonClick"></button>
-        <button class = "filter-button orange" @click="handleButtonClick"></button>
-        <button class = "filter-button orange" @click="handleButtonClick"></button>
-        <button class = "filter-button blue" @click="handleButtonClick"></button>
+    <div class="buttons-container">
+        <div class="first-row">
+            <Button label="Summer" outlined />
+            <Button label="Winter" outlined />
+            <Button label="Tools" outlined/>
+            <Button label="Electronics" outlined/>
+        </div>
+        <div class="second-row">
+            <Button label="Electronics" outlined/>
+            <Button label="Clothing"  outlined/>
+            <Button label="Furniture" outlined/>
+            <Button label="Sports Equipment" outlined/>
+        </div>
     </div>
 </template>
 
 <script>
-export default {
+import Button from 'primevue/button';
+export default {    
+    components: {
+        Button
+    },
     name: 'FilterButtons',
 }
 </script>
 
 <style scoped>
-
-    .button-row{
+    .buttons-container {
         display: flex;
-        justify-content: space-evenly;
-        margin-top: 3%;
-        margin-left: 30%;
-        margin-right: 30%;
+        flex-direction: column;
+        flex-wrap: wrap;
+        align-content: center;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: auto auto;
     }
-
-    .filter-button {
-        width: 72px;
-        height: 72px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 3px solid black;
-        background-image: url('https://via.placeholder.com/72/');
+    .p-button {
+        margin: 10px;
+        transition: outline 200ms ease; 
     }
-
-    .filter-button:hover {
-        cursor: pointer;
-        transform: scale(1.1);
-        box-shadow: 0px 0px 5px 2px gray;
-        transition: 0.1s;
-
-    }
-
-    .red 
-    {
-        background-color: #ff5733;
-    }
-
-    .orange 
-    {
-        background-color: #ffa500;
-
-    }
-
-    .blue 
-    {
-        background-color: #4169e1;
-
+    .p-button:hover {
+        outline: 2px solid var(--primary-color);
     }
 
 

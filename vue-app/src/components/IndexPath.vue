@@ -9,12 +9,9 @@
 		<search-filter @filter="applyFilter" />
 		<SmallListing v-for="item in filteredItems" :key="item.id" :imageUrl="item.imageUrl" :title="item.title" :location="item.location" />
         <FilterButtons />
-        <ListingCarousel />
-        <ListingCarousel />
-        <ListingCarousel />
-        <ListingCarousel />
-        <ListingCarousel />
-    
+        <ListingCarousel category="Furniture"/>
+        <ListingCarousel category="Books"/>
+        <ListingCarousel category="Clothing"/>    
     </div>
 </template>
 
@@ -27,7 +24,7 @@
 
 	export default {
 		name: 'App',
-		components: { SearchFilter, SmallListing, FilterButtons, ListingCarousel},
+		components: { SearchFilter, SmallListing, ListingCarousel, FilterButtons},
 		data() {
 			return {
 				filteredItems: [],
