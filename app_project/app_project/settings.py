@@ -30,15 +30,17 @@ STATICFILES_DIRS = [
 SECRET_KEY = 'django-insecure-&@nmsdwxy*o!l1_r8p@t#&w4n@w3ljbeoqzq4t87q8accy=fdw'
 
 # Change the following to VUE app URL
-FRONTEND_URL = 'https://django.dybedahlserver.net'
+# FRONTEND_URL = 'https://django.dybedahlserver.net'
+FRONTEND_URL = 'http://localhost:8080/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # Use HTTPS for secure connections
-SECURE_SSL_REDIRECT = True
+# SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 
-ALLOWED_HOSTS = ['django.dybedahlserver.net', 'localhost']
+ALLOWED_HOSTS = ['django.dybedahlserver.net', 'localhost', '127.0.0.1']
 
 USER_MODEL = 'airfinn.User'
 AUTH_USER_MODEL = 'airfinn.User'
@@ -70,7 +72,7 @@ MIDDLEWARE = [
 
 ]
 
-CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net']
+CORS_ALLOWED_ORIGINS = ['https://django.dybedahlserver.net', 'https://rentopia.dybedahlserver.net', 'http://localhost:8080', 'http:// localhost:8000']
 CORS_ALLOW_ALL_ORIGINS = True # CORS middleware
 CORS_ALLOW_CREDENTIALS = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -118,15 +120,20 @@ WSGI_APPLICATION = 'app_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    # Use the following configuration for PostgreSQL:
+    # # Use the following configuration for PostgreSQL:
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'postgres',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'St3rkP@ss0rd',
+    #     'HOST': 'localhost',
+    #     'PORT': '5432',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'St3rkP@ss0rd',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / '../db.sqlite3',
     }
+    
 }
 
 
