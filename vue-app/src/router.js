@@ -14,6 +14,7 @@ import ContactUs from './components/ContactUs.vue'; // Import Contact Us compone
 // import LogoutScript from './components/LogoutScript.vue';
 import EditListing from './components/EditListing.vue'; // Import Edit Listing component
 import CreateItem from './components/CreateItem.vue';
+import MyAccount from './components/MyAccount.vue';
 
 const routes = [
   {
@@ -91,6 +92,11 @@ const routes = [
     path: '/contact',
     name: 'contact',
     component: ContactUs,
+  },
+  {
+    path: '/my-account',
+    name: 'my-account',
+    component: MyAccount,
   }
   // Other routes
 ];
