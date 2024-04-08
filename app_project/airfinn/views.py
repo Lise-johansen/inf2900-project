@@ -33,7 +33,7 @@ def get_user_id_for_token_auth(request):
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = payload['user_id']
         return user_id
-    
+
     except Exception as e:
         return None
 
@@ -491,3 +491,62 @@ def contact_us_message(request):
         return JsonResponse({'message': 'Message sent successfully'}, status=200)
     except Exception as e:
         return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
+
+def update_user(request):
+    if request.method != 'PUT':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    data = json.loads(request.body)
+    
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+
+    user = get_user_by_id(user_id)
+    
+    if user is None:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    user.first_name = data.get('first_name', user.first_name)
+    user.last_name = data.get('last_name', user.last_name)
+    user.address = data.get('address', user.address)
+    user.phone = data.get('phone', user.phone)
+    
+    user.save()
+    
+    return JsonResponse({'message': 'Profile updated successfully'}, status=200)
+
+def delete_user(request):
+    if request.method != 'DELETE':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    user = get_user_by_id(user_id)
+    
+    if user is None:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    user.delete()
+    
+    return JsonResponse({'message': 'User deleted successfully'}, status=200)

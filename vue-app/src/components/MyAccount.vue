@@ -14,9 +14,22 @@
         <div class="spacer"></div>
 
         <button class="button-link" @click="redirectToReset"> Reset password? </button>
-        <button class="button-link" @click="deleteAccount"> Delete your account?</button>
+        <button class="button-link" @click="showConfirmationPopup"> Delete your account? </button>
         <button class="button-link" @click="saveChanges"> Save changes </button>
       </div>
+
+      <!-- Confirmation Popup -->
+      <div v-if="showConfirmation" class="popup">
+        <div class="popup-content">
+          <p class ="error-message"> Are you sure you want to delete your account? </p>
+          <div class="button-container">
+            <button class="yes-button" @click="deleteAccount"> Yes </button>
+            <button class="no-button" @click="hideConfirmationPopup"> No </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Error Popup -->
       <div v-if="showPopup" class="popup">
       <div class="popup-content">
         <p class="error-message">{{ errorMessage }}</p>
@@ -43,6 +56,7 @@
         },
         profilePicture: null,
         showPopup: false,
+        showConfirmation: false,
         errorMessage: '',
         illegalSymbolsPattern: /[^\d\s+]/,
         };
@@ -77,7 +91,7 @@
                 };
             }
         },
-        
+      
         saveChanges() {
           // Check if any of the required fields are empty
           if (!this.user.firstName || !this.user.lastName || !this.user.address || !this.user.phone) {
@@ -105,6 +119,18 @@
           });
         },
         
+        deleteAccount() {
+          axios.delete('delete_user/')
+          .then(response => {
+            console.log('Account deleted successfully:', response);
+            this.$router.push('/login');
+          })
+          .catch(error => {
+            console.error('Error deleting user account:', error);
+          });
+          this.hideConfirmationPopup();
+        },
+
         redirectToReset() {
           this.$router.push('/reset');
         },
@@ -116,6 +142,15 @@
         hidePopup() {
           this.errorMessage = ''; // Clear the error message
           this.showPopup = false;
+        },
+
+        showConfirmationPopup(event) {
+          event.preventDefault();
+          this.showConfirmation = true;
+        },
+
+        hideConfirmationPopup() {
+          this.showConfirmation = false;
         },
     },
 
@@ -264,6 +299,42 @@
 
   .button-link:hover {
     background-color: #ffffff;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .button-container button {
+    margin: 0 20px;
+  }
+
+  .yes-button {
+    background-color: rgb(4, 200, 4);
+    color: white;
+    padding: 10px 20px;
+    font-size: 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  .yes-button:hover {
+    background-color: #058d02;
+  }
+  
+  .no-button {
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    font-size: 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  .no-button:hover {
+    background-color: #a30404;
   }
 
   .spacer {
