@@ -1,9 +1,9 @@
 <template>
-    <div>
-      <input type="password" v-model="password" placeholder="New Password">
-      <input type="password" v-model="confirmPassword" placeholder="Confirm New Password">
-      <button @click="resetPassword">Reset Password</button>
-    </div>
+  <div>
+    <input type="password" v-model="password" placeholder="New Password">
+    <input type="password" v-model="confirmPassword" placeholder="Confirm New Password">
+    <button @click="resetPassword">Reset Password</button>
+  </div>
 </template>
   
 <script>

@@ -17,24 +17,26 @@
 </script>
 
 <style scoped>
+    /* Ensure the footer is positioned at the bottom of the viewport */
     .footer {
         background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
         color: #fff;
         padding: 20px 0;
-        position: fixed;
-        bottom: 0;
-        left: 0;
         width: 100%;
         text-align: center;
         opacity: 0.8;
         z-index: 1;
+        box-shadow: 0px -10px 20px rgba(0, 0, 0, 0.3); /* Add shadow to the top */
     }
+
+    /* Ensure the footer stays at the bottom even when scrolling */
 
     .footer-content {
         max-width: 1200px;
         margin: 0 auto;
         opacity: 1;
         font-family: 'louis_george_cafe', sans-serif;
+        
     }
 
     .footer ul {

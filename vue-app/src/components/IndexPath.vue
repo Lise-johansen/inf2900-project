@@ -1,11 +1,5 @@
-/**
- * The template block of the IndexPath component.
- * This component represents the main template of the IndexPath component.
- */
-
- <template>
+<template>
 	<div>
-        <h1 class="headline">Find your next rental below:</h1>
 		<search-filter @filter="applyFilter" />
 		<SmallListing v-for="item in filteredItems" :key="item.id" :imageUrl="item.imageUrl" :title="item.title" :location="item.location" />
         <FilterButtons />
@@ -76,4 +70,3 @@
 	}
 
 </style>
-

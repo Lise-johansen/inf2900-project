@@ -1,5 +1,4 @@
-
-
+// router.js
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from './components/LoginPath.vue'; // Import your Login component
 import Register from './components/RegisterPath.vue'; // Import your Register component
@@ -9,7 +8,13 @@ import IndexPath from './components/IndexPath.vue';
 import PasswordResetForm from './components/PasswordResetForm.vue'; // Import Password Reset Form component
 import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email component
 // import Listing from '.components/Listing.vue'; // Import Listing component
+import AboutUs from './components/AboutUs.vue'; // Import About Us component
+import DeleteListing from './components/DeleteListing.vue'; // Import Delete Listing component
+import ContactUs from './components/ContactUs.vue'; // Import Contact Us component
 // import LogoutScript from './components/LogoutScript.vue';
+import EditListing from './components/EditListing.vue'; // Import Edit Listing component
+import CreateItem from './components/CreateItem.vue';
+import MyAccount from './components/MyAccount.vue';
 
 const routes = [
   {
@@ -57,12 +62,42 @@ const routes = [
     path: '/verify-email',
     name: 'verifyemail',
     component: VerifyEmail,
-  }
+  },
+  {
+    path: '/create-listing',
+    name: 'create-listing',
+    component: CreateItem
+  },
   // {
   //   path: '/listings/:id',
   //   name: 'listings',
   //   component: Listings,
   // },
+  {
+    path: '/about',
+    name: 'about',
+    component: AboutUs,
+  },
+  {
+    path: '/EditListing',
+    name: 'EditListing',
+    component: EditListing,
+  },
+  {
+    path: '/delete',
+    name: 'delete',
+    component: DeleteListing,
+  },
+  {
+    path: '/contact',
+    name: 'contact',
+    component: ContactUs,
+  },
+  {
+    path: '/my-account',
+    name: 'my-account',
+    component: MyAccount,
+  }
   // Other routes
 ];
 

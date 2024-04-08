@@ -20,6 +20,7 @@
             </div>
         </div>
     </header>
+    <div class="header-border"></div>
 </template> 
 
 <script>
@@ -51,6 +52,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            height: 60px;
+            z-index: 1;
         }
 
         .logo-container,
@@ -93,6 +96,12 @@
         .inbox-icon img {
             max-width: 50px; /* Set a maximum width for the image */
             height: auto; /* Allow the height to adjust proportionally */
+            transition: transform 1s ease;
+        }
+
+        .login-icon:hover img,
+        .inbox-icon:hover img {
+            transform: scale(1.2,1.2);
         }
 
         @font-face {
@@ -109,4 +118,10 @@
             font-style: normal;
         }
 
+        .header-border {
+            height: 3px; /* Adjust the height of the border */
+            background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
+            opacity: 0.4;
+            width: 100%; /* Make the border span the entire width of the page */
+        }
 </style>
