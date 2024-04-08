@@ -4,7 +4,7 @@ import router from './router';
 import axios from 'axios';
 import PrimeVue from 'primevue/config';
 
-axios.defaults.baseURL = 'http://localhost:8000/api/';
+axios.defaults.baseURL = 'https://django.dybedahlserver.net/api/';
 axios.defaults.withCredentials = true;
 import 'primevue/resources/themes/lara-light-amber/theme.css'
 const app = createApp(App);
