@@ -97,7 +97,12 @@ const routes = [
     path: '/my-account',
     name: 'my-account',
     component: MyAccount,
-  }
+  },
+  {
+    path: '/search-page/', // Ensure this matches the path used in navigation
+    name: 'searchPage',
+    component: SearchPage,
+  },
   // Other routes
 ];
 
