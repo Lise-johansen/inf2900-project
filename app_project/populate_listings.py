@@ -63,6 +63,8 @@ def main():
             populate_listings()
             populate_user()
             print('All populated')
+    else:
+        print('No arguments given. Use -listings to populate listings, -user to populate user, or -all to populate both.')
 
 if __name__ == '__main__':
     main()
