@@ -25,6 +25,10 @@ export default {
             { label: 'Electronics', icon: 'laptop', active: false },
             { label: 'Clothing', icon: 'tshirt', active: false },
             { label: 'Furniture', icon: 'couch', active: false },
+            { label: 'Tools', icon: 'tools', active: false },
+            { label: 'Toys', icon: 'robot', active: false },
+            { label: 'Instruments', icon: 'guitar', active: false},
+            { label: 'Town Square', icon: 'tree-city', active: false },
           ],
         };
     },
@@ -46,6 +50,7 @@ export default {
 
         // Emit the updated filters array to the parent component
         this.$emit('filter-change', this.filters);
+        console.log('Current active component filters:', this.filters);
       },
     },
 
@@ -63,6 +68,7 @@ export default {
 .filter-option {
   padding: 10px; /* adjust padding for filter options */
   border: 1px solid #d3d3d3; /* border color */
+  max-width: 1200px; /* maximum width for the filter options */
   border-radius: 5px; /* rounded corners for filter options */
   user-select: none; /* prevent text selection */
   cursor: pointer; /* change mouse cursor on hover */
