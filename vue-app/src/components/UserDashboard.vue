@@ -68,14 +68,21 @@
         },
 
         handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                    this.profilePicture = reader.result;
-                };
-            }
+          const file = event.target.files[0];
+          if (file) {
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            // Upload image to backend
+            axios.post('upload_image/', formData)
+              .then(response => {
+                // Update profilePicture with the URL of the uploaded image
+                this.profilePicture = response.data.image_url;
+              })
+              .catch(error => {
+                console.error('Error uploading image:', error);
+              });
+          }
         }
     },
 
@@ -84,6 +91,7 @@
         axios.get('dashboard/')
         .then(response => {
             this.user = response.data;
+            this.profilePicture = response.data.profilePicture;
         })
         .catch(error => {
             console.error('Error fetching user data:', error);
