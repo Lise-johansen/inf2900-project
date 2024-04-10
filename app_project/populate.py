@@ -12,6 +12,7 @@ from airfinn.models import Item, User  # Import your model
 def populate_user():
     # Create a random email since emails must be unique
     email = f'{random.randint(1000, 9999)}@example.com'
+    password = f'{random.randint(1000, 9999)}'
 
     user = {
         'first_name': f'Pop',
@@ -20,7 +21,7 @@ def populate_user():
         'username': email,
         'address': f'Pop User Street',
         'phone': f'12345678',
-        'password': f'admin',
+        'password': password,
     }
 
     #Create a single basic user
