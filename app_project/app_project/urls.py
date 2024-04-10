@@ -33,6 +33,7 @@ urlpatterns = [
     path('api/reset-password/<str:uidb64>/<str:token>/', views.reset_password, name='reset_password'),
     path('api/dashboard/', views.dashboard, name='dashboard'),
     path('api/search/', views.search_items, name='search_items'),
+    path('api/search-page/', views.search_page, name='search_page'),
     path('api/logout/', views.logout, name='logout'),
     path('api/upload-profile-picture/', utils.upload_profile_picture, name='upload_profile_picture'),
     path('api/verify-email/', views.verify_email, name='verify_email'),
