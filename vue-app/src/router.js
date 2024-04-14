@@ -16,6 +16,7 @@ import EditListing from './components/EditListing.vue'; // Import Edit Listing c
 import CreateItem from './components/CreateItem.vue';
 import MyAccount from './components/MyAccount.vue';
 import SearchPage from './components/SearchPage.vue';
+import PrivacyPolicy from './components/PrivacyPolicy.vue';
 
 
 const routes = [
@@ -104,6 +105,11 @@ const routes = [
     path: '/search-page/', // Ensure this matches the path used in navigation
     name: 'searchPage',
     component: SearchPage,
+  },
+  {
+    path: '/privacy-policy',
+    name: 'privacy-policy',
+    component: PrivacyPolicy,
   },
   // Other routes
 ];
