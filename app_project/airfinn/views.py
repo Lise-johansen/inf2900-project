@@ -524,9 +524,6 @@ def get_conversations(request):
     # Prepare data
     data = []
     for conversation in conversations:
-        # Get the other participant in the conversation
-        other_user = conversation.user2 if conversation.user1 == user else conversation.user1
-        
         # Assign sender and receiver names
         sender_name = 'You' if conversation.user1 == user else f"{conversation.user1.first_name} {conversation.user1.last_name}"
         receiver_name = 'You' if conversation.user2 == user else f"{conversation.user2.first_name} {conversation.user2.last_name}"
