@@ -17,7 +17,7 @@ import CreateItem from './components/CreateItem.vue';
 import MyAccount from './components/MyAccount.vue';
 import SearchPage from './components/SearchPage.vue';
 import PrivacyPolicy from './components/PrivacyPolicy.vue';
-
+import LeafletMap from './components/LeafletMap.vue';
 
 const routes = [
   {
@@ -110,6 +110,11 @@ const routes = [
     path: '/privacy-policy',
     name: 'privacy-policy',
     component: PrivacyPolicy,
+  },
+  {
+    path: '/map',
+    name: 'map',
+    component: LeafletMap,
   },
   // Other routes
 ];
