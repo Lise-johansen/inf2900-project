@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import 'primeicons/primeicons.css'
+import 'primeicons/primeicons.css';
 import axios from 'axios';
 import Carousel from 'primevue/carousel';
 import Button from 'primevue/button';
