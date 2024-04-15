@@ -491,7 +491,78 @@ def contact_us_message(request):
         return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
     
 
-def received_messages(request):
+def get_conversations(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get session token and decode it.
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+  
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    print(f"Conversations for user: {user_id}")
+    
+    # Retrieve the user object corresponding to the user ID
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    # Get all conversations where the user is a participant
+    conversations = Conversation.objects.filter(user1=user) | Conversation.objects.filter(user2=user)
+    
+    # Prepare data
+    data = []
+    for conversation in conversations:
+        # Get the other participant in the conversation
+        other_user = conversation.user2 if conversation.user1 == user else conversation.user1
+        
+        # Assign sender and receiver names
+        sender_name = 'You' if conversation.user1 == user else f"{conversation.user1.first_name} {conversation.user1.last_name}"
+        receiver_name = 'You' if conversation.user2 == user else f"{conversation.user2.first_name} {conversation.user2.last_name}"
+        
+        # Get the latest message in the conversation
+        latest_message = Message.objects.filter(conversation=conversation).order_by('-created_at').first()
+        
+        # Prepare conversation data
+        conversation_data = {
+            'id': conversation.id,
+            'item': {
+                'id': conversation.item.id,
+                'name': conversation.item.name
+            },
+            'sender': {
+                'id': conversation.user1.id,
+                'username': conversation.user1.username,
+                'name': sender_name
+            },
+            'receiver': {
+                'id': conversation.user2.id,
+                'username': conversation.user2.username,
+                'name': receiver_name
+            },
+            'latest_message': {
+                'message': latest_message.message,
+                'created_at': latest_message.created_at.strftime('%Y-%m-%d %H:%M:%S') if latest_message else None
+            }
+        }
+        data.append(conversation_data)
+        print(f"Conversation: {conversation_data}")
+        
+    # Return the data as JSON response
+    return JsonResponse(data, safe=False)
+
+def get_messages(request):
     if request.method != 'GET':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
     
@@ -518,16 +589,28 @@ def received_messages(request):
     except User.DoesNotExist:
         return JsonResponse({'error': 'User not found'}, status=404)
     
-    # Retrieve conversations where the user is a participant
-    conversations = Conversation.objects.filter(user1=user) | Conversation.objects.filter(user2=user)
+    # Retrieve the conversation ID from query parameters
+    conversation_id = request.GET.get('conversation_id')
     
-    # Prepare data
-    data = []
-    for conversation in conversations:
+    if not conversation_id:
+        return JsonResponse({'error': 'Conversation ID not provided'}, status=400)
+    
+    # Retrieve the conversation object by ID
+    conversation = get_object_or_404(Conversation, id=conversation_id)
+    
+    # Check if the user is a participant in the conversation
+    if user not in [conversation.user1] + [conversation.user2]:
+        return JsonResponse({'error': 'Conversation not found'}, status=404)
+    
+    else:
         # Get all messages in the conversation
         messages = Message.objects.filter(conversation=conversation).order_by('created_at')
         
-        # Iterate over each message in the conversation
+        # Sort messages from oldest to newest
+        messages = sorted(messages, key=lambda x: x.created_at)
+        
+        # Prepare data
+        data = []
         for message in messages:
             # Get the sender and receiver names
             sender_name = 'You' if message.sender == user else f"{message.sender.first_name} {message.sender.last_name}"
@@ -561,7 +644,8 @@ def received_messages(request):
             print(f"Message: {message_data}")
         
     # Return the data as JSON response
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data, safe=False)  
+    
 
 def send_messages(request):
     if request.method != 'POST':
