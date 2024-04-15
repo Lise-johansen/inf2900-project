@@ -1,13 +1,14 @@
 <template>
-    <div class="mailbox">
-      <!-- Left side: Display list of conversations -->
-      <div class="left-panel">
-        <div class="inbox">
-          <h3>Inbox</h3>
-          <div v-if="filteredConversations.length === 0">No conversations</div>
-          <div v-else>
-            <div v-for="conversation in filteredConversations" :key="conversation.id" @click="fetchMessages(conversation.id)">
-              <div class="conversation">
+  <div class="mailbox">
+    <!-- Left side: Display list of conversations -->
+    <div class="left-panel">
+      <div class="inbox">
+        <h3>Inbox</h3>
+        <div v-if="filteredConversations.length === 0">No conversations</div>
+        <div v-else>
+          <div class="conversation-box">
+            <div v-for="conversation in filteredConversations" :key="conversation.id" @click="openConversation(conversation)">
+              <div class="conversation-details">
                 <!-- Display the name of the other participant in the conversation -->
                 <div class="participant">
                   {{ getParticipantName(conversation) }}
@@ -21,22 +22,29 @@
           </div>
         </div>
       </div>
-  
-      <!-- Right side: Display selected conversation messages and input for new message -->
-      <div class="right-panel">
-        <div class="inbox">
+    </div>
+
+    <!-- Right side: Display selected conversation messages and input for new message -->
+    <div :class="{ 'right-panel': true, 'active': showRightPanel }">
+      <div class="inbox">
+      <div v-if="selectedConversation">
+        <router-link :to="'/listings/' + selectedConversation.item.id" class="item-link">
+        <h2> {{ selectedConversation.item.name }} </h2></router-link>
           <div class="mail-details" v-if="selectedConversation">
-            <h2> <router-link :to="'/listings/' + selectedConversation.item.id" class="item-link">
-                {{ selectedConversation.item.name }}
-            </router-link></h2>
-            <div class="conversation-area" ref="messageContainer">
+            <div class="mail-box"  ref="messageContainer">
               <div v-for="message in selectedConversation.messages" :key="message.id">
                 <div class="message">
                   <!-- Check if there are messages -->
                   <div v-if="selectedConversation.messages.length !== 0">
-                    <div class="sender">{{ message.sender.name }}</div>
-                    <div class="content">{{ message.message }}</div>
-                    <div class="date" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>                  </div>
+                    <div class="date" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>                  
+                    <div v-if="message.sender.name === 'You'" class="sender">{{ message.sender.name }}
+                      <div class="message-content-sender">{{ message.message }}</div>
+                    </div>
+                    <div v-else class="receiver">{{ message.sender.name }}
+                      <div class="message-content-receiver">{{ message.message }}</div>
+                    </div>
+                    
+                  </div>
                   <div v-else>
                     <p class="error-message">{{ errorMessage }}</p>
                   </div>
@@ -48,19 +56,20 @@
               <button @click="sendMessage">Send</button>
             </div>
           </div>
-        </div>
       </div>
-
-      <!-- Popup for displaying error message -->
-      <div v-if="showPopup" class="popup">
-        <div class="popup-content">
-          <p class="error-message">{{ errorMessage }}</p>
-          <button @click="hidePopup">OK</button>
-        </div>
       </div>
     </div>
+
+    <!-- Popup for displaying error message -->
+    <div v-if="showPopup" class="popup">
+      <div class="popup-content">
+        <p class="error-message">{{ errorMessage }}</p>
+        <button @click="hidePopup">OK</button>
+      </div>
+    </div>
+  </div>
 </template>
-  
+
 <script>
   import axios from 'axios';
   
@@ -71,7 +80,8 @@
         selectedConversation: null, // Object to store selected conversation
         newMessage: '', // New message input
         errorMessage: '', // Error message to display in popup
-        showPopup: false // Flag to show/hide popup
+        showPopup: false, // Flag to show/hide popup
+        showRightPanel: false
       };
     },
     mounted() {
@@ -155,6 +165,7 @@
       openConversation(conversation) {
         // Set selectedConversation to the clicked conversation to display messages
         this.selectedConversation = conversation;
+        this.showRightPanel = true;
         console.log("Selected conversation:", this.selectedConversation);
         this.fetchMessages(conversation.id);
       },
@@ -186,6 +197,12 @@
             // Assign the received messages to the selected conversation
             this.selectedConversation.messages = data;
             console.log("Messages for conversation:", this.selectedConversation.messages);
+
+            // Scroll to the bottom after messages have been fetched
+            this.$nextTick(() => {
+                this.scrollToBottom();
+            });
+
           } else {
             // Handle unexpected response format
             console.error('Unexpected response format:', data);
@@ -195,11 +212,6 @@
           // Handle error
           console.error('Error fetching messages:', error);
           this.errorMessage = 'Error fetching messages.';
-        });
-        
-        // After opening conversation, scroll to the bottom
-        this.$nextTick(() => {
-          this.scrollToBottom();
         });
       },
       sendMessage() {
@@ -247,6 +259,11 @@
           
           // Clear the new message input
           this.newMessage = '';
+
+          // Scroll to the bottom after sending the message
+          this.$nextTick(() => {
+            this.scrollToBottom();
+          });
         })
         .catch(error => {
           // Handle error
@@ -293,124 +310,251 @@
   
 <style scoped>
     .mailbox {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        height: calc(100vh - 200px); /* Adjust based on the height of the banner and footer */
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
     }
 
     .left-panel {
-        max-width: 25%;
-        transition: max-width 0.3s ease, margin-left 0.3s ease;
+      margin-left: 0%;
+      margin-right: 5px;
+      margin-top: 20px;
+      max-width: 15%;
+      transition: max-width 0.3s ease, margin-left 0.3s ease;
+      box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 30px;
+      backdrop-filter: blur(10px);
     }
 
     .right-panel {
-        max-width: 75%; /* Adjusted to accommodate both mail details and input box */
-        transition: max-width 0.3s ease, margin-right 0.3s ease;
+      max-width: 0%;
+      overflow: hidden;
+      overflow-y: auto;
+      transition: max-width 0.3s ease, margin-left 0.3s ease;
+    }
+
+    .right-panel.active {
+      margin-top: 20px;
+      margin-right: 0; /* Reset margin-right */
+      margin-left: 0; /* Reset margin-left */
+      max-width: calc(100% - 1%); /* Adjusted width when panel is active */
+      margin-right: 0; /* Reset margin-right */
+      box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 30px;
+      backdrop-filter: blur(10px);
     }
 
     .inbox {
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.13);
-        border-radius: 30px;
-        backdrop-filter: blur(10px);
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
-        padding: 20px; /* Adjusted padding */
+      height: 100%;
+      width: 800px;
+      background-color: rgba(255, 255, 255, 0.13);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Add animation for right panel opening */
+    .right-panel {
+      animation: slideInRight 0.3s forwards;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 100;
+      }
     }
 
     .inbox * {
-        font-family: 'Poppins', sans-serif;
-        color: #676767;
-        letter-spacing: 0.5px;
-        outline: none;
-        border: none;
+      font-family: 'Poppins', sans-serif;
+      color: #676767;
+      letter-spacing: 0.5px;
+      outline: none;
+      border: none;
     }
 
     .inbox h3 {
-        font-size: 35px;
-        font-weight: bolder;
-        line-height: 42px;
-        text-align: center;
-        font-family: 'louis_george_cafe', sans-serif;
-        background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
-        -webkit-text-fill-color: transparent;
-        -webkit-background-clip: text;
+      font-size: 35px;
+      font-weight: bolder;
+      max-width: 47%;
+      line-height: 42px;
+      text-align: center;
+      font-family: 'louis_george_cafe', sans-serif;
+      background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
     }
 
-    .mail {
-        cursor: pointer;
-        margin-bottom: 20px;
-        padding: 10px;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        background-color: #f9f9f9;
-        transition: background-color 0.3s ease;
+    .inbox h2 {
+      font-size: 30px;
+      font-weight: bolder;
+      line-height: 42px;
+      text-align: center;
+      font-family: 'louis_george_cafe', sans-serif;
+      background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
     }
-
-    .mail:hover {
-        background-color: #e0e0e0;
-    }
-
-    .sender {
-        font-weight: bold;
-    }
-
-    .date {
-        margin-top: 5px;
-        color: #888;
-    }
-
-    .mail-details {
-      margin-top: 20px; /* Adjusted margin */
-      padding: 20px;
-      background-color: #f9f9f9;
-      border: 2px solid #ccc;
-      border-radius: 30px;
-    }
-
+    
     .mail-details h2 {
         font-size: 24px;
         font-weight: bold;
     }
 
-    .conversation-area {
-      max-height: calc(100vh - 400px); /* Adjusted maximum height */
-      overflow-y: scroll; /* Enable vertical scrolling */
+    .sender, .receiver {
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 20px;
+      max-width: 70%; /* Adjust the width as needed */
+      word-wrap: break-word;
+      margin-bottom: 5px;
+    }
+
+    .sender {
+      background-color: #007bff;
+      color: #fff;
+      text-align: right;
+      margin-left: auto;
+      position: relative; /* Add position relative */
+    }
+
+    .sender::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: 100%; /* Position border to the left of the sender */
+      transform: translateY(-50%);
+      width: 8px; /* Adjust border width as needed */
+      height: 8px; /* Adjust border height as needed */
+      background-color: transparent;
+      border-top: 2px solid #007bff; /* Add border between sender and message */
+      border-right: 2px solid #007bff; /* Add border between sender and message */
+      border-radius: 50%;
+    }
+
+    .message-content-sender {
+      background-color: #007bff;
+      color: #fff;
+      text-align: right;
+      margin-left: auto;
+    }
+
+    .receiver {
+      background-color: #f0f0f0;
+      color: #333;
+      text-align: left;
+      margin-right: auto;
+      position: relative; /* Add position relative */
+    }
+
+    .receiver::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 100%; /* Position border to the right of the receiver */
+      transform: translateY(-50%);
+      width: 8px; /* Adjust border width as needed */
+      height: 8px; /* Adjust border height as needed */
+      background-color: transparent;
+      border-top: 2px solid #f0f0f0; /* Add border between receiver and message */
+      border-left: 2px solid #f0f0f0; /* Add border between receiver and message */
+      border-radius: 50%;
+    }
+
+    .message-content-receiver {
+      background-color: #f0f0f0;
+      color: #333;
+      text-align: left;
+      margin-right: auto;
+    }
+
+    .date {
+      margin-bottom: 5px;
+      margin-right: 5px;
+      color: #888;
+      font-size: 12px;
+      text-align: right;
     }
 
     .message {
-        margin-top: 10px;
+      margin-top: 20px;
+      border: 2px solid #ccc;
+      border-radius: 20px;
+      overflow-wrap: break-word;
+      padding: 15px;
+      background-color: #ffff;
     }
 
+    .mail-box {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      max-height: calc(100vh - 450px);
+      overflow-y: scroll;
+    }
+
+    .conversation-details {
+      margin-bottom: 10px;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #f0f0f0;
+      transition: background-color 0.3s ease;
+    }
+
+    .conversation-box {
+      margin-top: 10px;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      max-height: calc(100vh - 450px);
+      overflow-y: scroll;
+      max-width: 42%;
+    }
+
+    .conversation-details:hover {
+        background-color: #e0e0e0;
+    }
+
+
     .input-box {
-      margin-top: 20px; /* Adjusted margin */
+      margin-top: 20px;
       padding: 20px;
       background-color: #f9f9f9;
       border: 2px solid #ccc;
       border-radius: 30px;
+      display: flex;
+      align-items: center;
     }
 
     textarea {
-        flex: 1;
-        resize: none;
-        padding: 10px;
-        border: 2px solid #ccc;
-        border-radius: 5px;
+      flex: 1;
+      resize: none;
+      padding: 10px;
+      border: 2px solid #ffa500;
+      border-radius: 5px;
+      margin-right: 10px;
+      box-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
     }
 
     button {
-        padding: 10px 20px;
-        margin-left: 10px;
-        border: none;
-        border-radius: 5px;
-        background-color: #007bff;
-        color: white;
-        cursor: pointer;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: rgb(255, 255, 255);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
     }
 
     button:hover {
-        background-color: #0056b3;
+      background-color: #0056b3;
     }
 
     .popup {
@@ -447,14 +591,17 @@
         -webkit-background-clip: text;
     }
 
-    .item-name {
-        font-family: 'louis_george_cafe', sans-serif;
-        font-weight: bold;
-        font-size: 16px;
-        padding-bottom: 5px;
-        padding-top: 5px;
-        list-style: none;
-        margin-left: 0;
-        padding-left: 0;
+    .item-link {
+      text-decoration: none;
+      color: #000;
+    }
+
+    /* Define fade animation */
+    .fade-enter-active, .fade-leave-active {
+      transition: opacity 0.5s;
+    }
+
+    .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+      opacity: 0;
     }
 </style>
