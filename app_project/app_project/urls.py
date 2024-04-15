@@ -17,8 +17,6 @@ Including another URLconf
 from django.contrib import admin
 from airfinn import views
 from airfinn import utils
-
-
 from django.urls import path, include  # Ensure include is imported
 from django.conf.urls.static import static
 from django.conf import settings
