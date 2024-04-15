@@ -14,6 +14,7 @@ from fernet import Fernet
 import json
 import jwt
 from airfinn.utils import get_user_by_id, email_checks, password_checks
+import random
 from django.db.models import Q
 
 from airfinn.models import Item
@@ -551,6 +552,29 @@ def delete_user(request):
     user.delete()
     
     return JsonResponse({'message': 'User deleted successfully'}, status=200)
+    
+def get_listings(request, category):
+    try:
+        # Get all item id's in the specified category.
+        all_items = list(Item.objects.filter(category=category, availability=True).values_list('id', flat=True))
+
+        # Create a random sample of 12 item id's.
+        sample_ids = random.sample(all_items, 12)
+
+        # Get the items with the sampled id's and sort them in random order.
+        random_data = Item.objects.filter(id__in=sample_ids).order_by('?')
+        
+        # Create a list of dictionaries with the item data.
+        data = [{'id': item.id, 'name': item.name, 'description': item.description, 'price_per_day': item.price_per_day, 'location': item.location, 'category': item.category} for item in random_data]
+
+        # Return the data as a JSON response.
+        return JsonResponse(data, safe=False, status=200)
+
+    # Exception handling for when the item does not exist.    
+    except Item.DoesNotExist:
+        return JsonResponse({'error': 'Category does not exist'}, status=404)
+    
+
 
 def search_page(request):
     category = request.GET.get('category', '')

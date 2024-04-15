@@ -2,19 +2,26 @@
 	<div>
 		<search-filter @filter="applyFilter" />
 		<SmallListing v-for="item in filteredItems" :key="item.id" :imageUrl="item.imageUrl" :title="item.title" :location="item.location" />
-	</div>
+        <FilterButtons />
+        <ListingCarousel category="Furniture"/>
+        <ListingCarousel category="Books"/>
+        <ListingCarousel category="Clothing"/>    
+    </div>
 </template>
 
 <script>
 	import SearchFilter from './SearchFilter.vue';
 	import SmallListing from './SmallListing.vue';
+    import FilterButtons from './FilterButtons.vue';
+    import ListingCarousel from './ListingCarousel.vue';
+
 
 	export default {
 		name: 'App',
-		components: { SearchFilter, SmallListing },
+		components: { SearchFilter, SmallListing, ListingCarousel, FilterButtons},
 		data() {
 			return {
-				filteredItems: []
+				filteredItems: [],
 			};
 		},
 		methods: {
