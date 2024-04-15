@@ -415,23 +415,35 @@ def edit_listing(request, item_id):
         data = json.loads(request.body)
 
         # Update item fields with data from the request
-        item.name = data.get('name', item.name)
+        # item.name = data.get('name', item.name)
         
         # Update all fileds
         item.name = data.get('name', item.name)
         item.description = data.get('description', item.description)
-        item.price_per_day = data.get('price_per_day', item.price_per_day)
+        
+        price_per_day = data.get('price_per_day', item.price_per_day)
+
+        # Check if price is a number and not negative
+        if not isinstance(price_per_day, (int, float)):
+            return JsonResponse({'error': 'Price must be a number'}, status=400)
+        elif price_per_day < 0:
+            return JsonResponse({'error': 'Price cannot be negative'}, status=400)
+        else:
+            # item.price_per_day = float(price_per_day)
+            item.price_per_day = data.get('price_per_day', float(item.price_per_day))
+
         item.location = data.get('location', item.location)
         item.category = data.get('category', item.category)
+
         
         # Save the changes to the item
         item.save()
 
         # Return a success response
-        return JsonResponse({'message': 'Item updated successfully'})
-    except json.JSONDecodeError:
-        # Handle JSON decoding error
-        return JsonResponse({'message': 'Invalid JSON data'}, status=400)
+        return JsonResponse({'message': 'Item updated successfully'}, status=200)
+    
+    except ValueError:
+        return JsonResponse({'message': 'Invalid type inserted to a field'}, status=400)
     except Exception as e:
         # Handle other potential errors
         return JsonResponse({'message': f'Error updating item: {str(e)}'}, status=500)
