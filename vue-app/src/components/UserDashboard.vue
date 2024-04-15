@@ -5,7 +5,7 @@
       <div class="profilepicture-container">
         <div class="profile-picture-outline">
           <img v-if="profilePicture" :src="profilePicture" alt="Avatar" class="profile-picture">
-          <input type="file" accept="image/*" @change="handleImageUpload" :style="{ display: profilePicture ? 'none' : 'block' }">
+          <input type="file" accept="image/jpeg,image/png" @change="handleImageUpload" :style="{ display: profilePicture ? 'none' : 'block' }">
         </div>
       </div>
       
@@ -58,32 +58,47 @@
     },
 
     methods: {
-        logout() {
+      logout() {
         axios.get('logout/')
-        .then(response => {
+          .then(response => {
             document.cookie = `token=${response.data.token}`;
             document.cookie = `auth_user=${response.data.auth_user}`;
             this.$router.push('/');
-        })
-        },
+          })
+      },
+      handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64Image = reader.result.split(',')[1]; // Extract base64 data
+            const imageData = {
+              image: base64Image
+            };
 
-        handleImageUpload(event) {
-          const file = event.target.files[0];
-          if (file) {
-            const formData = new FormData();
-            formData.append('image', file);
-            
-            // Upload image to backend
-            axios.post('upload_image/', formData)
+            // Upload image data to backend
+            axios.put('upload_image/', imageData)
               .then(response => {
-                // Update profilePicture with the URL of the uploaded image
+                console.log('Image uploaded:', response);
                 this.profilePicture = response.data.image_url;
               })
               .catch(error => {
                 console.error('Error uploading image:', error);
               });
+          };
+          reader.readAsDataURL(file); // Start reading the file as a data URL
+        }
+      },
+      getTokenFromCookies() {
+        const cookies = document.cookie.split('; ');
+        for (const cookie of cookies) {
+          const [name, value] = cookie.split('=');
+          if (name === 'token') {
+            return value;
           }
         }
+        return null; // Token not found in cookies
+      }
     },
 
     mounted() {

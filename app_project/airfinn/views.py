@@ -11,11 +11,9 @@ from .models import Item, User
 from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
-import json, jwt, requests
+import json, jwt, requests, base64
 from airfinn.utils import get_user_by_id, email_checks, password_checks
 from django.db.models import Q
-
-from airfinn.models import Item
 
 def index(request):
     return JsonResponse({'message': 'Welcome to Rentopia!'})
@@ -570,40 +568,38 @@ def search_page(request):
 
 
 def upload_image(request):
-    if request.method == 'POST' and request.FILES.get('image'):
+    if request.method == 'PUT':
+        print("request.FILES: ", request.data)
+        print("request print: ", request.FILES.get('image'))
+        
         uploaded_image = request.FILES['image']
+        
         
         # Handle image upload to Cloudflare's R2 Cloud Storage
         try:
-            # Replace 'YOUR_ACCOUNT_ID' and 'YOUR_NAMESPACE_ID' with your actual Cloudflare details
-            account_id = '6bd68a5646b28bbad02cbc5741100443'
-            namespace_id = 'YOUR_NAMESPACE_ID'
-            
-            # Assuming you have a bucket created, replace 'YOUR_BUCKET_NAME' with your actual bucket name
-            bucket_name = 'YOUR_BUCKET_NAME'
-            
             # Construct the URL for uploading to Cloudflare R2 Cloud Storage
-            url = f'https://{account_id}.r2.cloudflarestorage.com'
+            url = f'https://rentopia-images.dybedahlserver.net/{uploaded_image.name}'
             
             # Prepare headers with necessary authentication information
             headers = {
-                'Authorization': 'Bearer YOUR_TOKEN',  # Replace 'YOUR_TOKEN' with your Cloudflare API token
-                'Content-Type': 'application/json'
+                'x-auth-email': 'adriandybdal@outlook.com',  # Replace with your Cloudflare account email
+                'x-auth-key': '76r_N9GS2_zviF7458zlzi8QI-oAGw5UKlomtXE-',  # Replace with your Cloudflare API key
+                'Content-Type': 'application/octet-stream'
             }
             
             # Upload image to Cloudflare R2 Cloud Storage using PUT request
             response = requests.put(url, data=uploaded_image.read(), headers=headers)
-            response_data = response.json()
             
-            # Check if the upload was successful and retrieve the URL of the uploaded image
+            # Check if the upload was successful
             if response.ok:
-                image_url = f'https://cdn.example.com/{response_data["key"]}'  # Replace 'cdn.example.com' with your actual CDN domain
-                user_profile = User.objects.get(user=request.user)  # Assuming user profile is associated with the logged-in user
+                image_url = url
+                # Assuming you want to save the image URL to user profile
+                user_profile = User.objects.get(user=request.user)
                 user_profile.profile_picture = image_url
                 user_profile.save()
                 return JsonResponse({'image_url': image_url}, status=201)
             else:
-                return JsonResponse({'error': response_data['errors']}, status=response.status_code)
+                return JsonResponse({'error': response.text}, status=response.status_code)
         
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
