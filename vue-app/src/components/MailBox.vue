@@ -6,7 +6,7 @@
           <h3>Inbox</h3>
           <div v-if="filteredConversations.length === 0">No conversations</div>
           <div v-else>
-            <div v-for="conversation in filteredConversations" :key="conversation.conversation.id" @click="openConversation(conversation)">
+            <div v-for="conversation in filteredConversations" :key="conversation.id" @click="fetchMessages(conversation.id)">
               <div class="conversation">
                 <!-- Display the name of the other participant in the conversation -->
                 <div class="participant">
@@ -14,9 +14,7 @@
                 </div>
                 <!-- Display item id and date -->
                 <div class="details">
-                  Listing: {{ conversation.listing.name }}
-                  <br>
-                  Date: {{ formatDateString(conversation.created_at) }}
+                  Listing: {{ conversation.item.name }}
                 </div>
               </div>
             </div>
@@ -28,14 +26,21 @@
       <div class="right-panel">
         <div class="inbox">
           <div class="mail-details" v-if="selectedConversation">
-            <h2> <router-link :to="'/listings/' + selectedConversation.listing.id" class="item-link">
-                {{ selectedConversation.listing.name }}
+            <h2> <router-link :to="'/listings/' + selectedConversation.item.id" class="item-link">
+                {{ selectedConversation.item.name }}
             </router-link></h2>
-            <div v-for="message in selectedConversation.messages" :key="message.id">
-              <div class="message">
-                <div class="sender">{{ message.sender.name }}</div>
-                <div class="content">{{ message.message }}</div>
-                <div class="date">{{ formatDateString(message.created_at) }}</div>
+            <div class="conversation-area" ref="messageContainer">
+              <div v-for="message in selectedConversation.messages" :key="message.id">
+                <div class="message">
+                  <!-- Check if there are messages -->
+                  <div v-if="selectedConversation.messages.length !== 0">
+                    <div class="sender">{{ message.sender.name }}</div>
+                    <div class="content">{{ message.message }}</div>
+                    <div class="date" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>                  </div>
+                  <div v-else>
+                    <p class="error-message">{{ errorMessage }}</p>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="input-box">
@@ -45,7 +50,7 @@
           </div>
         </div>
       </div>
-  
+
       <!-- Popup for displaying error message -->
       <div v-if="showPopup" class="popup">
         <div class="popup-content">
@@ -70,7 +75,7 @@
       };
     },
     mounted() {
-      // Fetch conversations with messages from API when component is mounted
+      // Fetch conversations when component is mounted
       this.fetchConversations();
     },
     computed: {
@@ -79,7 +84,7 @@
             const groupedConversations = {};
             
             this.conversations.forEach(conversation => {
-            const conversationId = conversation.conversation.id;
+            const conversationId = conversation.id;
             if (!groupedConversations[conversationId]) {
                 // Create a new array for this conversation ID if it doesn't exist
                 groupedConversations[conversationId] = { ...conversation, messages: [] };
@@ -96,10 +101,17 @@
         }
     },
     methods: {
+      scrollToBottom() {
+        // Get the message container element using $refs
+        const messageContainer = this.$refs.messageContainer;
+
+        // Scroll the message container to the bottom
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      },
       fetchConversations() {
         // Get the authentication token from cookies
         const token = this.getTokenFromCookies();
-  
+
         // Make sure token is available
         if (!token) {
           // Handle error - user is not logged in
@@ -107,9 +119,9 @@
           this.showPopup = true;
           return;
         }
-  
+
         // Make API request to fetch conversations with messages
-        axios.get('received-messages/', {
+        axios.get('get-conversations/', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -121,10 +133,19 @@
             // Assign the received conversations directly
             this.conversations = data;
             console.log("Conversations with messages:", this.conversations);
+
+            // Update selectedConversation to reflect the first conversation (if available)
+            if (!this.selectedConversation && this.conversations.length > 0) {
+              this.selectedConversation = this.conversations[0];
+            }
+
           } else {
             // Handle unexpected response format
             console.error('Unexpected response format:', data);
           }
+
+          // Trigger vue component update
+          this.$forceUpdate();
         })
         .catch(error => {
           // Handle error
@@ -134,6 +155,52 @@
       openConversation(conversation) {
         // Set selectedConversation to the clicked conversation to display messages
         this.selectedConversation = conversation;
+        console.log("Selected conversation:", this.selectedConversation);
+        this.fetchMessages(conversation.id);
+      },
+      fetchMessages(conversation_id){
+        // Get the authentication token from cookies
+        const token = this.getTokenFromCookies();
+        
+        // Make sure token is available
+        if (!token) {
+          // Handle error - user is not logged in
+          this.errorMessage = 'Please login to view messages.';
+          this.showPopup = true;
+          return;
+        }
+  
+        // Make API request to fetch messages for the selected conversation
+        axios.get(`get-messages/`, {
+          params: {
+            conversation_id: conversation_id
+          },
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        .then(response => {
+          // Handle successful response
+          const data = response.data;
+          if (data && Array.isArray(data) && data.length > 0) {
+            // Assign the received messages to the selected conversation
+            this.selectedConversation.messages = data;
+            console.log("Messages for conversation:", this.selectedConversation.messages);
+          } else {
+            // Handle unexpected response format
+            console.error('Unexpected response format:', data);
+          }
+        })
+        .catch(error => {
+          // Handle error
+          console.error('Error fetching messages:', error);
+          this.errorMessage = 'Error fetching messages.';
+        });
+        
+        // After opening conversation, scroll to the bottom
+        this.$nextTick(() => {
+          this.scrollToBottom();
+        });
       },
       sendMessage() {
         // Get the authentication token from cookies
@@ -156,12 +223,13 @@
   
         // Make API request to send a message
         axios.post('send-messages/', {
-          sender_id: this.selectedConversation.sender.id, // Assuming you have the sender's ID available
-          receiver_id: this.selectedConversation.receiver.id, // Assuming you can access the recipient's ID
+          sender_id: this.selectedConversation.sender.id,
+          receiver_id: this.selectedConversation.receiver.id,
           message: this.newMessage,
-          item_id: this.selectedConversation.listing.id, // Assuming you can access the ID of the listing (item)
-          conversation_id: this.selectedConversation.conversation.id // Assuming you can access the conversation ID
-        }, {
+          item_id: this.selectedConversation.item.id,
+          conversation_id: this.selectedConversation.id
+        }, 
+        {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -169,6 +237,14 @@
         .then(response => {
           // Handle successful response
           console.log('Message sent:', response.data);
+          
+          // Append the new message to the selected conversation
+          this.selectedConversation.messages.push({
+            sender: { name: "You" },
+            message: this.newMessage,
+            created_at: response.data.created_at
+          });
+          
           // Clear the new message input
           this.newMessage = '';
         })
@@ -210,7 +286,7 @@
       getParticipantName(conversation) {
         // Return the name of the other participant in the conversation
         return conversation.sender.name === "You" ? conversation.receiver.name : conversation.sender.name;
-      }
+      },
     }
   };
 </script>
@@ -286,11 +362,11 @@
     }
 
     .mail-details {
-        margin-top: 20px; /* Adjusted margin */
-        padding: 20px;
-        background-color: #f9f9f9;
-        border: 2px solid #ccc;
-        border-radius: 30px;
+      margin-top: 20px; /* Adjusted margin */
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 2px solid #ccc;
+      border-radius: 30px;
     }
 
     .mail-details h2 {
@@ -298,13 +374,21 @@
         font-weight: bold;
     }
 
+    .conversation-area {
+      max-height: calc(100vh - 400px); /* Adjusted maximum height */
+      overflow-y: scroll; /* Enable vertical scrolling */
+    }
+
     .message {
         margin-top: 10px;
     }
 
     .input-box {
-        margin-top: 20px; /* Adjusted margin */
-        display: flex;
+      margin-top: 20px; /* Adjusted margin */
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 2px solid #ccc;
+      border-radius: 30px;
     }
 
     textarea {
