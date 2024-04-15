@@ -1,7 +1,7 @@
 <template>
   <div class="my-account">
       <div class="input-container">
-        <h3>Feel free to change your account information here!</h3>
+        <h3>Change your account information here!</h3>
         <h4>First name:</h4>
         <input v-model="user.firstName" placeholder="First name..." class="input-field"/>
         <h4>Last name:</h4>
@@ -255,7 +255,7 @@
   .input-field {
     display: block;
     height: 50px;
-    width: 96%;
+    width: 100%;
     background-color: rgba(255,255,255,0.07);
     border-radius: 3px;
     padding: 0 10px;
@@ -266,8 +266,7 @@
   }
 
   .input-container {
-    height: 600px;
-    width: 600px;
+    max-width: 600px;
     background-color: rgba(255,255,255,0.13);
     position: absolute;
     transform: translate(-50%,-50%);
@@ -277,6 +276,7 @@
     backdrop-filter: blur(10px);
     border: 2px solid rgba(255,255,255,0.1);
     box-shadow: 0 0 40px rgba(8,7,16,0.6);
+    margin: 0 auto;
     padding: 50px 35px;
   }
 
