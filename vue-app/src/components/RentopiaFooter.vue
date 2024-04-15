@@ -19,7 +19,7 @@
   <style scoped>
   /* Ensure the footer is positioned at the bottom of the viewport */
   .footer {
-    position: fixed;
+    position: relative;
     left: 0;
     bottom: 0;
     background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
@@ -35,8 +35,7 @@
     max-width: 1200px;
     margin: 0 auto;
     font-family: 'louis_george_cafe', sans-serif;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    font-size: 1.5em;
   }
   
   .footer ul {
