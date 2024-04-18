@@ -7,17 +7,13 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Item, User
+from .models import Item, User, Message, Conversation
 from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
-import json
-import jwt
+import json, jwt, random
 from airfinn.utils import get_user_by_id, email_checks, password_checks
-import random
 from django.db.models import Q
-
-from airfinn.models import Item
 
 def index(request):
     return JsonResponse({'message': 'Welcome to Rentopia!'})
@@ -592,3 +588,254 @@ def search_page(request):
 
     data = serialize('json', items)
     return JsonResponse(data, safe=False)
+
+    
+
+def get_conversations(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get session token and decode it.
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+  
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    print(f"Conversations for user: {user_id}")
+    
+    # Retrieve the user object corresponding to the user ID
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    # Get all conversations where the user is a participant
+    conversations = Conversation.objects.filter(user1=user) | Conversation.objects.filter(user2=user)
+    
+    # Prepare data
+    data = []
+    for conversation in conversations:
+        # Assign sender and receiver names
+        sender_name = 'You' if conversation.user1 == user else f"{conversation.user1.first_name} {conversation.user1.last_name}"
+        receiver_name = 'You' if conversation.user2 == user else f"{conversation.user2.first_name} {conversation.user2.last_name}"
+        
+        # Get the latest message in the conversation
+        latest_message = Message.objects.filter(conversation=conversation).order_by('-created_at').first()
+        
+        # Prepare conversation data
+        conversation_data = {
+            'id': conversation.id,
+            'item': {
+                'id': conversation.item.id,
+                'name': conversation.item.name
+            },
+            'sender': {
+                'id': conversation.user1.id,
+                'username': conversation.user1.username,
+                'name': sender_name
+            },
+            'receiver': {
+                'id': conversation.user2.id,
+                'username': conversation.user2.username,
+                'name': receiver_name
+            },
+            'latest_message': {
+                'message': latest_message.message,
+                'created_at': latest_message.created_at.strftime('%Y-%m-%d %H:%M:%S') if latest_message else None
+            }
+        }
+        data.append(conversation_data)
+        print(f"Conversation: {conversation_data}")
+        
+    # Return the data as JSON response
+    return JsonResponse(data, safe=False)
+
+def get_messages(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get session token and decode it.
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+  
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    print(f"Messages for user: {user_id}")
+    
+    # Retrieve the user object corresponding to the user ID
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    # Retrieve the conversation ID from query parameters
+    conversation_id = request.GET.get('conversation_id')
+    
+    if not conversation_id:
+        return JsonResponse({'error': 'Conversation ID not provided'}, status=400)
+    
+    # Retrieve the conversation object by ID
+    conversation = get_object_or_404(Conversation, id=conversation_id)
+    
+    # Check if the user is a participant in the conversation
+    if user not in [conversation.user1] + [conversation.user2]:
+        return JsonResponse({'error': 'Conversation not found'}, status=404)
+    
+    else:
+        # Get all messages in the conversation
+        messages = Message.objects.filter(conversation=conversation).order_by('created_at')
+        
+        # Sort messages from oldest to newest
+        messages = sorted(messages, key=lambda x: x.created_at)
+        
+        # Prepare data
+        data = []
+        for message in messages:
+            # Get the sender and receiver names
+            sender_name = 'You' if message.sender == user else f"{message.sender.first_name} {message.sender.last_name}"
+            receiver_name = 'You' if message.receiver == user else f"{message.receiver.first_name} {message.receiver.last_name}"
+            
+            # Prepare message data
+            message_data = {
+                'id': message.id,
+                'sender': {
+                    'id': message.sender.id,
+                    'username': message.sender.username,
+                    'name': sender_name
+                },
+                'receiver': {
+                    'id': message.receiver.id,
+                    'username': message.receiver.username,
+                    'name': receiver_name
+                },
+                'listing': {
+                    'id': conversation.item.id,
+                    'name': conversation.item.name
+                },
+                'conversation': {
+                    'id': conversation.id,
+                    'created_at': conversation.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                },
+                'message': message.message,
+                'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')  # Convert to string format
+            }
+            data.append(message_data)
+            print(f"Message: {message_data}")
+        
+    # Return the data as JSON response
+    return JsonResponse(data, safe=False)  
+    
+
+def send_messages(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    data = json.loads(request.body)
+    sender_id = data.get('sender_id')
+    receiver_id = data.get('receiver_id')
+    message_text = data.get('message')
+    item_id = data.get('item_id')
+    conversation_id = data.get('conversation_id')
+    
+    # Get session token and decode it.
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+  
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    print(f"Messages for user: {user_id}")
+    
+    # Retrieve the user object corresponding to the user ID
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    # Check if the sender_id corresponds to the user_id
+    if sender_id != user_id:
+        receiver_id = sender_id
+        sender_id = user_id
+        
+    # Retrieve the sender and receiver objects
+    sender = get_user_by_id(sender_id)
+    receiver = get_user_by_id(receiver_id)
+    
+    # Check if the sender and receiver exist
+    if not sender or not receiver:
+        return JsonResponse({'error': 'Sender or receiver not found'}, status=404)
+    
+    # Retrieve the item object
+    item = get_object_or_404(Item, id=item_id)
+    
+    # Check if the conversation ID is provided
+    if conversation_id:
+        # Get the conversation object by ID
+        conversation = get_object_or_404(Conversation, id=conversation_id)
+    else:
+        # Check if there is an existing conversation between sender and receiver for this item
+        conversation = Conversation.objects.filter(user1=sender, user2=receiver, item=item).first()
+    
+    # If no existing conversation found, create a new one
+    if not conversation:
+        conversation = Conversation.objects.create(user1=sender, user2=receiver, item=item)
+        
+    # Create a new message
+    message = Message.objects.create(conversation=conversation, sender=sender, receiver=receiver, message=message_text)
+    
+    # Prepare message data
+    message_data = {
+        'id': message.id,
+        'sender': {
+            'id': sender.id,
+            'username': sender.username,
+            'name': f"{sender.first_name} {sender.last_name}"
+        },
+        'receiver': {
+            'id': receiver.id,
+            'username': receiver.username,
+            'name': f"{receiver.first_name} {receiver.last_name}"
+        },
+        'listing': {
+            'id': item.id,
+            'name': item.name
+        },
+        'conversation': {
+                    'id': conversation.id,
+                    'created_at': conversation.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'message': message.message,
+        'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')  # Convert to string format
+    }
+    
+    print(f"Message: {message_data}")
+    print(f"Sender ID: {message_data.get('sender').get('id')}, Receiver ID: {message_data.get('receiver').get('id')}")
+    print(f"Sender name {message_data.get('sender').get('name')}. Receiver name {message_data.get('receiver').get('name')}")
+    # Return the message data as JSON response
+    return JsonResponse(message_data, status=201)
