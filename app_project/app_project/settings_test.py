@@ -38,7 +38,7 @@ DEBUG = True
 # Use HTTPS for secure connections
 SECURE_SSL_REDIRECT = False
 
-ALLOWED_HOSTS = ['django.dybedahlserver.net', 'localhost']
+ALLOWED_HOSTS = ['django.dybedahlserver.net', 'localhost', '127.0.0.1']
 
 USER_MODEL = 'airfinn.User'
 AUTH_USER_MODEL = 'airfinn.User'

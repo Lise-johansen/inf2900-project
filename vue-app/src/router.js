@@ -14,6 +14,9 @@ import ContactUs from './components/ContactUs.vue'; // Import Contact Us compone
 // import LogoutScript from './components/LogoutScript.vue';
 import EditListing from './components/EditListing.vue'; // Import Edit Listing component
 import CreateItem from './components/CreateItem.vue';
+import MyAccount from './components/MyAccount.vue';
+import SearchPage from './components/SearchPage.vue';
+import PrivacyPolicy from './components/PrivacyPolicy.vue';
 import MailBox from './components/MailBox.vue';
 
 const routes = [
@@ -97,7 +100,22 @@ const routes = [
     path: '/inbox',
     name: 'inbox',
     component: MailBox,
-  }
+  },
+  {
+    path: '/my-account',
+    name: 'my-account',
+    component: MyAccount,
+  },
+  {
+    path: '/search-page/', // Ensure this matches the path used in navigation
+    name: 'searchPage',
+    component: SearchPage,
+  },
+  {
+    path: '/privacy-policy',
+    name: 'privacy-policy',
+    component: PrivacyPolicy,
+  },
   // Other routes
 ];
 
