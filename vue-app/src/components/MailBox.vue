@@ -26,7 +26,7 @@
 
     <!-- Right side: Display selected conversation messages and input for new message -->
     <div :class="{ 'right-panel': true, 'active': showRightPanel }">
-      <div class="inbox">
+      <div class="message-box">
       <div v-if="selectedConversation">
         <router-link :to="'/listings/' + selectedConversation.item.id" class="item-link">
         <h2> {{ selectedConversation.item.name }} </h2></router-link>
@@ -36,12 +36,17 @@
                 <div class="message">
                   <!-- Check if there are messages -->
                   <div v-if="selectedConversation.messages.length !== 0">
-                    <div class="date" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>                  
-                    <div v-if="message.sender.name === 'You'" class="sender">{{ message.sender.name }}
-                      <div class="message-content-sender">{{ message.message }}</div>
+                    <div v-if="message.sender.name === 'You'">
+                      <div class="date-sender" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>                  
+                      <div class="sender">{{ message.sender.name }}
+                        <div class="message-content-sender">{{ message.message }}</div>
+                      </div>
                     </div>
-                    <div v-else class="receiver">{{ message.sender.name }}
-                      <div class="message-content-receiver">{{ message.message }}</div>
+                    <div v-else>
+                      <div class="date-receiver" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>   
+                      <div class="receiver">{{ message.sender.name }}
+                        <div class="message-content-receiver">{{ message.message }}</div>
+                      </div>
                     </div>
                     
                   </div>
@@ -319,16 +324,17 @@
       margin-left: 0%;
       margin-right: 5px;
       margin-top: 20px;
-      max-width: 15%;
+      width: 15%;
       transition: max-width 0.3s ease, margin-left 0.3s ease;
       box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
       padding: 20px;
       border-radius: 30px;
       backdrop-filter: blur(10px);
+      overflow: auto;
     }
 
     .right-panel {
-      max-width: 0%;
+      width: 0%;
       overflow: hidden;
       overflow-y: auto;
       transition: max-width 0.3s ease, margin-left 0.3s ease;
@@ -338,7 +344,7 @@
       margin-top: 20px;
       margin-right: 0; /* Reset margin-right */
       margin-left: 0; /* Reset margin-left */
-      max-width: calc(100% - 1%); /* Adjusted width when panel is active */
+      width: 40%; /* Adjusted width when panel is active */
       margin-right: 0; /* Reset margin-right */
       box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
       padding: 20px;
@@ -348,8 +354,7 @@
 
     .inbox {
       height: 100%;
-      width: 800px;
-      background-color: rgba(255, 255, 255, 0.13);
+      max-width: 800px;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
@@ -380,7 +385,6 @@
     .inbox h3 {
       font-size: 35px;
       font-weight: bolder;
-      max-width: 47%;
       line-height: 42px;
       text-align: center;
       font-family: 'louis_george_cafe', sans-serif;
@@ -389,7 +393,19 @@
       -webkit-background-clip: text;
     }
 
-    .inbox h2 {
+    .message-box {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .message-box * {
+      font-family: 'Poppins', sans-serif;
+      color: #676767;
+      letter-spacing: 0.5px;
+      outline: none;
+      border: none;
+    }
+
+    .message-box h2 {
       font-size: 30px;
       font-weight: bolder;
       line-height: 42px;
@@ -405,35 +421,42 @@
         font-weight: bold;
     }
 
+    .mail-details {
+      max-width: 100%;
+    }
+
     .sender, .receiver {
-      font-weight: bold;
+      font-family: 'Poppins', sans-serif;
+      display: inline-block;
+      position: relative;
+      font-display: swap;
       padding: 10px;
       border-radius: 20px;
-      max-width: 70%; /* Adjust the width as needed */
       word-wrap: break-word;
       margin-bottom: 5px;
+    }
+
+    .sender::after, .receiver::after {
+      display: inline-block;
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      position: absolute;
     }
 
     .sender {
       background-color: #007bff;
       color: #fff;
       text-align: right;
-      margin-left: auto;
-      position: relative; /* Add position relative */
+      float: right;
     }
 
     .sender::after {
-      content: '';
-      position: absolute;
+      border-left: 8px solid #007bff;
+      right: -15px;
       top: 50%;
-      right: 100%; /* Position border to the left of the sender */
       transform: translateY(-50%);
-      width: 8px; /* Adjust border width as needed */
-      height: 8px; /* Adjust border height as needed */
-      background-color: transparent;
-      border-top: 2px solid #007bff; /* Add border between sender and message */
-      border-right: 2px solid #007bff; /* Add border between sender and message */
-      border-radius: 50%;
     }
 
     .message-content-sender {
@@ -444,35 +467,26 @@
     }
 
     .receiver {
-      background-color: #f0f0f0;
-      color: #333;
+      background-color: #868686;
+      color: #fff;
       text-align: left;
-      margin-right: auto;
-      position: relative; /* Add position relative */
+      float: left;
     }
 
     .receiver::after {
-      content: '';
-      position: absolute;
+      border-right: 8px solid #868686;
+      left: -15px;
       top: 50%;
-      left: 100%; /* Position border to the right of the receiver */
       transform: translateY(-50%);
-      width: 8px; /* Adjust border width as needed */
-      height: 8px; /* Adjust border height as needed */
-      background-color: transparent;
-      border-top: 2px solid #f0f0f0; /* Add border between receiver and message */
-      border-left: 2px solid #f0f0f0; /* Add border between receiver and message */
-      border-radius: 50%;
     }
 
     .message-content-receiver {
-      background-color: #f0f0f0;
-      color: #333;
+      color: #fff;
       text-align: left;
       margin-right: auto;
     }
 
-    .date {
+    .date-sender {
       margin-bottom: 5px;
       margin-right: 5px;
       color: #888;
@@ -480,17 +494,26 @@
       text-align: right;
     }
 
+    .date-receiver {
+      margin-bottom: 5px;
+      margin-right: 5px;
+      color: #888;
+      font-size: 12px;
+      text-align: left;
+    }
+
     .message {
+      display: flex;
+      flex-direction: column;
       margin-top: 20px;
-      border: 2px solid #ccc;
       border-radius: 20px;
       overflow-wrap: break-word;
       padding: 15px;
-      background-color: #ffff;
     }
 
     .mail-box {
       margin-top: 20px;
+      max-width: 100%;
       padding: 20px;
       background-color: #f9f9f9;
       border: 2px solid #ccc;
@@ -509,13 +532,13 @@
 
     .conversation-box {
       margin-top: 10px;
+      max-width: 100%;
       padding: 20px;
       background-color: #f9f9f9;
       border: 2px solid #ccc;
       border-radius: 10px;
       max-height: calc(100vh - 450px);
       overflow-y: scroll;
-      max-width: 42%;
     }
 
     .conversation-details:hover {
@@ -594,6 +617,7 @@
     .item-link {
       text-decoration: none;
       color: #000;
+      max-width: 100%;
     }
 
     /* Define fade animation */
