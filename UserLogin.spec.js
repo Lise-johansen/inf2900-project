@@ -2,11 +2,20 @@ import { mount } from '@vue/test-utils';
 import LoginPath from '@/components/LoginPath.vue';
 import router from '@/router';
 import axios from 'axios';
+import 'primeicons/primeicons.css'
 
 // Mock axios to avoid making real requests
 jest.mock('axios');
 jest.mock('@/assets/about_us.png', () => 'test-file-stub');
 jest.mock('@/assets/logo.png', () => 'test-file-stub');
+jest.mock('primevue/button', () => ({
+  // Mocking the Button component
+  // You can add any necessary properties or methods here
+  name: 'Button',
+  render() {
+    return null;
+  }
+}));
 
 describe('LoginPath.vue', () => {
   it('shows login form', () => {
