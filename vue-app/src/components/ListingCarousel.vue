@@ -2,9 +2,9 @@
     <div class="carousel-object">
         <div class="title-and-button">
             <h1 class="category-header">{{this.category}}</h1>
-            <Button class= "refresh-button" icon="pi pi-refresh" rounded outlined/>
+            <Button class= "refresh-button" icon="pi pi-refresh" rounded outlined @click="refreshListings"/>
         </div>
-            <Carousel :value="listings" :orientation="horizontal" :circular="true" :numVisible="4" :numScroll="2" :responsiveOptions="responsiveOptions">
+            <Carousel :value="listings" :orientation="horizontal" :circular="true" :numVisible="4" :numScroll="2" :responsiveOptions="responsiveOptions" v-model:page="page">
                 <template #item="slotProps">
                     <div class="carousel-item">
                         <div class="carousel-details">
@@ -59,8 +59,21 @@ export default {
                     numVisible: 1,
                     numScroll: 1,   
                 }
-            ]
+            ],
+            page: 0
         };
+    },
+    methods: {
+        refreshListings() {
+            axios.get('/get_items/' + this.category)
+                .then(response => {
+                    this.listings = response.data;
+                    this.page = 0;
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        },
     },
     created() {
         axios.get('/get_items/' + this.category)
