@@ -53,7 +53,7 @@ export default {
             uploadedFileCount: 0,
             maxFiles: 2,
             // Define the available categories
-            categories: ['Electronics', 'Furniture', 'Clothing', 'Books', 'Sports', 'Other'],
+            categories: ['Summer', 'Winter', 'Tools', 'Electronics', 'Clothing', 'Furniture', 'Sports Equipment', 'Books'],
             conditions: ['New', 'Used', 'Refurbished']
         }
     },
