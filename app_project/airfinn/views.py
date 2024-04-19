@@ -551,13 +551,16 @@ def delete_user(request):
     
 def get_listings(request, category):
     try:
-        # Get all item id's in the specified category.
+        # Get all item ids in the specified category that are available.
         all_items = list(Item.objects.filter(category=category, availability=True).values_list('id', flat=True))
 
-        # Create a random sample of 12 item id's.
-        sample_ids = random.sample(all_items, 12)
+        # Limit the number of items to 12 or the total number of available items if less than 12.
+        num_items_to_display = min(len(all_items), 8)
+        
+        # Randomly select the item ids to display.
+        sample_ids = random.sample(all_items, num_items_to_display)
 
-        # Get the items with the sampled id's and sort them in random order.
+        # Get the items with the sampled ids and sort them in random order.
         random_data = Item.objects.filter(id__in=sample_ids).order_by('?')
         
         # Create a list of dictionaries with the item data.
@@ -566,7 +569,7 @@ def get_listings(request, category):
         # Return the data as a JSON response.
         return JsonResponse(data, safe=False, status=200)
 
-    # Exception handling for when the item does not exist.    
+    # Exception handling for when the category does not exist.    
     except Item.DoesNotExist:
         return JsonResponse({'error': 'Category does not exist'}, status=404)
     
