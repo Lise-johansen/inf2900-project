@@ -6,6 +6,8 @@
         <ListingCarousel category="Furniture"/>
         <ListingCarousel category="Books"/>
         <ListingCarousel category="Clothing"/>    
+		<ListingCarousel category="Electronics"/>
+		<ListingCarousel category="Tools"/>
     </div>
 </template>
 
