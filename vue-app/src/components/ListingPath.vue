@@ -3,18 +3,18 @@
         <header class="listing-header">
             <img class="listing-image" src="@/assets/skiutstyr.jpg" alt="Listing Image">
             <div class="listing-details">
-                <h1 class="listing-title">Skiutstyr</h1>
+                <h1 class="listing-title">{{ this.listing.name }}</h1>
                 <div class="rating-container" @click="scrollToRating">
                     <!-- Use the StarRating component to display the rating -->
                     <star-rating :rating="rating" :editable="false" />
                 </div>
-                <p class="listing-description">Add description here</p>
+                <p class="listing-description">{{ this.listing.description }}</p>
             </div>
         </header>
         <!--  -->
         <div class="new-rating-container">
             <star-rating v-model="newRating" :editable="true" />
-            <textarea v-model="newDescription" placeholder="Add a new description (max 150 characters)"
+            <textarea v-model="newDescription" placeholder="Add a new review (max 150 characters)"
                 class="message-box"></textarea>
             <button @click="addNewRating" class="btn">Add Rating</button>
         </div>
@@ -33,8 +33,9 @@
 </template>
 
 <script>
-import { Axios } from 'axios';
+import axios from 'axios';
 import StarRating from './StarRating.vue';
+// import Rating from 'primevue/rating';
 
 export default {
     data() {
@@ -42,7 +43,7 @@ export default {
             // Empty listing object to be populated with data
             listing: {},
 
-            rating: 4.5, // Initial rating for the listing
+            rating: 0, // Initial rating for the listing
             additionalRatings: [
                 { rating: 4.2, description: 'Description 1 (max 150 characters)' },
                 { rating: 3.8, description: 'Description 2 (max 150 characters)' },
@@ -54,7 +55,7 @@ export default {
     },
 
     mounted() {
-        fetchListingData();
+        this.fetchListingData();
     },
 
     methods: {
@@ -78,13 +79,18 @@ export default {
         fetchListingData() {
             // Fetch listing data from the server
             const ListingID = this.$route.params.id;
-            Axios.get(`api/listing/${ListingID}`)
+            axios.get(`get_listing/${ListingID}/`)
                 .then(response => {
+                    document.cookie = `token=${response.data.token}`;
                     // Update the listing data based on the response
                     this.listing = response.data;
+                    console.log('Listing data:', this.listing);
                 })
+                .catch(error => {
+                    console.error('Error fetching listing data:', error);
+                })
+        },
 
-        }
     },
 
     components: {

@@ -17,7 +17,7 @@
     export default {
         data() {
             return {
-                title: '',
+                name: '',
                 description: '',
                 price_per_day: '',
                 location: '',
@@ -41,7 +41,7 @@
 
                 // Send a POST request
                 axios.post('create-item/', {
-                    title: this.title,
+                    name: this.name,
                     description: this.description,
                     price_per_day: this.price_per_day,
                     location: this.location,
@@ -99,7 +99,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     input[type="text"] {
         font-family: 'louis_george_cafe', sans-serif;
         font-size: 23px;

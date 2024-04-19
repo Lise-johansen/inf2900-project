@@ -63,3 +63,4 @@ class Item(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default=None)
     location = models.CharField(max_length=100, default='')
     category = models.CharField(max_length=100, default='')
+    rating = models.FloatField(default=0.0)

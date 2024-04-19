@@ -42,4 +42,5 @@ urlpatterns = [
     path('api/contact_us_message/', views.contact_us_message, name='contact_us_message'),
     path('api/update_user/', views.update_user, name='update_user'),
     path('api/delete_user/', views.delete_user, name='delete_user'),
+    path('api/get_listing/<int:item_id>/', views.get_listing, name='get_listing'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
