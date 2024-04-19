@@ -589,7 +589,6 @@ def search_page(request):
     data = serialize('json', items)
     return JsonResponse(data, safe=False)
 
-    
 
 def get_conversations(request):
     if request.method != 'GET':
@@ -891,4 +890,5 @@ def create_item(request):
     # Handle invalid JSON
     except json.decoder.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+    
     
