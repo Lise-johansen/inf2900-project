@@ -563,13 +563,16 @@ def delete_user(request):
     
 def get_listings(request, category):
     try:
-        # Get all item id's in the specified category.
+        # Get all item ids in the specified category that are available.
         all_items = list(Item.objects.filter(category=category, availability=True).values_list('id', flat=True))
 
-        # Create a random sample of 12 item id's.
-        sample_ids = random.sample(all_items, 12)
+        # Limit the number of items to 12 or the total number of available items if less than 12.
+        num_items_to_display = min(len(all_items), 8)
+        
+        # Randomly select the item ids to display.
+        sample_ids = random.sample(all_items, num_items_to_display)
 
-        # Get the items with the sampled id's and sort them in random order.
+        # Get the items with the sampled ids and sort them in random order.
         random_data = Item.objects.filter(id__in=sample_ids).order_by('?')
         
         # Create a list of dictionaries with the item data.
@@ -578,7 +581,7 @@ def get_listings(request, category):
         # Return the data as a JSON response.
         return JsonResponse(data, safe=False, status=200)
 
-    # Exception handling for when the item does not exist.    
+    # Exception handling for when the category does not exist.    
     except Item.DoesNotExist:
         return JsonResponse({'error': 'Category does not exist'}, status=404)
     
@@ -601,7 +604,6 @@ def search_page(request):
     data = serialize('json', items)
     return JsonResponse(data, safe=False)
 
-    
 
 def get_conversations(request):
     if request.method != 'GET':
@@ -851,3 +853,57 @@ def send_messages(request):
     print(f"Sender name {message_data.get('sender').get('name')}. Receiver name {message_data.get('receiver').get('name')}")
     # Return the message data as JSON response
     return JsonResponse(message_data, status=201)
+
+def create_item(request):
+    # Check if the request method is POST
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    try:
+        # Load the JSON data from the request body
+        data = json.loads(request.body)
+
+        # Pull token from request cookies and decode it to get the user info
+        token = request.COOKIES.get('token')
+
+        # Decode the token
+        secret_key = settings.SECRET_KEY
+        try:
+            payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+            user_id = payload['user_id']
+
+        except jwt.ExpiredSignatureError:
+            return JsonResponse({'error': 'Token has expired'}, status=401)
+        except jwt.InvalidTokenError:
+            return JsonResponse({'error': 'Invalid token'}, status=401)
+
+
+        # Get the data from the request body
+        name = data.get('name')
+        price_per_day = data.get('price_per_day')
+        description = data.get('description')
+        availability = data.get('availability')
+        condition = data.get('condition')
+        image = data.get('image')
+        location = data.get('location')
+        category = data.get('category')
+        owner_id = user_id
+
+        # Create a new item
+        item = Item.objects.create( name=name,
+                                    description=description,
+                                    availability=availability,
+                                    condition=condition,
+                                    price_per_day=price_per_day,
+                                    images=image,
+                                    location=location,
+                                    category=category,
+                                    owner_id=owner_id
+        )
+        # return JsonResponse({'id': item.id})
+        return JsonResponse({'message': 'Item created'})
+        
+    # Handle invalid JSON
+    except json.decoder.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+    
+    

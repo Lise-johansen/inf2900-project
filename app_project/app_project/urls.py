@@ -44,4 +44,5 @@ urlpatterns = [
     path('api/get-conversations/', views.get_conversations, name='get_conversations'),
     path('api/get-messages/', views.get_messages, name='get_messages'),
     path('api/send-messages/', views.send_messages, name='send_messages'),
+    path('api/create-item/', views.create_item, name='create_item'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
