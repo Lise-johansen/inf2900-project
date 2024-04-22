@@ -63,6 +63,7 @@ class Item(models.Model):
     postal_code = models.CharField(max_length=4)
     location = models.CharField(max_length=100, default='')
     category = models.CharField(max_length=100, default='')
+    rating = models.FloatField(default=0.0)
     
 # Model for creating a message platform for users to send messages to each other    
 class Conversation(models.Model):

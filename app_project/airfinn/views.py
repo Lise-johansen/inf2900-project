@@ -894,4 +894,26 @@ def create_item(request):
     except json.decoder.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
     
-    
+
+def get_listing(request, item_id):
+    item = get_object_or_404(Item, id=item_id)
+
+    if request.method != "GET":
+        # Return a 405 Method Not Allowed response for non-GET requests
+        return JsonResponse({"error": "Method Not Allowed"}, status=405)
+
+    # Return the item data as JSON
+    data = {
+        "id": item.id,
+        "name": item.name,
+        "description": item.description,
+        "price_per_day": item.price_per_day,
+        "location": item.location,
+        "category": item.category,
+        "owner": item.owner.username,
+        "condition": item.condition,
+        "availability": item.availability,
+        "images": item.images.url if item.images else "",
+        "rating": item.rating,
+    }
+    return JsonResponse(data, safe=False)
