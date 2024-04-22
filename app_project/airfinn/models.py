@@ -58,9 +58,25 @@ class Item(models.Model):
     availability = models.BooleanField(default=True)
     condition = models.CharField(max_length=100, default='')
     price_per_day = models.FloatField(max_length=1000, default=0.0)
-    images = models.ImageField(
-        upload_to='images/', default='images/default.jpg')
+    images = models.ImageField(upload_to='images/', default='images/default.jpg')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default=None)
+    postal_code = models.CharField(max_length=4)
     location = models.CharField(max_length=100, default='')
     category = models.CharField(max_length=100, default='')
     rating = models.FloatField(default=0.0)
+    
+# Model for creating a message platform for users to send messages to each other    
+class Conversation(models.Model):
+    id = models.AutoField(primary_key=True)
+    user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversations_as_user1')
+    user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversations_as_user2')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='conversations')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Message(models.Model):
+    id = models.AutoField(primary_key=True)
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    message = models.TextField(default='')
+    created_at = models.DateTimeField(auto_now_add=True)
