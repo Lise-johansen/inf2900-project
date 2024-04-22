@@ -58,9 +58,9 @@ class Item(models.Model):
     availability = models.BooleanField(default=True)
     condition = models.CharField(max_length=100, default='')
     price_per_day = models.FloatField(max_length=1000, default=0.0)
-    images = models.ImageField(
-        upload_to='images/', default='images/default.jpg')
+    images = models.ImageField(upload_to='images/', default='images/default.jpg')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default=None)
+    postal_code = models.CharField(max_length=4)
     location = models.CharField(max_length=100, default='')
     category = models.CharField(max_length=100, default='')
     

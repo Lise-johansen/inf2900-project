@@ -58,7 +58,17 @@ def create_test_user():
 def populate_listings(user_email=None):
     categories = ['Electronics', 'Clothing', 'Books', 'Furniture', 'Sports Equipment', 'Instruments', 'Tools', 'Town Square',]
     conditions = ['New', 'Used', 'Refurbished']
-    locations = ['Langneset', 'Mobekken', 'Gruben']
+    postal_locations = [
+        ('0010', 'Oslo'),
+        ('0210', 'Hamar'),
+        ('0505', 'Bergen'),
+        ('2000', 'Lillestrøm'),
+        ('4007', 'Stavanger'),
+        ('5805', 'Bergen'),
+        ('7030', 'Trondheim'),
+        ('9008', 'Tromsø'),
+        ('9991', 'Kirkenes')
+    ]
     
     # If user_email is provided, get the user from the database
     if user_email:
@@ -69,14 +79,16 @@ def populate_listings(user_email=None):
             return
     
         # Create ten random listings for the user
-        for _ in range(10):  
+        for _ in range(10): 
+            postal_code, location = random.choice(postal_locations) 
             data = {
                 'name': f'Listing {_ + 1} for test user',
                 'description': f'Description of item {_ + 1}',
                 'availability': random.choice([True, False]),
                 'condition': random.choice(conditions),
                 'price_per_day': round(random.uniform(5.0, 50.0), 2),
-                'location': random.choice(locations),
+                'location': location,
+                'postal_code': postal_code,
                 'category': random.choice(categories),
                 'owner': user,
             }
@@ -90,13 +102,15 @@ def populate_listings(user_email=None):
         
         # Create five random listings
         for _ in range(100):  
+            postal_code, location = random.choice(postal_locations)
             data = {
                 'name': f'Item {_ + 1}',
                 'description': f'Description of item {_ + 1}',
                 'availability': random.choice([True, False]),
                 'condition': random.choice(conditions),
                 'price_per_day': round(random.uniform(5.0, 50.0), 2),
-                'location': random.choice(locations),
+                'location': location,
+                'postal_code': postal_code,
                 'category': random.choice(categories),
                 'category': random.choice(categories),
                 'owner': random.choice(users),
