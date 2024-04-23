@@ -123,7 +123,6 @@
             }
             });
 
-            console.log("Grouped conversations:", groupedConversations);
             // Convert the grouped conversations object to an array
             return Object.values(groupedConversations);
         }
@@ -154,7 +153,6 @@
           if (data && Array.isArray(data) && data.length > 0) {
             // Assign the received conversations directly
             this.conversations = data;
-            console.log("Conversations with messages:", this.conversations);
 
             // Update selectedConversation to reflect the first conversation (if available)
             if (!this.selectedConversation && this.conversations.length > 0) {
@@ -179,7 +177,6 @@
         // Set selectedConversation to the clicked conversation to display messages
         this.selectedConversation = conversation;
         this.showRightPanel = true;
-        console.log("Selected conversation:", this.selectedConversation);
         this.fetchMessages(conversation.id);
       },
 
@@ -203,7 +200,6 @@
           if (data && Array.isArray(data) && data.length > 0) {
             // Assign the received messages to the selected conversation
             this.selectedConversation.messages = data;
-            console.log("Messages for conversation:", this.selectedConversation.messages);
 
             // Scroll to the bottom after messages have been fetched
             this.$nextTick(() => {
@@ -248,7 +244,6 @@
         })
         .then(response => {
           // Handle successful response
-          console.log('Message sent:', response.data);
           
           // Append the new message to the selected conversation
           this.selectedConversation.messages.push({
