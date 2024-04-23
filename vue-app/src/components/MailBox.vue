@@ -89,6 +89,19 @@
         showRightPanel: false
       };
     },
+
+    created() {
+      // Check if logged in
+      const token = this.loginCheck();
+      
+      // Redirect to login page if not logged in
+      if (!token) {
+        this.errorMessage = 'Please login to view your inbox.';
+        this.showPopup = true;
+        return;
+      }
+    },
+
     mounted() {
       // Fetch conversations when component is mounted
       this.fetchConversations();
@@ -123,17 +136,11 @@
         // Scroll the message container to the bottom
         messageContainer.scrollTop = messageContainer.scrollHeight;
       },
-      fetchConversations() {
-        // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
 
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to view your inbox.';
-          this.showPopup = true;
-          return;
-        }
+      fetchConversations() {
+        
+        // Get the authentication token from cookies
+        const token = this.loginCheck();
 
         // Make API request to fetch conversations with messages
         axios.get('get-conversations/', {
@@ -167,6 +174,7 @@
           console.error('Error fetching conversations with messages:', error);
         });
       },
+
       openConversation(conversation) {
         // Set selectedConversation to the clicked conversation to display messages
         this.selectedConversation = conversation;
@@ -174,17 +182,11 @@
         console.log("Selected conversation:", this.selectedConversation);
         this.fetchMessages(conversation.id);
       },
+
       fetchMessages(conversation_id){
-        // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
         
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to view messages.';
-          this.showPopup = true;
-          return;
-        }
+        // Get the authentication token from cookies
+        const token = this.loginCheck();
   
         // Make API request to fetch messages for the selected conversation
         axios.get(`get-messages/`, {
@@ -219,17 +221,10 @@
           this.errorMessage = 'Error fetching messages.';
         });
       },
+
       sendMessage() {
         // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
-        
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to send a message.';
-          this.showPopup = true;
-          return;
-        }
+        const token = this.loginCheck();
   
         // Make sure newMessage is not empty
         if (!this.newMessage) {
@@ -275,14 +270,12 @@
           console.error('Error sending message:', error);
         });
       },
+
       RedirectToLogin() {
         // Redirect to login page
         this.$router.push('/login');
       },
-      isLoggedIn() {
-        // Check if user is logged in by checking the token in cookies
-        return this.getTokenFromCookies() !== null;
-      },
+
       getTokenFromCookies() {
         const cookies = document.cookie.split('; ');
         for (const cookie of cookies) {
@@ -293,11 +286,13 @@
         }
         return null; // Token not found in cookies
       },
+
       hidePopup() {
         this.errorMessage = ''; // Clear the error message
         this.showPopup = false;
         this.RedirectToLogin();
       },
+
       formatDateString(dateString) {
         // Create a new Date object from the date string
         const date = new Date(dateString);
@@ -305,10 +300,25 @@
         // Format the date to a more readable format
         return date.toLocaleString();
       },
+
       getParticipantName(conversation) {
         // Return the name of the other participant in the conversation
         return conversation.sender.name === "You" ? conversation.receiver.name : conversation.sender.name;
       },
+
+      loginCheck() {
+        // Get the authentication token from cookies
+        const token = this.getTokenFromCookies();
+
+        // Make sure token is available
+        if (!token) {
+          // Handle error - user is not logged in
+          this.errorMessage = 'Please login to view your inbox.';
+          this.showPopup = true;
+          return null;
+        }
+        return token;
+      }
     }
   };
 </script>
