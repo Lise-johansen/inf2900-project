@@ -28,7 +28,7 @@
     <div :class="{ 'right-panel': true, 'active': showRightPanel }">
       <div class="message-box">
       <div v-if="selectedConversation">
-        <router-link :to="'/listings/' + selectedConversation.item.id" class="item-link">
+        <router-link :to="'/listing/' + selectedConversation.item.id" class="item-link">
         <h2> {{ selectedConversation.item.name }} </h2></router-link>
           <div class="mail-details" v-if="selectedConversation">
             <div class="mail-box"  ref="messageContainer">
