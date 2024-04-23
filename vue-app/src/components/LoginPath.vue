@@ -67,7 +67,6 @@ export default {
     },
     redirectIfLoggedIn() {
       const token = this.getTokenFromCookies();
-      console.log('Token:', token);
       if (token != null && token !== 'undefined') {
         this.$router.push('/dashboard');
       }
