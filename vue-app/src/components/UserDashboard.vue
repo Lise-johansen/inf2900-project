@@ -61,9 +61,8 @@
         logout() {
         axios.get('logout/')
         .then(response => {
-            document.cookie = `token=${response.data.token}`;
-            document.cookie = `auth_user=${response.data.auth_user}`;
             this.$router.push('/');
+            alert(response.data.message);
         })
         },
 
