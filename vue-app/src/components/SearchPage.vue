@@ -48,32 +48,36 @@ export default {
       searchTerm: this.$route.query.q || '',
     };
   },
-
-
+  
+  mounted() {
+    // Fetch all listings when the component is mounted and no search is performed
+    if (!this.searchTerm) this.handleSearch('');
+  },
+  
   methods: {
 
     async handleSearch(searchTerm) {
-    this.isLoading = true;
-    try {
-      const url = new URL('/api/search-page/', window.location.origin);
-      url.searchParams.append('q', searchTerm);
+      this.isLoading = true;
+      try {
+        const url = new URL('/api/search-page/', window.location.origin);
+        url.searchParams.append('q', searchTerm);
 
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch');
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Failed to fetch');
 
-      const data = await response.json();
-      this.searchResults = JSON.parse(data); // Assume data is already in the correct format
+        const data = await response.json();
+        this.searchResults = JSON.parse(data); // Assume data is already in the correct format
 
-      console.log('Current active filters:', this.currentFilters);
-    
-      // Initially set filteredResults to be the same as searchResults
-      this.handleFilterUpdate(this.currentFilters);
-    } catch (error) {
-      console.error('Error fetching search results:', error);
-    } finally {
-      this.isLoading = false;
-    }
-  },
+        console.log('Current active filters:', this.currentFilters);
+      
+        // Initially set filteredResults to be the same as searchResults
+        this.handleFilterUpdate(this.currentFilters);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
 
     formatCurrency(value) {
       const formatter = new Intl.NumberFormat('no-NB', {
