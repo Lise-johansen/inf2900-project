@@ -1,9 +1,9 @@
 <template>
   <div>
-    <SearchBox :initialSearchTerm="searchTerm" @search="handleSearch" />
+    <SearchBox :initialSearchTerm="searchTerm" @search="handleSearch"/>
     <div class="spacing">
     </div>
-    <ItemFilters @filter-change="handleFilterUpdate" />
+    <ItemFilters @filter-change="handleFilterUpdate"/>
     <div class="spacing">
     </div>
     <div v-if="isLoading">Loading...</div>
@@ -44,32 +44,40 @@ export default {
       isLoading: false,
       searchResults: [],
       filteredResults: [],
+      currentFilters: [],
       searchTerm: this.$route.query.q || '',
     };
   },
-
-
+  
+  mounted() {
+    // Fetch all listings when the component is mounted and no search is performed
+    if (!this.searchTerm) this.handleSearch('');
+  },
+  
   methods: {
 
     async handleSearch(searchTerm) {
-    this.isLoading = true;
-    try {
-      const url = new URL('/api/search-page/', window.location.origin);
-      url.searchParams.append('q', searchTerm);
+      this.isLoading = true;
+      try {
+        const url = new URL('/api/search-page/', window.location.origin);
+        url.searchParams.append('q', searchTerm);
 
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch');
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Failed to fetch');
 
-      const data = await response.json();
-      this.searchResults = JSON.parse(data); // Assume data is already in the correct format
-      // Initially set filteredResults to be the same as searchResults
-      this.filteredResults = [...this.searchResults];
-    } catch (error) {
-      console.error('Error fetching search results:', error);
-    } finally {
-      this.isLoading = false;
-    }
-  },
+        const data = await response.json();
+        this.searchResults = JSON.parse(data); // Assume data is already in the correct format
+
+        console.log('Current active filters:', this.currentFilters);
+      
+        // Initially set filteredResults to be the same as searchResults
+        this.handleFilterUpdate(this.currentFilters);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
 
     formatCurrency(value) {
       const formatter = new Intl.NumberFormat('no-NB', {
@@ -80,7 +88,8 @@ export default {
     },
 
     handleFilterUpdate(filters) {
-      // This will update the displayed listings to only show those that match the active filters
+      // Update the current filters state and then apply these filters
+      this.currentFilters = filters;
       this.applyFilters(filters);
     },
 
@@ -88,13 +97,16 @@ export default {
       // Start with all results
       let results = this.searchResults;
 
+      // Log active filters
+      console.log("Active filters before applying:", filters.filter(f => f.active).map(f => f.label));
+
       // Filter results if any filters are active
       const activeFilters = filters.filter(f => f.active);
       if (activeFilters.length) {
         results = this.searchResults.filter(item => {
           // Assumes item.fields.category is the category of the item
           // and filter.label is the label of the filter
-          return activeFilters.some(filter => item.fields.category === filter.label);
+          return activeFilters.some(filter => item.fields?.category === filter.label);
         });
       }
 
