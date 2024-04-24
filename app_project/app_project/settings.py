@@ -33,7 +33,7 @@ SECRET_KEY = 'django-insecure-&@nmsdwxy*o!l1_r8p@t#&w4n@w3ljbeoqzq4t87q8accy=fdw
 FRONTEND_URL = 'https://django.dybedahlserver.net'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Use HTTPS for secure connections
 SECURE_SSL_REDIRECT = True
