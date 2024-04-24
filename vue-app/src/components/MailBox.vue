@@ -28,7 +28,7 @@
     <div :class="{ 'right-panel': true, 'active': showRightPanel }">
       <div class="message-box">
       <div v-if="selectedConversation">
-        <router-link :to="'/listings/' + selectedConversation.item.id" class="item-link">
+        <router-link :to="'/listing/' + selectedConversation.item.id" class="item-link">
         <h2> {{ selectedConversation.item.name }} </h2></router-link>
           <div class="mail-details" v-if="selectedConversation">
             <div class="mail-box"  ref="messageContainer">
@@ -89,6 +89,19 @@
         showRightPanel: false
       };
     },
+
+    created() {
+      // Check if logged in
+      const token = this.loginCheck();
+      
+      // Redirect to login page if not logged in
+      if (!token) {
+        this.errorMessage = 'Please login to view your inbox.';
+        this.showPopup = true;
+        return;
+      }
+    },
+
     mounted() {
       // Fetch conversations when component is mounted
       this.fetchConversations();
@@ -110,7 +123,6 @@
             }
             });
 
-            console.log("Grouped conversations:", groupedConversations);
             // Convert the grouped conversations object to an array
             return Object.values(groupedConversations);
         }
@@ -123,17 +135,11 @@
         // Scroll the message container to the bottom
         messageContainer.scrollTop = messageContainer.scrollHeight;
       },
-      fetchConversations() {
-        // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
 
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to view your inbox.';
-          this.showPopup = true;
-          return;
-        }
+      fetchConversations() {
+        
+        // Get the authentication token from cookies
+        const token = this.loginCheck();
 
         // Make API request to fetch conversations with messages
         axios.get('get-conversations/', {
@@ -147,7 +153,6 @@
           if (data && Array.isArray(data) && data.length > 0) {
             // Assign the received conversations directly
             this.conversations = data;
-            console.log("Conversations with messages:", this.conversations);
 
             // Update selectedConversation to reflect the first conversation (if available)
             if (!this.selectedConversation && this.conversations.length > 0) {
@@ -167,24 +172,18 @@
           console.error('Error fetching conversations with messages:', error);
         });
       },
+
       openConversation(conversation) {
         // Set selectedConversation to the clicked conversation to display messages
         this.selectedConversation = conversation;
         this.showRightPanel = true;
-        console.log("Selected conversation:", this.selectedConversation);
         this.fetchMessages(conversation.id);
       },
+
       fetchMessages(conversation_id){
-        // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
         
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to view messages.';
-          this.showPopup = true;
-          return;
-        }
+        // Get the authentication token from cookies
+        const token = this.loginCheck();
   
         // Make API request to fetch messages for the selected conversation
         axios.get(`get-messages/`, {
@@ -201,7 +200,6 @@
           if (data && Array.isArray(data) && data.length > 0) {
             // Assign the received messages to the selected conversation
             this.selectedConversation.messages = data;
-            console.log("Messages for conversation:", this.selectedConversation.messages);
 
             // Scroll to the bottom after messages have been fetched
             this.$nextTick(() => {
@@ -219,17 +217,10 @@
           this.errorMessage = 'Error fetching messages.';
         });
       },
+
       sendMessage() {
         // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
-        
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to send a message.';
-          this.showPopup = true;
-          return;
-        }
+        const token = this.loginCheck();
   
         // Make sure newMessage is not empty
         if (!this.newMessage) {
@@ -253,7 +244,6 @@
         })
         .then(response => {
           // Handle successful response
-          console.log('Message sent:', response.data);
           
           // Append the new message to the selected conversation
           this.selectedConversation.messages.push({
@@ -275,14 +265,12 @@
           console.error('Error sending message:', error);
         });
       },
+
       RedirectToLogin() {
         // Redirect to login page
         this.$router.push('/login');
       },
-      isLoggedIn() {
-        // Check if user is logged in by checking the token in cookies
-        return this.getTokenFromCookies() !== null;
-      },
+
       getTokenFromCookies() {
         const cookies = document.cookie.split('; ');
         for (const cookie of cookies) {
@@ -293,11 +281,13 @@
         }
         return null; // Token not found in cookies
       },
+
       hidePopup() {
         this.errorMessage = ''; // Clear the error message
         this.showPopup = false;
         this.RedirectToLogin();
       },
+
       formatDateString(dateString) {
         // Create a new Date object from the date string
         const date = new Date(dateString);
@@ -305,10 +295,25 @@
         // Format the date to a more readable format
         return date.toLocaleString();
       },
+
       getParticipantName(conversation) {
         // Return the name of the other participant in the conversation
         return conversation.sender.name === "You" ? conversation.receiver.name : conversation.sender.name;
       },
+
+      loginCheck() {
+        // Get the authentication token from cookies
+        const token = this.getTokenFromCookies();
+
+        // Make sure token is available
+        if (!token) {
+          // Handle error - user is not logged in
+          this.errorMessage = 'Please login to view your inbox.';
+          this.showPopup = true;
+          return null;
+        }
+        return token;
+      }
     }
   };
 </script>

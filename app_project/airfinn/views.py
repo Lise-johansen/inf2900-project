@@ -71,10 +71,10 @@ The result is that the token is invalidated and the user cant access the dashboa
 """
 def logout(request):
     # Create a response object with an empty dictionary or a simple message
-    response = JsonResponse({'message': 'Logged out successfully'}, safe=False)
+    response = JsonResponse({'message': 'Logged out successfully'})
     
     # Clear all cookies by setting their expiration time to a past date
-    response.set_cookie('token', '', expires=0)
+    response.delete_cookie('token')
     
     return response
 
