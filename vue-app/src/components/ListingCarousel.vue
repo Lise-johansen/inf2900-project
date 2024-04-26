@@ -7,6 +7,7 @@
             <Carousel :value="listings" :orientation="horizontal" :circular="true" :numVisible="4" :numScroll="2" :responsiveOptions="responsiveOptions" v-model:page="page">
                 <template #item="slotProps">
                     <div class="carousel-item">
+                        <router-link :to="`/listing/${slotProps.data.pk}`" class="card-link"></router-link>
                         <div class="carousel-details">
                             <div class="item-name">{{ slotProps.data.name }}</div>
                             <img :src="'https://via.placeholder.com/210'" :alt="slotProps.data.name"/>
