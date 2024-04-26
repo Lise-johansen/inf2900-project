@@ -6,8 +6,7 @@
         </div>
             <Carousel :value="listings" :orientation="horizontal" :circular="true" :numVisible="4" :numScroll="2" :responsiveOptions="responsiveOptions" v-model:page="page">
                 <template #item="slotProps">
-                    <div class="carousel-item">
-                        <router-link :to="`/listing/${slotProps.data.pk}`" class="card-link"></router-link>
+                    <router-link :to="'/listing/' + slotProps.data.id" class="carousel-item">
                         <div class="carousel-details">
                             <div class="item-name">{{ slotProps.data.name }}</div>
                             <img :src="'https://via.placeholder.com/210'" :alt="slotProps.data.name"/>
@@ -16,7 +15,7 @@
                                 <div class="item-location">{{ slotProps.data.location}}</div>
                             </div>
                         </div>
-                    </div>
+                    </router-link>
                 </template>
             </Carousel>
     </div>
@@ -80,6 +79,7 @@ export default {
         axios.get('/get_items/' + this.category)
             .then(response => {
                 this.listings = response.data;
+                console.log(response.data);
             })
             .catch(error => {
                 console.log(error);
