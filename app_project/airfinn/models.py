@@ -58,12 +58,17 @@ class Item(models.Model):
     availability = models.BooleanField(default=True)
     condition = models.CharField(max_length=100, default='')
     price_per_day = models.FloatField(max_length=1000, default=0.0)
-    images = models.ImageField(upload_to='images/', default='images/default.jpg')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default=None)
     postal_code = models.CharField(max_length=4)
     location = models.CharField(max_length=100, default='')
     category = models.CharField(max_length=100, default='')
     rating = models.FloatField(default=0.0)
+    
+class ItemImage(models.Model):
+    id = models.AutoField(primary_key=True)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='images')
+    image_url = models.URLField(default='https://rentopia-images.dybedahlserver.net/default_item_picture.jpg')
+    
     
 # Model for creating a message platform for users to send messages to each other    
 class Conversation(models.Model):
