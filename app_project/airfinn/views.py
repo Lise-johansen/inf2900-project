@@ -7,7 +7,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Item, User, Message, Conversation
+from .models import Item, ItemImage, User, Message, Conversation
 from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
@@ -901,13 +901,19 @@ def create_item(request):
         return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
     
 
-def get_listing(request, item_id):
-    item = get_object_or_404(Item, id=item_id)
-
+def get_listing(request, item_id):    
     if request.method != "GET":
         # Return a 405 Method Not Allowed response for non-GET requests
         return JsonResponse({"error": "Method Not Allowed"}, status=405)
 
+    item = get_object_or_404(Item, id=item_id)
+    
+    # Get all images for the listing
+    images = ItemImage.objects.filter(item=item)
+    
+    # Create a list of image URLs
+    images = [image.image_url for image in images]
+    
     # Return the item data as JSON
     data = {
         "id": item.id,
@@ -919,7 +925,7 @@ def get_listing(request, item_id):
         "owner": item.owner.username,
         "condition": item.condition,
         "availability": item.availability,
-        "images": item.images.url if item.images else "",
+        "images": images,
         "rating": item.rating,
     }
     return JsonResponse(data, safe=False)
