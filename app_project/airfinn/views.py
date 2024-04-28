@@ -877,7 +877,6 @@ def create_item(request):
         description = data.get('description')
         availability = data.get('availability')
         condition = data.get('condition')
-        image = data.get('image')
         location = data.get('location')
         category = data.get('category')
         owner_id = user_id
@@ -888,15 +887,69 @@ def create_item(request):
                                     availability=availability,
                                     condition=condition,
                                     price_per_day=price_per_day,
-                                    images=image,
                                     location=location,
                                     category=category,
                                     owner_id=owner_id
         )
-        # return JsonResponse({'id': item.id})
-        return JsonResponse({'message': 'Item created'})
+    
+        # Get the uploaded images form data from the request
+        uploaded_images = data.get('images')
         
-    # Handle invalid JSON
+        print(f"Uploaded images: {uploaded_images}")
+
+        # Check if any images were provided
+        if not uploaded_images:
+            return JsonResponse({'error': 'Images not provided'}, status=400)
+
+        # Initialize the S3 client with your credentials and endpoint
+        ACCOUNT_ID = os.getenv('ACCOUNT_ID')
+        ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+        SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+        s3 = boto3.client('s3', 
+                        region_name='auto',
+                        endpoint_url=f'https://{ACCOUNT_ID}.r2.cloudflarestorage.com',
+                        aws_access_key_id=ACCESS_KEY_ID,
+                        aws_secret_access_key=SECRET_ACCESS_KEY)
+
+        # Initialize a list to store the URLs of uploaded images
+        uploaded_image_urls = []
+
+        # Iterate over each uploaded image
+        for uploaded_image in uploaded_images:
+            # Split the data to extract only the base64 part
+            base64_data = uploaded_image.split(',')[1]
+            
+            # Decode the base64-encoded image data
+            image_binary = base64.b64decode(base64_data)
+            
+            # Check if the image size exceeds the limit (2MB)
+            if len(image_binary) > 2 * 1024 * 1024:
+                return JsonResponse({'error': 'Image size exceeds the limit of 2MB'}, status=400)
+
+            # Generate a unique filename for the image
+            image_token_name = uuid.uuid4().hex
+            file_name = f'{item.name}/{item.id}/{image_token_name}.png'
+            
+            # Create a new bucket for each listing
+            bucket_name = 'rentopia-files'
+
+            try:
+                # Upload the image data to the specified bucket
+                response = s3.put_object(Bucket=bucket_name, Key=file_name, Body=image_binary)
+                URL = os.getenv('URL_DOMAIN')
+                image_url = f'{URL}/{file_name}'
+                
+                # Add the image URL to the list
+                uploaded_image_urls.append(image_url)
+            except ClientError as e:
+                return JsonResponse({'error': str(e)}, status=500)
+
+        # Add the image URLs to the item
+        for image_url in uploaded_image_urls:
+            ItemImage.objects.create(item=item, image_url=image_url)
+
+        return JsonResponse({'message': 'Item created'})
+
     except json.decoder.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
     
@@ -942,6 +995,10 @@ def upload_image(request):
 
         # Decode the base64-encoded image data
         image_binary = base64.b64decode(base64_data)
+        
+        # Check if the image size exceeds the limit (2MB)
+        if len(image_binary) > 2 * 1024 * 1024:
+            return JsonResponse({'error': 'Image size exceeds the limit of 2MB'}, status=400)
         
         # Get session token and decode it.
         token = request.COOKIES.get('token')
