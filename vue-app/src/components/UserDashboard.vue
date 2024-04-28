@@ -5,7 +5,6 @@
       <div class="profilepicture-container">
         <div class="profile-picture-outline">
           <img v-if="profilePicture" :src="profilePicture" alt="Avatar" class="profile-picture">
-          <input type="file" accept="image/jpeg,image/png" @change="handleImageUpload" :style="{ display: profilePicture ? 'none' : 'block' }">
         </div>
       </div>
       
@@ -65,29 +64,7 @@
             alert(response.data.message);
           })
       },
-      handleImageUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const base64Image = reader.result.split(',')[1]; // Extract base64 data
-            const imageData = {
-              image: base64Image
-            };
-
-            // Upload image data to backend
-            axios.put('upload_image/', imageData)
-              .then(response => {
-                console.log('Image uploaded:', response);
-                this.profilePicture = response.data.image_url;
-              })
-              .catch(error => {
-                console.error('Error uploading image:', error);
-              });
-          };
-          reader.readAsDataURL(file); // Start reading the file as a data URL
-        }
-      },
+      
       getTokenFromCookies() {
         const cookies = document.cookie.split('; ');
         for (const cookie of cookies) {
@@ -105,6 +82,7 @@
         axios.get('dashboard/')
         .then(response => {
             this.user = response.data;
+            console.log('User data:', this.user);
             this.profilePicture = response.data.profilePicture;
         })
         .catch(error => {
