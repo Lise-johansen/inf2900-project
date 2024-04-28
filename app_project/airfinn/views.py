@@ -11,9 +11,15 @@ from .models import Item, User, Message, Conversation
 from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
-import json, jwt, random, requests, base64
+import os, json, jwt, random, base64, boto3, uuid
 from airfinn.utils import get_user_by_id, email_checks, password_checks
+from botocore.exceptions import ClientError
 from django.db.models import Q
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 def index(request):
     return JsonResponse({'message': 'Welcome to Rentopia!'})
@@ -26,7 +32,7 @@ def get_user_id_for_token_auth(request):
     # Pull token from request cookies and decode it to get the user info
     token = request.COOKIES.get('token')
     # Decode the token
-    secret_key = 'St3rkP@ssord'
+    secret_key = settings.SECRET_KEY
     try:
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = payload['user_id']
@@ -61,7 +67,7 @@ def dashboard(request):
     if type(user) != type(User): 
         JsonResponse({'success': False, 'error': 'User does not exist'}, status=401)
 
-    return JsonResponse({'email': user.email, 'firstName': user.first_name, 'lastName': user.last_name, 'address': user.address, 'phone': user.phone, 'verified': user.is_verified})
+    return JsonResponse({'email': user.email, 'firstName': user.first_name, 'lastName': user.last_name, 'address': user.address, 'phone': user.phone, 'verified': user.is_verified, 'profilePicture': user.profile_picture_url})
 
 
 """
@@ -920,39 +926,96 @@ def get_listing(request, item_id):
 
 def upload_image(request):
     if request.method == 'PUT':
-        print("request.FILES: ", request.data)
-        print("request print: ", request.FILES.get('image'))
+        # Get the image data from the request body
+        image_data = json.loads(request.body).get('image')
+        if not image_data:
+            return JsonResponse({'error': 'Image not provided'}, status=400)
         
-        uploaded_image = request.FILES['image']
+        # Split the data to extract only the base64 part
+        base64_data = image_data.split(',')[1]
+
+        # Decode the base64-encoded image data
+        image_binary = base64.b64decode(base64_data)
         
+        # Get session token and decode it.
+        token = request.COOKIES.get('token')
+        if not token:
+            return JsonResponse({'error': 'User not authenticated'}, status=401)
         
-        # Handle image upload to Cloudflare's R2 Cloud Storage
+        secret_key = settings.SECRET_KEY
         try:
-            # Construct the URL for uploading to Cloudflare R2 Cloud Storage
-            url = f'https://rentopia-images.dybedahlserver.net/{uploaded_image.name}'
-            
-            # Prepare headers with necessary authentication information
-            headers = {
-                'x-auth-email': 'adriandybdal@outlook.com',  # Replace with your Cloudflare account email
-                'x-auth-key': '76r_N9GS2_zviF7458zlzi8QI-oAGw5UKlomtXE-',  # Replace with your Cloudflare API key
-                'Content-Type': 'application/octet-stream'
-            }
-            
-            # Upload image to Cloudflare R2 Cloud Storage using PUT request
-            response = requests.put(url, data=uploaded_image.read(), headers=headers)
-            
-            # Check if the upload was successful
-            if response.ok:
-                image_url = url
-                # Assuming you want to save the image URL to user profile
-                user_profile = User.objects.get(user=request.user)
-                user_profile.profile_picture = image_url
-                user_profile.save()
-                return JsonResponse({'image_url': image_url}, status=201)
-            else:
-                return JsonResponse({'error': response.text}, status=response.status_code)
+            payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+            user_id = payload['user_id']
+    
+        except jwt.ExpiredSignatureError:
+            return JsonResponse({'error': 'Token has expired'}, status=401)
+        except jwt.InvalidTokenError:
+            return JsonResponse({'error': 'Invalid token'}, status=401)
+                
+        # Retrieve the user object corresponding to the user ID
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
         
-        except Exception as e:
+        # Delete the previous image
+        previous_image_url = user.profile_picture_url
+        
+        # Extract the filename from the URL
+        if previous_image_url:
+            previous_image_filename = previous_image_url.split('/')[-1]
+            
+            # Delete the previous image from the S3 bucket
+            delete_previous_image(previous_image_filename)
+        
+        # Initialize the S3 client with your credentials and endpoint
+        ACCOUNT_ID = os.getenv('ACCOUNT_ID')
+        ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+        SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+        
+        s3 = boto3.client('s3', 
+                          region_name='auto',
+                          endpoint_url=f'https://{ACCOUNT_ID}.r2.cloudflarestorage.com',
+                          aws_access_key_id=ACCESS_KEY_ID,
+                          aws_secret_access_key=SECRET_ACCESS_KEY)
+
+        image_token_name = uuid.uuid4().hex
+        file_name = f'{image_token_name}.png'
+        bucket_name = 'rentopia-files'
+
+        try:
+            # Upload the image data to the specified bucket
+            response = s3.put_object(Bucket=bucket_name, Key=file_name, Body=image_binary, ContentType='image/png')
+            URL = os.getenv('URL_DOMAIN')
+            image_url = f'{URL}/{file_name}'
+            
+            # Assuming you want to save the image URL to the user profile
+            user_profile = User.objects.get(pk=user_id)
+            user_profile.profile_picture_url = image_url
+            user_profile.save()
+            
+            return JsonResponse({'image_url': image_url}, status=201)
+        except ClientError as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-    return JsonResponse({'error': 'Image not provided or invalid request'}, status=400)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def delete_previous_image(previous_image_filename):
+    # Initialize the S3 client with your credentials and endpoint
+    ACCOUNT_ID = os.getenv('ACCOUNT_ID')
+    ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+    SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+    
+    s3 = boto3.client('s3', 
+                      region_name='auto',
+                      endpoint_url=f'https://{ACCOUNT_ID}.r2.cloudflarestorage.com',
+                      aws_access_key_id=ACCESS_KEY_ID,
+                      aws_secret_access_key=SECRET_ACCESS_KEY)
+    
+    bucket_name = 'rentopia-files'
+
+    try:
+        # Delete the previous image from the specified bucket
+        s3.delete_object(Bucket=bucket_name, Key=previous_image_filename)
+    except ClientError as e:
+        print(f"Error deleting previous image: {str(e)}")
