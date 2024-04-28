@@ -36,7 +36,7 @@ class User(AbstractBaseUser):
     address = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    profile_picture_url = models.URLField(default='https://rentopia-images.dybedahlserver.net/default_profile_picture.jpg')
     is_active = models.BooleanField(default=True)
     is_verified = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
