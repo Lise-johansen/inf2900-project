@@ -605,8 +605,11 @@ def search_page(request):
     query = request.GET.get('q', '')
 
     items = Item.objects.all()
+    item_images = ItemImage.objects.all()
+    
     if category:
         items = items.filter(category=category)
+        images = item_images.filter(item_id=items.id)
     if query:
         items = items.filter(
             Q(name__icontains=query) | 
@@ -615,6 +618,15 @@ def search_page(request):
         ).distinct()  # Use distinct() to avoid duplicate results
 
     data = serialize('json', items)
+    
+    # Add the first image URL for each item to the serialized data
+    data = json.loads(data)
+    for item in data:
+        image = item_images.filter(item_id=item['pk']).first()
+        
+        # Add the image URL to the item data field
+        item['fields']['image'] = image.image_url if image else None
+    
     return JsonResponse(data, safe=False)
 
 
