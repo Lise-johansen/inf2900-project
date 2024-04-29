@@ -117,7 +117,12 @@ const routes = [
     path: '/listing/:id/', // Ensure this matches the path used in navigation
     name: 'listingPage',
     component: ListingPath,
-  }
+  },
+  {
+    path: '/odered-listings/',
+    name: 'ordered-listings',
+    component: UserDashboard,
+  },
   // Other routes
 ];
 
