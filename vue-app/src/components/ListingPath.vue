@@ -10,6 +10,11 @@
                 </div>
                 <p class="listing-description">{{ this.listing.description }}</p>
             </div>
+            <div>
+                <!-- I am here-->
+                <button @click="redirectToEditPage" class="btn">Edit Listing</button>
+                <!-- I end here-->
+            </div>
         </header>
         <!--  -->
         <div class="new-rating-container">
@@ -60,45 +65,45 @@ export default {
     },
 
     methods: {
-        scrollToRating() {
-            // Scroll to the rating section using smooth behavior
-            // You can customize this behavior based on your needs
-        },
-        addNewRating() {
-            // Add a new rating and description to the list
-            if (this.newRating > 0 && this.newDescription.length <= 150) {
-                this.additionalRatings.push({
-                    rating: this.newRating,
-                    description: this.newDescription,
-                });
+        redirectToEditPage() {
+            // Navigate to edit-listing page
+            this.$router.push({ name: 'edit-listing', params: { id: this.$route.params.id } });
+        }
+    },
 
-                // Reset new rating and description
-                this.newRating = 0;
-                this.newDescription = '';
-            }
-        },
-        fetchListingData() {
-            // Fetch listing data from the server
-            const ListingID = this.$route.params.id;
-            axios.get(`get_listing/${ListingID}/`)
-                .then(response => {
-                    // Update the listing data based on the response
-                    this.listing = response.data;
-                    console.log('Listing data:', this.listing);
+    addNewRating() {
+        // Add a new rating and description to the list
+        if (this.newRating > 0 && this.newDescription.length <= 150) {
+            this.additionalRatings.push({
+                rating: this.newRating,
+                description: this.newDescription,
+            });
 
-                    // Format the image URLs for Galleria
-                    this.images = response.data.images.map(url => ({
-                        itemImageSrc: url,
-                        thumbnailImageSrc: url,
-                        alt: 'Image', // Alt text for the image
-                    }));
-                    console.log('Images:', this.images);
-                })
-                .catch(error => {
-                    console.error('Error fetching listing data:', error);
-                })
-        },
+            // Reset new rating and description
+            this.newRating = 0;
+            this.newDescription = '';
+        }
+    },
+    fetchListingData() {
+        // Fetch listing data from the server
+        const ListingID = this.$route.params.id;
+        axios.get(`get_listing/${ListingID}/`)
+            .then(response => {
+                // Update the listing data based on the response
+                this.listing = response.data;
+                console.log('Listing data:', this.listing);
 
+                // Format the image URLs for Galleria
+                this.images = response.data.images.map(url => ({
+                    itemImageSrc: url,
+                    thumbnailImageSrc: url,
+                    alt: 'Image', // Alt text for the image
+                }));
+                console.log('Images:', this.images);
+            })
+            .catch(error => {
+                console.error('Error fetching listing data:', error);
+            })
     },
 
     components: {
