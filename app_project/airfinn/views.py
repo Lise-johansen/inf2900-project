@@ -569,9 +569,28 @@ def get_listings(request, category):
         # Get the items with the sampled ids and sort them in random order.
         random_data = Item.objects.filter(id__in=sample_ids).order_by('?')
         
-        # Create a list of dictionaries with the item data.
-        data = [{'id': item.id, 'name': item.name, 'description': item.description, 'price_per_day': item.price_per_day, 'location': item.location, 'category': item.category} for item in random_data]
-
+        # Get the images for the items.
+        images = ItemImage.objects.filter(item__in=random_data)
+        
+        # Prepare the data to return.
+        data = []
+        for item in random_data:
+            # Get the first image URL for each item.
+            image = images.filter(item=item).first()
+            image_url = image.image_url if image else None
+            
+            # Prepare the item data.
+            item_data = {
+                'id': item.id,
+                'name': item.name,
+                'description': item.description,
+                'price_per_day': item.price_per_day,
+                'location': item.location,
+                'category': item.category,
+                'image': image_url
+            }
+            data.append(item_data)
+        
         # Return the data as a JSON response.
         return JsonResponse(data, safe=False, status=200)
 
