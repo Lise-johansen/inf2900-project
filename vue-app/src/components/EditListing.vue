@@ -287,12 +287,26 @@ export default {
             userLoggedIn: false
         };
     },
+    computed: {
+        namePlaceholder() {
+            return this.name ? this.name : 'Name';
+        },
+        descriptionPlaceholder() {
+            return this.description ? this.description : 'Write a creative description';
+        },
+        pricePlaceholder() {
+            return this.price_per_day ? this.price_per_day : 'Price per day';
+        },
+        locationPlaceholder() {
+            return this.location ? this.location : 'Location';
+        },
+        categoryPlaceholder() {
+            return this.category ? this.category : 'Category';
+        }
+    },
 
     created() {
-        // Call the method to redirect if the user is not logged in
-        this.redirectIfLoggedIn();
-
-        // Fetch listing details based on ID
+        this.checkLoggedIn();
         this.fetchListingDetails();
     },
 
@@ -306,30 +320,72 @@ export default {
                 category: this.category,
             };
 
-            axios
-                .put(
-                    `http://localhost:8080/api/edit_listing/${this.inputNumber}/`,
-                    data
-                )
-                .then((response) => {
-                    console.log(response);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+            // Update the listing based on the ID
+            this.updateListingData(data);
         },
 
-        redirectIfLoggedIn() {
-            // Check if user is logged in (you might need to implement this logic)
-            this.userLoggedIn = true; // Example
+        async updateListingData(data) {
+            try {
+                const response = await axios.put(`edit_listing/${this.inputNumber}/`, data);
+                console.log(response);
+            }
+            catch (error) {
+                console.error('Error updating listing:', error);
+            }
         },
 
-        fetchListingDetails() {
-            // Fetch listing details based on ID
+        checkLoggedIn() {
+            const token = this.getTokenFromCookies();
+            if (token) {
+                this.userLoggedIn = true;
+            }
+            else {
+                this.redirectToLogin();
+            }
         },
-    },
+
+        redirectToLogin() {
+            if (confirm("You must be logged in to view this page.")) {
+                this.$router.push("/login");
+            }
+        },
+
+        getTokenFromCookies() {
+            const cookies = document.cookie.split('; ');
+            for (const cookie of cookies) {
+                const [name, value] = cookie.split('=');
+                if (name === 'token') {
+                    return value;
+                }
+            }
+            return null;
+        },
+
+        async fetchListingDetails() {
+            const ListingID = this.$route.params.id;
+            try {
+                const response = await axios.get(`get_listing/${ListingID}/`);
+                document.cookie = `token=${response.data.token}`;
+
+                const listingData = response.data;
+
+                // Update the data fields with the fetched listing data
+                this.name = listingData.name || '';
+                this.description = listingData.description || '';
+                this.price_per_day = listingData.price_per_day || '';
+                this.location = listingData.location || '';
+                this.category = listingData.category || '';
+
+                console.log('Listing data:', listingData);
+            }
+            catch (error) {
+                console.error('Error fetching listing data:', error);
+            }
+        },
+    }
 };
 </script>
+
 
 <style scoped>
 .contact-form {
@@ -409,7 +465,8 @@ export default {
 
 .button-container {
     padding-bottom: 10px;
-    transform: translate(350px, -75px); /* right and down */
+    transform: translate(350px, -75px);
+    /* right and down */
 
 }
 
