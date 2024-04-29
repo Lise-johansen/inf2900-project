@@ -743,6 +743,7 @@ def get_messages(request):
                     'created_at': conversation.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 },
                 'message': message.message,
+                'image': message.image if message.image else '',
                 'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')  # Convert to string format
             }
             data.append(message_data)
@@ -760,6 +761,7 @@ def send_messages(request):
     sender_id = data.get('sender_id')
     receiver_id = data.get('receiver_id')
     message_text = data.get('message')
+    message_image = data.get('image')
     item_id = data.get('item_id')
     conversation_id = data.get('conversation_id')
     
@@ -815,7 +817,56 @@ def send_messages(request):
         conversation = Conversation.objects.create(user1=sender, user2=receiver, item=item)
         
     # Create a new message
-    message = Message.objects.create(conversation=conversation, sender=sender, receiver=receiver, message=message_text)
+    message = Message.objects.create(conversation=conversation, sender=sender, receiver=receiver, message=message_text, image=message_image)
+    
+    # Upload the image to the S3 bucket if there is one
+    if message_image:
+        # Initialize the S3 client with your credentials and endpoint
+        ACCOUNT_ID = os.getenv('ACCOUNT_ID')
+        ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+        SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+
+        s3 = boto3.client('s3', 
+                        region_name='auto',
+                        endpoint_url=f'https://{ACCOUNT_ID}.r2.cloudflarestorage.com',
+                        aws_access_key_id=ACCESS_KEY_ID,
+                        aws_secret_access_key=SECRET_ACCESS_KEY)
+        
+        # Split the data to extract only the base64 part
+        base64_data = message_image.split(',')[1]
+        
+        # Decode the base64-encoded image data
+        image_binary = base64.b64decode(base64_data)
+        
+        # Check if the image size exceeds the limit (2MB)
+        if len(image_binary) > 2 * 1024 * 1024:
+            return JsonResponse({'error': 'Image size exceeds the limit of 2MB'}, status=400)
+        
+        # Get correct file extension
+        if message_image.startswith('data:image/png'):
+            file_extension = 'png'
+        elif message_image.startswith('data:image/jpeg'):
+            file_extension = 'jpeg'
+        elif message_image.startswith('data:image/jpg'):
+            file_extension = 'jpg'
+        else:
+            return JsonResponse({'error': 'Invalid image format'}, status=400)
+        
+        # Generate a unique filename for the image
+        image_token_name = uuid.uuid4().hex
+        file_name = f'message/{message.id}/{image_token_name}.{file_extension}'
+        
+        # Create a new bucket for each message
+        bucket_name = 'rentopia-files'
+        
+        try:
+            # Upload the image data to the specified bucket
+            response = s3.put_object(Bucket=bucket_name, Key=file_name, Body=image_binary)
+            URL = os.getenv('URL_DOMAIN')
+            message.image = f'{URL}/{file_name}'
+            message.save()
+        except ClientError as e:
+            return JsonResponse({'error': str(e)}, status=500)
     
     # Prepare message data
     message_data = {
@@ -839,6 +890,7 @@ def send_messages(request):
                     'created_at': conversation.created_at.strftime('%Y-%m-%d %H:%M:%S')
         },
         'message': message.message,
+        'image': message.image if message.image else '',
         'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')  # Convert to string format
     }
     
@@ -926,9 +978,19 @@ def create_item(request):
             if len(image_binary) > 2 * 1024 * 1024:
                 return JsonResponse({'error': 'Image size exceeds the limit of 2MB'}, status=400)
 
+            # Get correct file extension
+            if uploaded_image.startswith('data:image/png'):
+                file_extension = 'png'
+            elif uploaded_image.startswith('data:image/jpeg'):
+                file_extension = 'jpeg'
+            elif uploaded_image.startswith('data:image/jpg'):
+                file_extension = 'jpg'
+            else:
+                return JsonResponse({'error': 'Invalid image format'}, status=400)
+            
             # Generate a unique filename for the image
             image_token_name = uuid.uuid4().hex
-            file_name = f'{item.name}/{item.id}/{image_token_name}.png'
+            file_name = f'listing/{item.id}/{image_token_name}.{file_extension}'
             
             # Create a new bucket for each listing
             bucket_name = 'rentopia-files'
@@ -1029,7 +1091,7 @@ def upload_image(request):
             previous_image_filename = previous_image_url.split('/')[-1]
             
             # Delete the previous image from the S3 bucket
-            delete_previous_image(previous_image_filename)
+            delete_image(previous_image_filename)
         
         # Initialize the S3 client with your credentials and endpoint
         ACCOUNT_ID = os.getenv('ACCOUNT_ID')
@@ -1042,8 +1104,18 @@ def upload_image(request):
                           aws_access_key_id=ACCESS_KEY_ID,
                           aws_secret_access_key=SECRET_ACCESS_KEY)
 
+        # Get correct file extension
+        if image_data.startswith('data:image/png'):
+            file_extension = 'png'
+        elif image_data.startswith('data:image/jpeg'):
+            file_extension = 'jpeg'
+        elif image_data.startswith('data:image/jpg'):
+            file_extension = 'jpg'
+        else:
+            return JsonResponse({'error': 'Invalid image format'}, status=400)
+        
         image_token_name = uuid.uuid4().hex
-        file_name = f'{image_token_name}.png'
+        file_name = f'user/{user.id}/{image_token_name}.{file_extension}'
         bucket_name = 'rentopia-files'
 
         try:
@@ -1063,7 +1135,7 @@ def upload_image(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-def delete_previous_image(previous_image_filename):
+def delete_image(filename):
     # Initialize the S3 client with your credentials and endpoint
     ACCOUNT_ID = os.getenv('ACCOUNT_ID')
     ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
@@ -1079,6 +1151,6 @@ def delete_previous_image(previous_image_filename):
 
     try:
         # Delete the previous image from the specified bucket
-        s3.delete_object(Bucket=bucket_name, Key=previous_image_filename)
+        s3.delete_object(Bucket=bucket_name, Key=filename)
     except ClientError as e:
         print(f"Error deleting previous image: {str(e)}")
