@@ -7,7 +7,7 @@ import sys
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app_project.settings')
 django.setup()
 
-from airfinn.models import Item, ItemImage, User  # Import your model
+from airfinn.models import Item, ItemImage, User, Order  # Import your model
 
 def populate_user():
     first_name = ['John', 'Jane', 'Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank', 'Grace', 'Hank', 'Ivy', 'Jack', 'Kate', 'Liam', 'Mia', 'Noah', 'Olivia', 'Peter', 'Quinn', 'Rose', 'Sam', 'Tina', 'Uma', 'Vince', 'Wendy', 'Xander', 'Yara', 'Zane']
@@ -132,6 +132,40 @@ def populate_listings(user_email=None):
             for _ in range(1):
                 ItemImage.objects.create(item=item)
 
+def populate_reserved_listings(user_email):
+    # Create a random user
+    try:
+        user = User.objects.get(email=user_email)
+    except User.DoesNotExist:
+        print(f"User with email '{user_email}' does not exist.")
+        return
+
+    # Create a random listing
+    item = Item.objects.create(
+        name='Item 1',
+        description='Description of item 1',
+        availability=True,
+        condition='New',
+        price_per_day=10.0,
+        owner=User.objects.get(id=1),
+        postal_code='0010',
+        location='Oslo',
+        category='Electronics',
+    )
+
+    # Add images to the listing
+    for _ in range(1):
+        ItemImage.objects.create(item=item)
+
+    # Create a reservation for the listing
+    order = Order.objects.create(
+        item=item,
+        renter=user,
+        period= {'start': '2021-08-01', 'end': '2021-08-05'}
+    )
+
+
+
 def main():
     args = sys.argv[1:]
 
@@ -145,9 +179,14 @@ def main():
         elif args[0] == '-user':
             populate_user()
             print('User populated')
+        elif args[0] == '-reserved':
+            user = args[1]
+            populate_reserved_listings(user)
+            print('Reserved listings populated')
         elif args[0] == '-all':
             populate_user()
             populate_listings()
+            populate_reserved_listings()
             print('All populated')
     else:
         print('No arguments given. Use -listings to populate listings, -user to populate user, or -all to populate both.')
