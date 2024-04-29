@@ -9,7 +9,7 @@
                     <div class="carousel-item">
                         <div class="carousel-details">
                             <div class="item-name">{{ slotProps.data.name }}</div>
-                            <img :src="'https://via.placeholder.com/210'" :alt="slotProps.data.name"/>
+                            <img :src="slotProps.data.image" style="max-width: 100%;" :alt="slotProps.data.name"/>
                             <div class ="item-data">
                                 <div class="item-price">{{ slotProps.data.price_per_day}} kr/day</div>
                                 <div class="item-location">{{ slotProps.data.location}}</div>
@@ -79,6 +79,7 @@ export default {
         axios.get('/get_items/' + this.category)
             .then(response => {
                 this.listings = response.data;
+                console.log(this.listings);
             })
             .catch(error => {
                 console.log(error);
