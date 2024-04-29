@@ -16,6 +16,13 @@
                 <!-- Display item id and date -->
                 <div class="details">
                   Listing: {{ conversation.item.name }}
+                  <br>
+                  <div v-if="conversation.sender.name === 'You'">
+                    <div>You: {{ conversation.latest_message.message }}</div>
+                  </div>
+                  <div v-else>
+                    <div>{{ conversation.latest_message.message }}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -28,7 +35,7 @@
     <div :class="{ 'right-panel': true, 'active': showRightPanel }">
       <div class="message-box">
       <div v-if="selectedConversation">
-        <router-link :to="'/listings/' + selectedConversation.item.id" class="item-link">
+        <router-link :to="'/listing/' + selectedConversation.item.id" class="item-link">
         <h2> {{ selectedConversation.item.name }} </h2></router-link>
           <div class="mail-details" v-if="selectedConversation">
             <div class="mail-box"  ref="messageContainer">
@@ -37,15 +44,23 @@
                   <!-- Check if there are messages -->
                   <div v-if="selectedConversation.messages.length !== 0">
                     <div v-if="message.sender.name === 'You'">
-                      <div class="date-sender" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>                  
-                      <div class="sender">{{ message.sender.name }}
-                        <div class="message-content-sender">{{ message.message }}</div>
+                      <div class="date-sender" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>
+                      <div class="sender">
+                          {{ message.sender.name }}
+                          <div class="message-content-sender">{{ message.message }}</div>
+                          <div v-if="message.image" class="image-container">
+                            <Image :src="message.image" alt="Image Preview" width="250" preview />
+                          </div>
                       </div>
-                    </div>
+                  </div>
                     <div v-else>
                       <div class="date-receiver" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>   
-                      <div class="receiver">{{ message.sender.name }}
+                      <div class="receiver">
+                        {{ message.sender.name }}
                         <div class="message-content-receiver">{{ message.message }}</div>
+                          <div v-if="message.image" class="image-container">
+                            <Image :src="message.image" alt="Image Preview" class="message-image" preview />
+                          </div>
                       </div>
                     </div>
                     
@@ -57,8 +72,29 @@
               </div>
             </div>
             <div class="input-box">
-              <textarea v-model="newMessage" placeholder="Type your message..."></textarea>
-              <button @click="sendMessage">Send</button>
+              <Textarea v-model="newMessage" autoResize rows="2" cols="100" placeholder="Type your message..."/>
+                <!-- Add image upload input button by the send message -->
+                <div class="send-and-upload-buttons">
+                  <!-- File input for image uploading -->
+                  <input type="file" accept="image/*" style="display: none;" ref="fileInput" @change="handleImageUpload">
+                  
+                  <!-- Button for triggering file selection -->
+                  <Button class="upload-button" icon="pi pi-link" outlined @click="$refs.fileInput.click()"/>
+
+                  <!-- Button for sending message -->
+                  <Button label="Send" raised @click="sendMessage"/>
+                  
+                  <!-- Image preview dialog -->
+                  <Dialog v-model:visible="displayImagePreview" modal>
+                    <img :src="selectedImage" alt="Image Preview" style="width: 500px; margin: 10px;"/>
+                    <div class="p-d-flex p-jc-between p-mt-2">
+                      <div class="close-and-send-preview">
+                        <Button label="Cancel" class="p-button-text" @click="closeImagePreviewDialog" />
+                        <Button label="Send" class="p-button-primary" @click="sendImage" />
+                      </div>
+                    </div>
+                  </Dialog>
+                </div>
             </div>
           </div>
       </div>
@@ -76,9 +112,17 @@
 </template>
 
 <script>
+  import 'primeicons/primeicons.css';
   import axios from 'axios';
+  import Image from 'primevue/image';
+  import Button from 'primevue/button';
+  import Dialog from 'primevue/dialog';
+  import Textarea from 'primevue/textarea';
   
   export default {
+    components: {
+      Image, Button, Dialog, Textarea
+    },
     data() {
       return {
         conversations: [], // Array to store conversations with messages
@@ -86,9 +130,24 @@
         newMessage: '', // New message input
         errorMessage: '', // Error message to display in popup
         showPopup: false, // Flag to show/hide popup
-        showRightPanel: false
+        showRightPanel: false, // Flag to show/hide right panel
+        image: '', // Image data to be sent if available
+        displayImagePreview: false, // Flag to show/hide image preview dialog
       };
     },
+
+    created() {
+      // Check if logged in
+      const token = this.loginCheck();
+      
+      // Redirect to login page if not logged in
+      if (!token) {
+        this.errorMessage = 'Please login to view your inbox.';
+        this.showPopup = true;
+        return;
+      }
+    },
+
     mounted() {
       // Fetch conversations when component is mounted
       this.fetchConversations();
@@ -110,7 +169,6 @@
             }
             });
 
-            console.log("Grouped conversations:", groupedConversations);
             // Convert the grouped conversations object to an array
             return Object.values(groupedConversations);
         }
@@ -123,17 +181,11 @@
         // Scroll the message container to the bottom
         messageContainer.scrollTop = messageContainer.scrollHeight;
       },
-      fetchConversations() {
-        // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
 
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to view your inbox.';
-          this.showPopup = true;
-          return;
-        }
+      fetchConversations() {
+        
+        // Get the authentication token from cookies
+        const token = this.loginCheck();
 
         // Make API request to fetch conversations with messages
         axios.get('get-conversations/', {
@@ -147,7 +199,6 @@
           if (data && Array.isArray(data) && data.length > 0) {
             // Assign the received conversations directly
             this.conversations = data;
-            console.log("Conversations with messages:", this.conversations);
 
             // Update selectedConversation to reflect the first conversation (if available)
             if (!this.selectedConversation && this.conversations.length > 0) {
@@ -167,24 +218,18 @@
           console.error('Error fetching conversations with messages:', error);
         });
       },
+
       openConversation(conversation) {
         // Set selectedConversation to the clicked conversation to display messages
         this.selectedConversation = conversation;
         this.showRightPanel = true;
-        console.log("Selected conversation:", this.selectedConversation);
         this.fetchMessages(conversation.id);
       },
+
       fetchMessages(conversation_id){
-        // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
         
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to view messages.';
-          this.showPopup = true;
-          return;
-        }
+        // Get the authentication token from cookies
+        const token = this.loginCheck();
   
         // Make API request to fetch messages for the selected conversation
         axios.get(`get-messages/`, {
@@ -201,7 +246,6 @@
           if (data && Array.isArray(data) && data.length > 0) {
             // Assign the received messages to the selected conversation
             this.selectedConversation.messages = data;
-            console.log("Messages for conversation:", this.selectedConversation.messages);
 
             // Scroll to the bottom after messages have been fetched
             this.$nextTick(() => {
@@ -219,22 +263,14 @@
           this.errorMessage = 'Error fetching messages.';
         });
       },
+
       sendMessage() {
         // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
-        
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to send a message.';
-          this.showPopup = true;
-          return;
-        }
+        const token = this.loginCheck();
   
         // Make sure newMessage is not empty
-        if (!this.newMessage) {
-          this.errorMessage = 'Please enter a message.';
-          this.showPopup = true;
+        if (!this.newMessage && !this.image) {
+          alert('Please enter a message.');
           return;
         }
   
@@ -243,6 +279,7 @@
           sender_id: this.selectedConversation.sender.id,
           receiver_id: this.selectedConversation.receiver.id,
           message: this.newMessage,
+          image: this.image,
           item_id: this.selectedConversation.item.id,
           conversation_id: this.selectedConversation.id
         }, 
@@ -253,17 +290,18 @@
         })
         .then(response => {
           // Handle successful response
-          console.log('Message sent:', response.data);
           
           // Append the new message to the selected conversation
           this.selectedConversation.messages.push({
             sender: { name: "You" },
             message: this.newMessage,
+            image: this.image,
             created_at: response.data.created_at
           });
           
           // Clear the new message input
           this.newMessage = '';
+          this.image = '';
 
           // Scroll to the bottom after sending the message
           this.$nextTick(() => {
@@ -275,14 +313,20 @@
           console.error('Error sending message:', error);
         });
       },
+
+      sendImage(){
+        this.image = this.selectedImage;
+        this.displayImagePreview = false;
+        
+        // Send the message with the image
+        this.sendMessage();
+      },
+
       RedirectToLogin() {
         // Redirect to login page
         this.$router.push('/login');
       },
-      isLoggedIn() {
-        // Check if user is logged in by checking the token in cookies
-        return this.getTokenFromCookies() !== null;
-      },
+
       getTokenFromCookies() {
         const cookies = document.cookie.split('; ');
         for (const cookie of cookies) {
@@ -293,11 +337,13 @@
         }
         return null; // Token not found in cookies
       },
+
       hidePopup() {
         this.errorMessage = ''; // Clear the error message
         this.showPopup = false;
         this.RedirectToLogin();
       },
+
       formatDateString(dateString) {
         // Create a new Date object from the date string
         const date = new Date(dateString);
@@ -305,10 +351,47 @@
         // Format the date to a more readable format
         return date.toLocaleString();
       },
+
       getParticipantName(conversation) {
         // Return the name of the other participant in the conversation
         return conversation.sender.name === "You" ? conversation.receiver.name : conversation.sender.name;
       },
+
+      handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+          // Read the file as a data URL
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const imageData = reader.result;
+
+            // Set the selected image for preview
+            this.selectedImage = imageData;
+
+            // Open the image preview dialog
+            this.displayImagePreview = true;
+          };
+          reader.readAsDataURL(file);
+        }
+      },
+
+      closeImagePreviewDialog() {
+        this.displayImagePreview = false;
+      },
+
+      loginCheck() {
+        // Get the authentication token from cookies
+        const token = this.getTokenFromCookies();
+
+        // Make sure token is available
+        if (!token) {
+          // Handle error - user is not logged in
+          this.errorMessage = 'Please login to view your inbox.';
+          this.showPopup = true;
+          return null;
+        }
+        return token;
+      }
     }
   };
 </script>
@@ -324,12 +407,11 @@
       margin-left: 0%;
       margin-right: 5px;
       margin-top: 20px;
-      width: 15%;
+      width: 20%;
       transition: max-width 0.3s ease, margin-left 0.3s ease;
       box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
       padding: 20px;
       border-radius: 30px;
-      backdrop-filter: blur(10px);
       overflow: auto;
     }
 
@@ -553,31 +635,25 @@
       border: 2px solid #ccc;
       border-radius: 30px;
       display: flex;
-      align-items: center;
     }
 
-    textarea {
-      flex: 1;
-      resize: none;
-      padding: 10px;
-      border: 2px solid #ffa500;
-      border-radius: 5px;
+    .send-and-upload-buttons {
+      display: flex;
+      align-items: right;
+      justify-content: space-between;
       margin-right: 10px;
-      box-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+      padding: 2px;
     }
 
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      background-color: #007bff;
-      color: rgb(255, 255, 255);
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+    .upload-button {
+      scale: 0.8;
     }
 
-    button:hover {
-      background-color: #0056b3;
+    .close-and-send-preview {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px;
     }
 
     .popup {

@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, environ
 from datetime import timedelta
 
+# Load environment variables from .env file
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,14 +30,14 @@ STATICFILES_DIRS = [
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&@nmsdwxy*o!l1_r8p@t#&w4n@w3ljbeoqzq4t87q8accy=fdw'
+SECRET_KEY = env('SECRET_KEY')
 
 # Change the following to VUE app URL
 # FRONTEND_URL = 'https://django.dybedahlserver.net'
 FRONTEND_URL = 'http://localhost:8080/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Use HTTPS for secure connections
 # SECURE_SSL_REDIRECT = True
@@ -182,11 +185,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email server for SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.zeptomail.eu'  # Your Zoho Mail SMTP server address
-EMAIL_PORT = 465  # Zoho Mail SMTP port for SSL
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = env('EMAIL_PORT')  # Zoho Mail SMTP port for SSL
 EMAIL_USE_SSL = True  # Use SSL/TLS for secure connection
 EMAIL_USE_TLS = False  # No need for TLS if using SSL
-EMAIL_HOST_USER = 'emailapikey'  # Your Zoho Mail API key as the username
-# Your Zoho Mail Send Mail Token 1 as the password
-EMAIL_HOST_PASSWORD = 'yA6KbHsMugT+kDpWQ0hs1ZWNoo40qqAwjXm+sX/kdJYuKNnn26E71BJkdNTvJzWLitfX56oDbY5AL4C9vYoLfJZiZ9YEL5TGTuv4P2uV48xh8ciEYNYkgZigCrAVFa9MeBoiDSw2QfgoWA=='
-DEFAULT_FROM_EMAIL = 'dybedahlserver.net'  # Your domain/sender address
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')

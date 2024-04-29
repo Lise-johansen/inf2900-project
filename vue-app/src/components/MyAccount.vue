@@ -2,6 +2,13 @@
   <div class="my-account">
       <div class="input-container">
         <h3>Change your account information here!</h3>
+        <h4>Profile picture:</h4>
+        <div class="profilepicture-container">
+          <div class="profile-picture-outline">
+            <img v-if="profilePicture" :src="profilePicture" alt="Avatar" class="profile-picture">
+            <input type="file" accept="image/jpeg,image/png" name="image" @change="handleImageUpload" :style="{ display: profilePicture ? 'none' : 'block' }">
+          </div>
+        </div>
         <h4>First name:</h4>
         <input v-model="user.firstName" placeholder="First name..." class="input-field"/>
         <h4>Last name:</h4>
@@ -82,14 +89,28 @@
         },
 
         handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                    this.profilePicture = reader.result;
-                };
-            }
+          const file = event.target.files[0];
+          if (file) {
+              // Read the file as a data URL
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                  const imageData = reader.result;
+                  // Send the image data to the backend
+                  axios.put('upload_image/', { image: imageData }, {
+                      headers: {
+                          'Content-Type': 'application/json'
+                      }
+                  })
+                  .then(response => {
+                      console.log('Image uploaded:', response);
+                      this.profilePicture = response.data.image_url;
+                  })
+                  .catch(error => {
+                      console.error('Error uploading image:', error);
+                  });
+              };
+              reader.readAsDataURL(file);
+          }
         },
       
         saveChanges() {
@@ -218,9 +239,9 @@
   }
 
   .profilepicture-container, .profile-picture {
-    width: 150px;
-    height: 150px;
-    margin-top: 20px;
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
   }
 
   .profilepicture-container {
@@ -230,7 +251,7 @@
   }
 
   .profile-picture {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     border-radius: 50%;
     object-fit: cover;
     object-position: center;

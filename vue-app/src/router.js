@@ -18,6 +18,8 @@ import MyAccount from './components/MyAccount.vue';
 import SearchPage from './components/SearchPage.vue';
 import PrivacyPolicy from './components/PrivacyPolicy.vue';
 import MailBox from './components/MailBox.vue';
+import ListingPath from './components/ListingPath.vue';
+
 
 const routes = [
   {
@@ -71,11 +73,6 @@ const routes = [
     name: 'create-listing',
     component: CreateItem
   },
-  // {
-  //   path: '/listings/:id',
-  //   name: 'listings',
-  //   component: Listings,
-  // },
   {
     path: '/about',
     name: 'about',
@@ -116,6 +113,11 @@ const routes = [
     name: 'privacy-policy',
     component: PrivacyPolicy,
   },
+  {
+    path: '/listing/:id/', // Ensure this matches the path used in navigation
+    name: 'listingPage',
+    component: ListingPath,
+  }
   // Other routes
 ];
 

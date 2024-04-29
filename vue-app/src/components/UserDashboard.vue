@@ -5,7 +5,6 @@
       <div class="profilepicture-container">
         <div class="profile-picture-outline">
           <img v-if="profilePicture" :src="profilePicture" alt="Avatar" class="profile-picture">
-          <input type="file" accept="image/*" @change="handleImageUpload" :style="{ display: profilePicture ? 'none' : 'block' }">
         </div>
       </div>
       
@@ -58,25 +57,24 @@
     },
 
     methods: {
-        logout() {
+      logout() {
         axios.get('logout/')
         .then(response => {
-            document.cookie = `token=${response.data.token}`;
-            document.cookie = `auth_user=${response.data.auth_user}`;
             this.$router.push('/');
-        })
-        },
-
-        handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                    this.profilePicture = reader.result;
-                };
-            }
+            alert(response.data.message);
+          })
+      },
+      
+      getTokenFromCookies() {
+        const cookies = document.cookie.split('; ');
+        for (const cookie of cookies) {
+          const [name, value] = cookie.split('=');
+          if (name === 'token') {
+            return value;
+          }
         }
+        return null; // Token not found in cookies
+      }
     },
 
     mounted() {
@@ -84,6 +82,8 @@
         axios.get('dashboard/')
         .then(response => {
             this.user = response.data;
+            console.log('User data:', this.user);
+            this.profilePicture = response.data.profilePicture;
         })
         .catch(error => {
             console.error('Error fetching user data:', error);
