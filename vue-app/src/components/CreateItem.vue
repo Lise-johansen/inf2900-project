@@ -26,6 +26,14 @@
                     <option v-for="condition in conditions" :key="condition" :value="condition">{{ condition }}</option>
                 </select>
             </div>
+            <!-- Upload Images to the listing -->
+            <div class="form-group">
+                <input type="file" ref="fileInput" @change="handleFileUpload" multiple>
+                <!-- Iterate and display the images in the preview -->
+                <div v-for="(imagePreview, index) in imagePreviews" :key="index">
+                    <img :src="imagePreview" alt="Image Preview" style="margin-top: 10px;">
+                </div>
+            </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Create Item</button>
             </div>
@@ -44,7 +52,7 @@ export default {
             price_per_day: '',
             location: '',
             availability: true,
-            image: null,
+            image: [],
             condition: '',
             category: '',
             owner_id: '',
@@ -66,19 +74,20 @@ export default {
     },
     methods: {
         createItem() {
-            // Create a new item
-            // Send a POST request
-
-            axios.post('create-item/', {
+            // Create an object to store item data
+            const itemData = {
                 name: this.title,
                 description: this.description,
                 price_per_day: this.price_per_day,
                 location: this.location,
                 availability: this.availability,
-                image: this.image,
                 condition: this.condition,
                 category: this.category,
-            })
+                images: this.image,
+            };
+
+            // Send a POST request with itemData as JSON
+            axios.post('create-item/', itemData)
                 .then(() => {
                     // Handle successful creation
                     console.log('Item created successfully');
@@ -113,44 +122,31 @@ export default {
 
             // Iterate over each file and handle it individually
             for (let i = 0; i < files.length; i++) {
-                if (this.uploadedFileCount >= this.maxFiles) {
-                    console.error('Exceeded maximum number of allowed files');
-                    return;
-                }
-
                 const file = files[i];
-                const maxSize = 2 * 1024 * 1024; // 2 MB
-
-                // Check if the file is an image
-                if (file && file.type.startsWith('image/')) {
-                    if (file.size > maxSize) {
-                        console.error('File size exceeds 2MB:', file);
-                        return;
-                    }
+                if (file) {
+                    // Create a new FileReader instance for each file
                     const reader = new FileReader();
+                    
+                    // Setup an onloadend event handler for each reader
+                    reader.onloadend = () => {
+                        const imageData = reader.result;
+                        
+                        // Add each image data to the imagePreviews array separately
+                        this.imagePreviews.push(imageData);
 
-                    // Read the image file as a data URL
-                    reader.readAsDataURL(file);
+                        // Increment the uploadedFileCount
+                        this.uploadedFileCount++;
+                        
+                        // Add the image data to the image array
+                        this.image.push(imageData);
 
-                    // Set up a listener for when the file has been loaded
-                    reader.onload = () => {
-                        // Store or process the image data as needed
-                        // For example, you can store the data in an array or emit an event
-                        this.imagePreviews.push(reader.result);
                     };
-
-                    // Increment the uploaded file count
-                    this.uploadedFileCount++;
-                } else {
-                    // Handle non-image files or display an error message
-                    console.error('Invalid file:', file);
+                    
+                    // Read the current file as a data URL
+                    reader.readAsDataURL(file);
                 }
             }
         },
-
-
-
-
 
         clearForm() {
             this.title = '';

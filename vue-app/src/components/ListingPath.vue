@@ -40,6 +40,7 @@ import StarRating from './StarRating.vue';
 export default {
     data() {
         return {
+            images: null,
             // Empty listing object to be populated with data
             listing: {},
 
@@ -81,10 +82,17 @@ export default {
             const ListingID = this.$route.params.id;
             axios.get(`get_listing/${ListingID}/`)
                 .then(response => {
-                    document.cookie = `token=${response.data.token}`;
                     // Update the listing data based on the response
                     this.listing = response.data;
                     console.log('Listing data:', this.listing);
+
+                    // Format the image URLs for Galleria
+                    this.images = response.data.images.map(url => ({
+                        itemImageSrc: url,
+                        thumbnailImageSrc: url,
+                        alt: 'Image', // Alt text for the image
+                    }));
+                    console.log('Images:', this.images);
                 })
                 .catch(error => {
                     console.error('Error fetching listing data:', error);

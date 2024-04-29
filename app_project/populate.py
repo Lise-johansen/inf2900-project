@@ -7,7 +7,7 @@ import sys
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app_project.settings')
 django.setup()
 
-from airfinn.models import Item, User  # Import your model
+from airfinn.models import Item, ItemImage, User  # Import your model
 
 def populate_user():
     first_name = ['John', 'Jane', 'Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank', 'Grace', 'Hank', 'Ivy', 'Jack', 'Kate', 'Liam', 'Mia', 'Noah', 'Olivia', 'Peter', 'Quinn', 'Rose', 'Sam', 'Tina', 'Uma', 'Vince', 'Wendy', 'Xander', 'Yara', 'Zane']
@@ -91,8 +91,16 @@ def populate_listings(user_email=None):
                 'postal_code': postal_code,
                 'category': random.choice(categories),
                 'owner': user,
-            }
+            }            
             Item.objects.create(**data)
+            
+        # Add images to the listings
+        items = Item.objects.all()
+        for item in items:
+            for _ in range(1):
+                ItemImage.objects.create(item=item)
+            
+            
     else:
         # Get a random user from the database
         users = User.objects.all()
@@ -117,7 +125,12 @@ def populate_listings(user_email=None):
 
             }
             Item.objects.create(**data)
-
+        
+        # Add images to the listings
+        items = Item.objects.all()
+        for item in items:
+            for _ in range(1):
+                ItemImage.objects.create(item=item)
 
 def main():
     args = sys.argv[1:]

@@ -1,4 +1,3 @@
-
 from .models import Item, User
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.core.serializers import serialize

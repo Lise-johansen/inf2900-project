@@ -11,7 +11,7 @@
     <div class="card" v-for="item in filteredResults" :key="item.pk">
       <router-link :to="`/listing/${item.pk}`" class="card-link">
         <div class="card-image">
-          <img :src="item.fields.imageUrl" alt="item.fields.name">
+          <img :src="item.fields.image" alt="item.fields.name">
         </div>
         <div class="card-body">
           <h2 class="card-title">{{ item.fields.name }}</h2>
@@ -65,8 +65,8 @@ export default {
         const response = await fetch(url);
         if (!response.ok) throw new Error('Failed to fetch');
 
-        const data = await response.json();
-        this.searchResults = JSON.parse(data); // Assume data is already in the correct format
+        // const data = await response.json();
+        this.searchResults = await response.json();
 
         console.log('Current active filters:', this.currentFilters);
       
