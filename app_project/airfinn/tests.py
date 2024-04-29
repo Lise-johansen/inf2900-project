@@ -21,7 +21,7 @@ class UserTestCase(TestCase):
         self.user = User.objects.create_user(**self.credentials)
         
         # Create a test item
-        self.item = Item.objects.create(name="Test Item", description="This is a test item", availability=True, condition="New", price_per_day=5.00, images="images/default.jpg", owner=self.user, location="Test Location")
+        self.item = Item.objects.create(name="Test Item", description="This is a test item", availability=True, condition="New", price_per_day=5.00, owner=self.user, location="Test Location")
     
     def test_login(self):
         # Test with correct credentials
