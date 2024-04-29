@@ -33,12 +33,16 @@
       
       <button class="logout-button" @click="logout">Logout</button>
 
+      <div v-for="listing in listings" :key="listing.id">
+        <ListingCard :listing="listing" />
+      </div>
     </div>
 </template>
 
 
 <script>
   import axios from 'axios';
+  import ListingCard from './ReservedListing.vue'
 
   export default {
     data() {
@@ -51,9 +55,22 @@
             address: '',
             profilepicture: '',
             verified: false,
+            orderedListings: [],
         },
         profilePicture: null
         };
+    },
+    components: {
+      ListingCard
+    },
+    listingsdata() {
+      return {
+          reserved_date: '',
+          listing: '',
+          image: '',
+          price_per_day: '',
+          location: '',
+      };
     },
 
     methods: {
@@ -84,6 +101,12 @@
             this.user = response.data;
             console.log('User data:', this.user);
             this.profilePicture = response.data.profilePicture;
+            axios.get('ordered-listings/')
+            .then(response => {
+                this.user.orderedListings = response.data;
+                console.log('Fetched data:', response.data)
+                console.log('Ordered listings:', this.user.orderedListings);
+            })
         })
         .catch(error => {
             console.error('Error fetching user data:', error);
