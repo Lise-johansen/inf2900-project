@@ -94,8 +94,8 @@ def populate_listings(user_email=None):
             }            
             Item.objects.create(**data)
             
-        # Create images for the listings
-        items = Item.objects.filter(owner=user)
+        # Add images to the listings
+        items = Item.objects.all()
         for item in items:
             for _ in range(1):
                 ItemImage.objects.create(item=item)
@@ -126,8 +126,8 @@ def populate_listings(user_email=None):
             }
             Item.objects.create(**data)
         
-        # Create images for the listings
-        items = Item.objects.filter(owner=user)
+        # Add images to the listings
+        items = Item.objects.all()
         for item in items:
             for _ in range(1):
                 ItemImage.objects.create(item=item)
