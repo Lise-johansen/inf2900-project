@@ -12,7 +12,7 @@ from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
 import os, json, jwt, random, base64, boto3, uuid
-from airfinn.utils import get_user_by_id, email_checks, password_checks, get_ordered_items
+from airfinn.utils import get_user_by_id, email_checks, password_checks, get_reserved_items
 from botocore.exceptions import ClientError
 from django.db.models import Q
 from dotenv import load_dotenv
@@ -1207,8 +1207,34 @@ def reserved_listings(request):
         return JsonResponse({'error': 'Token has expired'}, status=401)
     except jwt.InvalidTokenError:
         return JsonResponse({'error': 'Invalid token'}, status=401)
-    
 
-    reserved_listings = get_ordered_items(user_id)
+    reserved_listings = get_reserved_items(user_id)
 
-    return JsonResponse(reserved_listings, safe=False)
+    listing_id = json.loads(reserved_listings)
+
+    listings = []
+
+
+    for listing in listing_id:
+        item = get_object_or_404(Item, id=listing['pk'])
+
+        images = ItemImage.objects.filter(item=item).values_list('image_url', flat=True)
+        images = list(images)
+
+        listing = {
+            "id": item.id,
+            "name": item.name,
+            "description": item.description,
+            "price_per_day": item.price_per_day,
+            "location": item.location,
+            "category": item.category,
+            "owner": item.owner.username,
+            "condition": item.condition,
+            "availability": item.availability,
+            "images": images,
+            "rating": item.rating,
+        }
+        listings.append(listing)
+
+    print("listings: ", listings)
+    return JsonResponse(listings, safe=False)

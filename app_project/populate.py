@@ -180,13 +180,11 @@ def main():
             populate_user()
             print('User populated')
         elif args[0] == '-reserved':
-            user = args[1]
-            populate_reserved_listings(user)
+            populate_reserved_listings(args[1])
             print('Reserved listings populated')
         elif args[0] == '-all':
             populate_user()
             populate_listings()
-            populate_reserved_listings()
             print('All populated')
     else:
         print('No arguments given. Use -listings to populate listings, -user to populate user, or -all to populate both.')

@@ -69,8 +69,7 @@ def upload_profile_picture(request):
          return JsonResponse({'error': 'Failed to upload profile picture'}, status=400)
 
 
-def get_ordered_items(user):
-    print(f"this is the user in get ordered items:{user}")
+def get_reserved_items(user):
     order = Order.objects.filter(renter_id=user)
     items = [order.item for order in order]
     data = serialize('json', items)
