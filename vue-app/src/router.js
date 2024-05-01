@@ -119,6 +119,11 @@ const routes = [
     name: 'listingPage',
     component: ListingPath,
   },
+  {
+    path: '/odered-listings/',
+    name: 'ordered-listings',
+    component: UserDashboard,
+  },
   // Other routes
 
   // Wildcard route to catch any requests to a page that does not exist.
