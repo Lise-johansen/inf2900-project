@@ -35,6 +35,8 @@
 
     <div class="divider"></div>
 
+    <div class="Realname">Reserved Listings:</div>
+    <div class="spacing"></div>
     <div v-for="listing in orderedListings" :key="listing">
       <ListingCard :listing="listing"  />
       <div class="spacing"></div>
