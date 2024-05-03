@@ -66,13 +66,32 @@ export default {
     mounted() {
         this.fetchListingData();
     },
-
+    // I am here
     methods: {
+        fetchListingData() {
+            // Fetch listing data from the server
+            const ListingID = this.$route.params.id;
+            axios.get(`get_listing/${ListingID}/`)
+                .then(response => {
+                    // Update the listing data based on the response
+                    this.listing = response.data;
+                    console.log('Listing data:', this.listing);
+
+                    // Format the image URLs for Galleria
+                    this.images_list = (this.listing.images);
+                    console.log('Images:', this.images);
+                })
+                .catch(error => {
+                    console.error('Error fetching listing data:', error);
+                });
+        },
         redirectToEditPage() {
-            // Navigate to edit-listing page
-            this.$router.push({ name: 'edit-listing', params: { id: this.$route.params.id } });
+            const listingID = this.$route.params.id;
+            this.$router.push({ name: 'EditListing', params: { id: listingID } });
         }
     },
+
+    // I end here
 
     addNewRating() {
         // Add a new rating and description to the list
@@ -104,11 +123,8 @@ export default {
                 console.error('Error fetching listing data:', error);
             })
     },
-
-},
-
-components: {
-    StarRating,
+    components: {
+        StarRating,
         ImageGallery,
     },
 
