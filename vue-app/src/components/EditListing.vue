@@ -134,24 +134,26 @@ export default {
         },
 
         async fetchListingDetails() {
-            const ListingID = this.$route.params.id;
-            try {
-                const response = await axios.get(`get_listing/${ListingID}/`);
-                // document.cookie = `token=${response.data.token}`;
+            const ListingID = this.$route.params.id; // Ensure that this.$route.params.id is defined
+            if (ListingID) {
+                try {
+                    const response = await axios.get(`get_listing/${ListingID}/`);
+                    // const response = await axios.put(`http://localhost:8000/api/edit_listing/${this.inputNumber}/`)
+                    const listingData = response.data;
 
-                const listingData = response.data;
+                    // Update the data fields with the fetched listing data
+                    this.name = listingData.name || '';
+                    this.description = listingData.description || '';
+                    this.price_per_day = listingData.price_per_day || '';
+                    this.location = listingData.location || '';
+                    this.category = listingData.category || '';
 
-                // Update the data fields with the fetched listing data
-                this.name = listingData.name || '';
-                this.description = listingData.description || '';
-                this.price_per_day = listingData.price_per_day || '';
-                this.location = listingData.location || '';
-                this.category = listingData.category || '';
-
-                console.log('Listing data:', listingData);
-            }
-            catch (error) {
-                console.error('Error fetching listing data:', error);
+                    console.log('Listing data:', listingData);
+                } catch (error) {
+                    console.error('Error fetching listing data:', error);
+                }
+            } else {
+                console.error('Listing ID is undefined');
             }
         },
     }
