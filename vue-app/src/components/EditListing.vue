@@ -98,7 +98,7 @@ export default {
 
         async updateListingData(data) {
             try {
-                const response = await axios.put(`edit_listing/${this.inputNumber}/`, data);
+                const response = await axios.put(`edit_listing/${this.inputNumber}/`, data); // you are the problem here
                 console.log(response);
             }
             catch (error) {
