@@ -33,27 +33,43 @@
       
       <button class="logout-button" @click="logout">Logout</button>
 
+    <div class="divider"></div>
+
+    <div class="Realname">Reserved Listings:</div>
+    <div class="spacing"></div>
+    <div v-for="listing in orderedListings" :key="listing">
+      <ListingCard :listing="listing"  />
+      <div class="spacing"></div>
+    </div>
+    <div class="divider"></div>
     </div>
 </template>
 
 
 <script>
   import axios from 'axios';
+  import ListingCard from './ReservedListing.vue'
+
 
   export default {
     data() {
-        return {
+      return {
         user: {
-            firstName: '',
-            lastName: '',
-            email: '',
-            phone: '',
-            address: '',
-            profilepicture: '',
-            verified: false,
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          address: '',
+          profilePicture: '',
+          verified: false,
         },
-        profilePicture: null
-        };
+        orderedListings: [], // Make this a top-level data property
+        profilePicture: null,
+        listings_id: []
+      };
+    },
+    components: {
+      ListingCard
     },
 
     methods: {
@@ -84,6 +100,16 @@
             this.user = response.data;
             console.log('User data:', this.user);
             this.profilePicture = response.data.profilePicture;
+            axios.get('ordered-listings/')
+              .then(response => {
+                  this.orderedListings = response.data;
+                  this.listings_id = response.data;
+                  console.log('Listings id:', this.listings_id);
+                  console.log('Ordered listings:', this.orderedListings);
+              })
+              .catch(error => {
+                  console.error('Error fetching ordered listings:', error);
+              });
         })
         .catch(error => {
             console.error('Error fetching user data:', error);
@@ -189,4 +215,9 @@
     font-size: 1em;
     margin-top: 2em;
   }
+
+  .spacing {
+  padding: 1em;
+  }
+
 </style> 

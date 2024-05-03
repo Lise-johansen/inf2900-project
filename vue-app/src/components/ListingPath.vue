@@ -1,7 +1,9 @@
 <template>
     <div class="listing-container">
         <header class="listing-header">
-            <img class="listing-image" src="@/assets/skiutstyr.jpg" alt="Listing Image">
+            <!-- Use the Galleria component to display the images -->
+            <ImageGallery :images="images_list" />
+            <!-- <img :src="images" :alt="listing.name" :class="listing-image"> -->
             <div class="listing-details">
                 <h1 class="listing-title">{{ this.listing.name }}</h1>
                 <div class="rating-container" @click="scrollToRating">
@@ -40,12 +42,13 @@
 <script>
 import axios from 'axios';
 import StarRating from './StarRating.vue';
+import ImageGallery from './ImagesCarousel.vue';
 // import Rating from 'primevue/rating';
 
 export default {
     data() {
         return {
-            images: null,
+            images_list: [],
             // Empty listing object to be populated with data
             listing: {},
 
@@ -94,11 +97,7 @@ export default {
                 console.log('Listing data:', this.listing);
 
                 // Format the image URLs for Galleria
-                this.images = response.data.images.map(url => ({
-                    itemImageSrc: url,
-                    thumbnailImageSrc: url,
-                    alt: 'Image', // Alt text for the image
-                }));
+                this.images_list = (this.listing.images);
                 console.log('Images:', this.images);
             })
             .catch(error => {
@@ -106,8 +105,11 @@ export default {
             })
     },
 
-    components: {
-        StarRating,
+},
+
+components: {
+    StarRating,
+        ImageGallery,
     },
 
 };
