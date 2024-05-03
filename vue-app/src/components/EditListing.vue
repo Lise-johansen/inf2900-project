@@ -97,15 +97,14 @@ export default {
         },
 
         async updateListingData(data) {
+            const ListingID = this.$route.params.id;
             try {
-                const response = await axios.put(`edit_listing/${this.inputNumber}/`, data); // you are the problem here
+                const response = await axios.put(`EditListing/${ListingID}/`, data);
                 console.log(response);
-            }
-            catch (error) {
-                console.error('Error updating listing:', error);
+            } catch (error) {
+                console.error('Error updating listing:', error); // you are the problem here.
             }
         },
-
         checkLoggedIn() {
             const token = this.getTokenFromCookies();
             if (token) {
@@ -134,11 +133,10 @@ export default {
         },
 
         async fetchListingDetails() {
-            const ListingID = this.$route.params.id; // Ensure that this.$route.params.id is defined
+            const ListingID = this.$route.params.id;
             if (ListingID) {
                 try {
                     const response = await axios.get(`get_listing/${ListingID}/`);
-                    // const response = await axios.put(`http://localhost:8000/api/edit_listing/${this.inputNumber}/`)
                     const listingData = response.data;
 
                     // Update the data fields with the fetched listing data
@@ -159,7 +157,6 @@ export default {
     }
 };
 </script>
-
 
 <style scoped>
 .contact-form {
