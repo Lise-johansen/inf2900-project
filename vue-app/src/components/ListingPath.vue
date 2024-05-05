@@ -9,6 +9,11 @@
                     <star-rating :rating="rating" :editable="false" />
                 </div>
                 <p class="listing-description">{{ this.listing.description }}</p>
+
+                <!-- Add the listing to favourites -->
+                <div class="favourite-button">
+                    <button class="btn" @click="addToFavourites">Add to Favourites</button>
+                </div>
             </div>
         </header>
         <!--  -->
@@ -97,6 +102,25 @@ export default {
                 .catch(error => {
                     console.error('Error fetching listing data:', error);
                 })
+        },
+        addToFavourites() {
+            // get the listing ID and user ID
+            const ListingID = this.$route.params.id;
+
+            console.log('Listing ID:', ListingID);
+
+            // Make a POST request to add the listing to favourites
+            axios.post('add-favourites/', {
+                    listing_id: ListingID,
+                })
+                .then(response => {
+                    console.log('Added to favourites:', response.data);
+                    // Show a success message or update the UI as needed
+                })
+                .catch(error => {
+                    console.error('Error adding to favourites:', error);
+                    // Show an error message or update the UI as needed
+                });
         },
 
     },
