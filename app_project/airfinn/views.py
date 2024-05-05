@@ -7,7 +7,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Item, ItemImage, User, Message, Conversation
+from .models import Item, ItemImage, User, Message, Conversation, Favourites
 from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
@@ -1185,3 +1185,44 @@ def delete_image(filename):
         s3.delete_object(Bucket=bucket_name, Key=filename)
     except ClientError as e:
         print(f"Error deleting previous image: {str(e)}")
+        
+def add_favourites(request):
+    # Add the listing to the favourties table
+    
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    data = json.loads(request.body)
+    item_id = data.get('listing_id')
+    
+    print(f"Data: {data}")
+    print(f"Item ID: {item_id}")
+    
+    # Get the user ID from the token
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    # Check if the item and user exist
+    item = get_object_or_404(Item, id=item_id)
+    user = get_object_or_404(User, id=user_id)
+    
+    print(f"Item: {item}, User: {user}")
+    
+    # Check if the item is already in the user's favourites
+    if Favourites.objects.filter(item=item, user=user).exists():
+        return JsonResponse({'error': 'Item already in favourites'}, status=400)
+    
+    # Add the item to the user's favourites
+    favourite_item = Favourites.objects.create(item=item, user=user)
+    
+    return JsonResponse({'message': 'Item added to favourites'}, status=201)
