@@ -48,4 +48,7 @@ urlpatterns = [
     path('api/get_listing/<int:item_id>/', views.get_listing, name='get_listing'),
     path('api/upload_image/', views.upload_image, name='upload_image'),
     path('api/ordered-listings/', views.reserved_listings, name='reserved_listings'),
+    path('api/add-favourites/', views.add_favourites, name='add_to_favourites'),
+    path('api/get-favourites/', views.get_favourites, name='get_favourites'),
+    path('api/remove-from-favourites/<int:item_id>/', views.remove_favourites, name='remove_favourites'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

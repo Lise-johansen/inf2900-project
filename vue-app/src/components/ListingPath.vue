@@ -11,6 +11,13 @@
                     <star-rating :rating="rating" :editable="false" />
                 </div>
                 <p class="listing-description">{{ this.listing.description }}</p>
+
+                <!-- Add the listing to favourites -->
+                <!-- Check if the item already is in favourites -->
+                <button :disabled="isInFavourites(listing.id)" @click="addToFavourites" class="btn">
+                    <span v-if="!isInFavourites(listing.id)">Add to Favourites</span>
+                    <span v-else>Already in Favourites</span>
+                </button>
             </div>
             <div>
                 <!-- I am here-->
@@ -18,14 +25,19 @@
                 <!-- I end here-->
             </div>
         </header>
-        <!--  -->
+
+        <div class="map-container">
+            <h3>Location: {{ listing.postal_code }}, {{ listing.location }}</h3>
+            <LeafletMap />
+        </div>
+
         <div class="new-rating-container">
             <star-rating v-model="newRating" :editable="true" />
             <textarea v-model="newDescription" placeholder="Add a new review (max 150 characters)"
                 class="message-box"></textarea>
             <button @click="addNewRating" class="btn">Add Rating</button>
         </div>
-        <!--  -->
+        
         <section id="more-ratings-section" class="more-ratings-section-container">
             <!-- Container for existing additional ratings -->
             <div v-for="(item, index) in additionalRatings" :key="index" class="additional-rating-container">
@@ -43,6 +55,7 @@
 import axios from 'axios';
 import StarRating from './StarRating.vue';
 import ImageGallery from './ImagesCarousel.vue';
+import LeafletMap from './LeafletMap.vue';
 // import Rating from 'primevue/rating';
 
 export default {
@@ -60,13 +73,14 @@ export default {
             ],
             newRating: 0, // New rating to be added
             newDescription: '', // New description to be added
+            favourites: [],
         };
     },
 
     mounted() {
         this.fetchListingData();
+        this.fetchFavourites();
     },
-    // I am here
     methods: {
         fetchListingData() {
             // Fetch listing data from the server
@@ -88,44 +102,65 @@ export default {
         redirectToEditPage() {
             const listingID = this.$route.params.id;
             this.$router.push({ name: 'edit_listing', params: { id: listingID } });
-        }
+        },
+        addNewRating() {
+            // Add a new rating and description to the list
+            if (this.newRating > 0 && this.newDescription.length <= 150) {
+                this.additionalRatings.push({
+                    rating: this.newRating,
+                    description: this.newDescription,
+                });
+
+                // Reset new rating and description
+                this.newRating = 0;
+                this.newDescription = '';
+            }
+        },
+        addToFavourites() {
+            // get the listing ID and user ID
+            const ListingID = this.$route.params.id;
+
+            // Make a POST request to add the listing to favourites
+            axios.post('add-favourites/', {
+                    listing_id: ListingID,
+                })
+                .then(response => {
+                    // Show message for successful addition
+                    console.log('Added to favourites:', response.data);
+                    alert('Added to favourites!');
+                    // Update the favourites array
+                    this.fetchFavourites();
+                })
+                .catch(error => {
+                    console.error('Error adding to favourites:', error.response.data.error);
+                    console.log('Error adding to favourites:', error.response.data.error);
+                    // Show the error message from the server
+                    alert(error.response.data.error);
+                });
+        },
+        fetchFavourites() {
+            // Fetch the user's favourite listings
+            axios.get('get-favourites/')
+                .then(response => {
+                    // Update the favourites array based on the response
+                    this.favourites = response.data;
+                    console.log('Favorites:', this.favourites);
+                })
+                .catch(error => {
+                    console.error('Error fetching favourites:', error);
+                });
+        },
+        isInFavourites(listingId) {
+            // Check if the listingId exists in the favourites array
+            return this.favourites.some(favorite => favorite.id === listingId);
+        
+        },
     },
 
-    // I end here
-
-    addNewRating() {
-        // Add a new rating and description to the list
-        if (this.newRating > 0 && this.newDescription.length <= 150) {
-            this.additionalRatings.push({
-                rating: this.newRating,
-                description: this.newDescription,
-            });
-
-            // Reset new rating and description
-            this.newRating = 0;
-            this.newDescription = '';
-        }
-    },
-    fetchListingData() {
-        // Fetch listing data from the server
-        const ListingID = this.$route.params.id;
-        axios.get(`get_listing/${ListingID}/`)
-            .then(response => {
-                // Update the listing data based on the response
-                this.listing = response.data;
-                console.log('Listing data:', this.listing);
-
-                // Format the image URLs for Galleria
-                this.images_list = (this.listing.images);
-                console.log('Images:', this.images);
-            })
-            .catch(error => {
-                console.error('Error fetching listing data:', error);
-            })
-    },
     components: {
         StarRating,
         ImageGallery,
+        LeafletMap,
     },
 
 };
