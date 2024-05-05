@@ -18,11 +18,11 @@
                     <span v-if="!isInFavourites(listing.id)">Add to Favourites</span>
                     <span v-else>Already in Favourites</span>
                 </button>
-            </div>
-            <div>
-                <!-- I am here-->
-                <button @click="redirectToEditPage" class="btn">Edit Listing</button>
-                <!-- I end here-->
+                <!-- Redirect to edit page -->
+                <!-- First check if the user is the owner of the item -->
+                <div class="edit-button" v-if="listing.owner === this.user.id">
+                    <button @click="redirectToEditPage" class="btn">Edit Listing</button>
+                </div>
             </div>
         </header>
 
@@ -74,11 +74,13 @@ export default {
             newRating: 0, // New rating to be added
             newDescription: '', // New description to be added
             favourites: [],
+            user: '',
         };
     },
 
     mounted() {
         this.fetchListingData();
+        this.fetchUser();
         this.fetchFavourites();
     },
     methods: {
@@ -154,6 +156,18 @@ export default {
             // Check if the listingId exists in the favourites array
             return this.favourites.some(favorite => favorite.id === listingId);
         
+        },
+        fetchUser() {
+            // Fetch the user data from the server
+            axios.get('get-user/')
+                .then(response => {
+                    // Update the user data based on the response
+                    this.user = response.data;
+                    console.log('User data:', this.user);
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                });
         },
     },
 
@@ -266,5 +280,10 @@ export default {
 
 .btn:hover {
     background: linear-gradient(to right, #ffa500 0, #ff5733 50%, #ffa500 100%);
+}
+
+.edit-button {
+    margin-top: 10px;
+    text-align: left;
 }
 </style>
