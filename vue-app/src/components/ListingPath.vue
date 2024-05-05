@@ -14,6 +14,10 @@
             </div>
         </header>
         <!--  -->
+        <div class="map-container">
+            <h3>Location: {{ listing.postal_code }}, {{ listing.location }}</h3>
+            <LeafletMap />
+        </div>
         <div class="new-rating-container">
             <star-rating v-model="newRating" :editable="true" />
             <textarea v-model="newDescription" placeholder="Add a new review (max 150 characters)"
@@ -38,6 +42,7 @@
 import axios from 'axios';
 import StarRating from './StarRating.vue';
 import ImageGallery from './ImagesCarousel.vue';
+import LeafletMap from './LeafletMap.vue';
 // import Rating from 'primevue/rating';
 
 export default {
@@ -103,6 +108,7 @@ export default {
     components: {
         StarRating,
         ImageGallery,
+        LeafletMap,
     },
 
 };
