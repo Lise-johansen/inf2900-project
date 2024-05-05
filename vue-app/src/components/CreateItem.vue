@@ -15,6 +15,9 @@
                 <input type="text" id="location" v-model="location" placeholder="Location">
             </div>
             <div class="form-group">
+                <input type="text" id="postal_code" v-model="postal_code" placeholder="Postal code">
+            </div>
+            <div class="form-group">
                 <select id="category" v-model="category" class="custom-select">
                     <option value="" disabled>Select a Category</option>
                     <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
@@ -51,6 +54,7 @@ export default {
             description: '',
             price_per_day: '',
             location: '',
+            postal_code: '',
             availability: true,
             image: [],
             condition: '',
@@ -61,7 +65,7 @@ export default {
             uploadedFileCount: 0,
             maxFiles: 2,
             // Define the available categories
-            categories: ['Summer', 'Winter', 'Tools', 'Electronics', 'Clothing', 'Furniture', 'Sports Equipment', 'Books'],
+            categories: ['Summer', 'Winter', 'Tools', 'Electronics', 'Clothing', 'Furniture', 'Sports Equipment', 'Books', 'Other'],
             conditions: ['New', 'Used', 'Refurbished']
         }
     },
@@ -80,6 +84,7 @@ export default {
                 description: this.description,
                 price_per_day: this.price_per_day,
                 location: this.location,
+                postal_code: this.postal_code,
                 availability: this.availability,
                 condition: this.condition,
                 category: this.category,
@@ -153,12 +158,12 @@ export default {
             this.description = '';
             this.price_per_day = '';
             this.location = '';
+            this.postal_code = '';
             this.availability = true;
             this.image = '';
             this.condition = '';
             this.category = '';
             this.owner_id = '';
-
         }
     }
 }

@@ -13,14 +13,19 @@
                 <p class="listing-description">{{ this.listing.description }}</p>
             </div>
         </header>
-        <!--  -->
+
+        <div class="map-container">
+            <h3>Location: {{ listing.postal_code }}, {{ listing.location }}</h3>
+            <LeafletMap />
+        </div>
+
         <div class="new-rating-container">
             <star-rating v-model="newRating" :editable="true" />
             <textarea v-model="newDescription" placeholder="Add a new review (max 150 characters)"
                 class="message-box"></textarea>
             <button @click="addNewRating" class="btn">Add Rating</button>
         </div>
-        <!--  -->
+        
         <section id="more-ratings-section" class="more-ratings-section-container">
             <!-- Container for existing additional ratings -->
             <div v-for="(item, index) in additionalRatings" :key="index" class="additional-rating-container">
@@ -38,6 +43,7 @@
 import axios from 'axios';
 import StarRating from './StarRating.vue';
 import ImageGallery from './ImagesCarousel.vue';
+import LeafletMap from './LeafletMap.vue';
 // import Rating from 'primevue/rating';
 
 export default {
@@ -103,6 +109,7 @@ export default {
     components: {
         StarRating,
         ImageGallery,
+        LeafletMap,
     },
 
 };

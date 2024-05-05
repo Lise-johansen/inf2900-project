@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="map-wrapper">
     <div id="map"></div>
   </div>
 </template>
@@ -17,7 +17,11 @@ export default {
     };
   },
   mounted() {
-    this.getLocationCoordinates('8610, Norway');
+    this.fetchListingData()
+      .then(() => {
+        console.log('Postal Code:', this.listing.postal_code);
+        this.getLocationCoordinates(`${this.listing.postal_code}, Norway`);
+      });
   },
   methods: {
     async getLocationCoordinates(city) {
@@ -39,6 +43,20 @@ export default {
         }
     },
 
+    fetchListingData() {
+            // Fetch listing data from the server
+            const ListingID = this.$route.params.id;
+            return axios.get(`get_listing/${ListingID}/`)
+                .then(response => {
+                    // Update the listing data based on the response
+                    this.listing = response.data;
+                    console.log('Listing data:', this.listing);
+                })
+                .catch(error => {
+                    console.error('Error fetching listing data:', error);
+                })
+    },
+
     initializeMap(lat, lon) {
       // Initialize the map
       const map = L.map('map').setView([lat, lon], 13);
@@ -53,13 +71,15 @@ export default {
 </script>
 
 <style scoped>
-.wrapper{
-height: 100dvh;
+.map-wrapper{
+height: 35dvh;
 display: flex;
 border: 2px solid rgba(255,255,255,0.1);
 justify-content: center;
 align-items: center;
+position: relative;
 }
+
 #map {
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(8,7,16,0.6);

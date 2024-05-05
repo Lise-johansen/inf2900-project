@@ -20,6 +20,7 @@ import PrivacyPolicy from './components/PrivacyPolicy.vue';
 import MailBox from './components/MailBox.vue';
 import ListingPath from './components/ListingPath.vue';
 import ErrorPage from './components/ErrorPage.vue';
+import LeafletMap from './components/LeafletMap.vue';
 
 
 const routes = [
