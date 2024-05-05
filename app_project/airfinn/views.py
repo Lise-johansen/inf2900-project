@@ -41,7 +41,28 @@ def get_user_id_for_token_auth(request):
 
     except Exception as e:
         return None
-
+    
+"""
+Function to check if the user is correct and authenticated.
+Called from edit listing to verify that the user is the owner of the item.
+"""
+def verify_user(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the user ID from the token
+    user_id = get_user_id_for_token_auth(request)
+    
+    # Get the item ID from the request path
+    item_id = request.GET.get('item_id')
+    
+    # Check if the user is the owner of the item
+    item = get_object_or_404(Item, id=item_id)
+    
+    if item.owner.id == user_id:
+        return JsonResponse({'message': 'User is the owner of the item'}, status=200)
+    else:
+        return JsonResponse({'error': 'User is not the owner of the item'}, status=403)
 
 """
 Pull the token from the request cookies and decode it to get the user info from the database. 
