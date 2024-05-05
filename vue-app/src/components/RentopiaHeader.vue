@@ -13,7 +13,7 @@
 
         <div class='icon-container'>
             <div class="newlisting-icon" @click="redirectToNewListing">
-                <img src="@/assets/newlisting.png" alt="New Listing Icon">
+                <img src="@/assets/addlisting.png" alt="New Listing Icon">
             </div>
             <div class="inbox-icon" @click="redirectToInbox">
                 <img src="@/assets/inbox.png" alt="Inbox Icon">
@@ -111,7 +111,8 @@
         }
 
         .login-icon:hover img,
-        .inbox-icon:hover img {
+        .inbox-icon:hover img,
+        .newlisting-icon:hover img{
             transform: scale(1.2,1.2);
         }
 
