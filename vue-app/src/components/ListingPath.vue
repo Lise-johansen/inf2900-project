@@ -84,6 +84,23 @@ export default {
         this.fetchFavourites();
     },
     methods: {
+        scrollToRating() {
+            // Scroll to the rating section using smooth behavior
+            // You can customize this behavior based on your needs
+        },
+        addNewRating() {
+            // Add a new rating and description to the list
+            if (this.newRating > 0 && this.newDescription.length <= 150) {
+                this.additionalRatings.push({
+                    rating: this.newRating,
+                    description: this.newDescription,
+                });
+
+                // Reset new rating and description
+                this.newRating = 0;
+                this.newDescription = '';
+            }
+        },
         fetchListingData() {
             // Fetch listing data from the server
             const ListingID = this.$route.params.id;
