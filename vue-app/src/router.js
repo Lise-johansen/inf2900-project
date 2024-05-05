@@ -20,6 +20,7 @@ import PrivacyPolicy from './components/PrivacyPolicy.vue';
 import MailBox from './components/MailBox.vue';
 import ListingPath from './components/ListingPath.vue';
 import ErrorPage from './components/ErrorPage.vue';
+import LeafletMap from './components/LeafletMap.vue';
 import FavouriteListings from './components/FavouriteListings.vue';
 
 
@@ -119,6 +120,16 @@ const routes = [
     path: '/listing/:id/', // Ensure this matches the path used in navigation
     name: 'listingPage',
     component: ListingPath,
+  },
+  {
+    path: '/odered-listings/',
+    name: 'ordered-listings',
+    component: UserDashboard,
+  },
+  {
+    path: '/map',
+    name: 'map',
+    component: LeafletMap,
   },
   {
     path: '/favourites',

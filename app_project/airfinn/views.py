@@ -7,12 +7,12 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Item, ItemImage, User, Message, Conversation, Favourites
+from .models import Item, ItemImage, User, Message, Conversation, Order, Favourites
 from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
 import os, json, jwt, random, base64, boto3, uuid
-from airfinn.utils import get_user_by_id, email_checks, password_checks
+from airfinn.utils import get_user_by_id, email_checks, password_checks, get_reserved_items
 from botocore.exceptions import ClientError
 from django.db.models import Q
 from dotenv import load_dotenv
@@ -36,6 +36,7 @@ def get_user_id_for_token_auth(request):
     try:
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = payload['user_id']
+        print(f"This is the user id: {user_id}")
         return user_id
 
     except Exception as e:
@@ -961,6 +962,7 @@ def create_item(request):
         availability = data.get('availability')
         condition = data.get('condition')
         location = data.get('location')
+        postal_code = data.get('postal_code')
         category = data.get('category')
         owner_id = user_id
 
@@ -971,6 +973,7 @@ def create_item(request):
                                     condition=condition,
                                     price_per_day=price_per_day,
                                     location=location,
+                                    postal_code=postal_code,
                                     category=category,
                                     owner_id=owner_id
         )
@@ -1068,6 +1071,7 @@ def get_listing(request, item_id):
         "price_per_day": item.price_per_day,
         "location": item.location,
         "category": item.category,
+        "postal_code": item.postal_code,
         "owner": item.owner.username,
         "condition": item.condition,
         "availability": item.availability,
@@ -1185,6 +1189,59 @@ def delete_image(filename):
         s3.delete_object(Bucket=bucket_name, Key=filename)
     except ClientError as e:
         print(f"Error deleting previous image: {str(e)}")
+
+
+
+def reserved_listings(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get session token and decode it.
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+  
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+
+    reserved_listings = get_reserved_items(user_id)
+
+    listing_id = json.loads(reserved_listings)
+
+    listings = []
+
+
+    for listing in listing_id:
+        item = get_object_or_404(Item, id=listing['pk'])
+
+        images = ItemImage.objects.filter(item=item).values_list('image_url', flat=True)
+        images = list(images)
+
+        listing = {
+            "id": item.id,
+            "name": item.name,
+            "description": item.description,
+            "price_per_day": item.price_per_day,
+            "location": item.location,
+            "category": item.category,
+            "owner": item.owner.username,
+            "condition": item.condition,
+            "availability": item.availability,
+            "images": images,
+            "rating": item.rating,
+        }
+        listings.append(listing)
+
+    print("listings: ", listings)
+    return JsonResponse(listings, safe=False)
+
         
 def add_favourites(request):
     # Add the listing to the favourties table

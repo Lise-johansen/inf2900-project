@@ -24,7 +24,7 @@
                         <ul class="item-name">
                             <li v-for="item in filteredItemsByCategory(category)" :key="item.pk" class="item-name">
                                 <!-- Display the item name as a clickable link -->
-                                <router-link :to="'/listings/' + item.pk" class="item-link">
+                                <router-link :to="'/listing/' + item.pk" class="item-link">
                                     {{ item.fields.name }}
                                 </router-link>
                             </li>
