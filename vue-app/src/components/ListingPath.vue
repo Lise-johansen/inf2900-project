@@ -11,9 +11,11 @@
                 <p class="listing-description">{{ this.listing.description }}</p>
 
                 <!-- Add the listing to favourites -->
-                <div class="favourite-button">
-                    <button class="btn" @click="addToFavourites">Add to Favourites</button>
-                </div>
+                <!-- Check if the item already is in favourites -->
+                <button :disabled="isInFavourites(listing.id)" @click="addToFavourites" class="btn">
+                    <span v-if="!isInFavourites(listing.id)">Add to Favourites</span>
+                    <span v-else>Already in Favourites</span>
+                </button>
             </div>
         </header>
         <!--  -->
@@ -57,11 +59,13 @@ export default {
             ],
             newRating: 0, // New rating to be added
             newDescription: '', // New description to be added
+            favourites: [],
         };
     },
 
     mounted() {
         this.fetchListingData();
+        this.fetchFavourites();
     },
 
     methods: {
@@ -107,20 +111,39 @@ export default {
             // get the listing ID and user ID
             const ListingID = this.$route.params.id;
 
-            console.log('Listing ID:', ListingID);
-
             // Make a POST request to add the listing to favourites
             axios.post('add-favourites/', {
                     listing_id: ListingID,
                 })
                 .then(response => {
+                    // Show message for successful addition
                     console.log('Added to favourites:', response.data);
-                    // Show a success message or update the UI as needed
+                    alert('Added to favourites!');
+                    // Update the favourites array
+                    this.fetchFavourites();
                 })
                 .catch(error => {
-                    console.error('Error adding to favourites:', error);
-                    // Show an error message or update the UI as needed
+                    console.error('Error adding to favourites:', error.response.data.error);
+                    console.log('Error adding to favourites:', error.response.data.error);
+                    // Show the error message from the server
+                    alert(error.response.data.error);
                 });
+        },
+        fetchFavourites() {
+            // Fetch the user's favourite listings
+            axios.get('get-favourites/')
+                .then(response => {
+                    // Update the favourites array based on the response
+                    this.favourites = response.data;
+                    console.log('Favorites:', this.favourites);
+                })
+                .catch(error => {
+                    console.error('Error fetching favourites:', error);
+                });
+        },
+        isInFavourites(listingId) {
+            // Check if the listingId exists in the favourites array
+            return this.favourites.some(favorite => favorite.id === listingId);
         },
 
     },
