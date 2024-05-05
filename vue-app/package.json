@@ -6,15 +6,20 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --dest /var/www/Rentopia",
     "test:build": "vue-cli-service build",
-    "test:unit": "vue-cli-service test:unit",
+    "test:unit": "vue-cli-service test:unit --passWithNoTests",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/vue-fontawesome": "^3.0.6",
     "axios": "^1.6.7",
     "core-js": "^3.8.3",
     "crypto-js": "^4.2.0",
     "node-rsa": "^1.1.1",
     "npm": "^10.4.0",
+    "primeicons": "^7.0.0",
+    "primevue": "^3.50.0",
     "vue": "^3.4.18",
     "vue-cli": "^2.9.6",
     "vue-router": "^4.2.5"
