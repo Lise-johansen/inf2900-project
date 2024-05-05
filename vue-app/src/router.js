@@ -81,7 +81,7 @@ const routes = [
   },
   {
     path: '/EditListing/:id',
-    name: 'EditListing',
+    name: 'edit_listing',
     component: EditListing,
   },
   {

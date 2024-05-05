@@ -87,7 +87,7 @@ export default {
         },
         redirectToEditPage() {
             const listingID = this.$route.params.id;
-            this.$router.push({ name: 'EditListing', params: { id: listingID } });
+            this.$router.push({ name: 'edit_listing', params: { id: listingID } });
         }
     },
 
