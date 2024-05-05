@@ -63,6 +63,26 @@ def verify_user(request):
         return JsonResponse({'message': 'User is the owner of the item'}, status=200)
     else:
         return JsonResponse({'error': 'User is not the owner of the item'}, status=403)
+    
+def get_user(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the user ID from the token
+    user_id = get_user_id_for_token_auth(request)
+    
+    # Get the user object from the database
+    user = get_user_by_id(user_id)
+    
+    if user is None:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    # Prepare the user data to return
+    data = {
+        'id': user.id,
+    }
+    
+    return JsonResponse(data, status=200)
 
 """
 Pull the token from the request cookies and decode it to get the user info from the database. 
@@ -1105,7 +1125,7 @@ def get_listing(request, item_id):
         "location": item.location,
         "category": item.category,
         "postal_code": item.postal_code,
-        "owner": item.owner.username,
+        "owner": item.owner.id,
         "condition": item.condition,
         "availability": item.availability,
         "images": images,
