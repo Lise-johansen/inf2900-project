@@ -12,6 +12,9 @@
             </div>
 
         <div class='icon-container'>
+            <div class="newlisting-icon" @click="redirectToNewListing">
+                <img src="@/assets/newlisting.png" alt="New Listing Icon">
+            </div>
             <div class="inbox-icon" @click="redirectToInbox">
                 <img src="@/assets/inbox.png" alt="Inbox Icon">
             </div>
@@ -36,6 +39,9 @@
             },
             redirectToInbox() {
             this.$router.push('/inbox');
+            },
+            redirectToNewListing() {
+            this.$router.push('/create-listing');
             }
         }
     }
@@ -90,13 +96,15 @@
         }
 
         .login-icon,
-        .inbox-icon {
+        .inbox-icon,
+        .newlisting-icon {
             display: block; /* Ensure the icon is treated as a block element */
             cursor: pointer;
         }
 
         .login-icon img,
-        .inbox-icon img {
+        .inbox-icon img,
+        .newlisting-icon img{
             max-width: 50px; /* Set a maximum width for the image */
             height: auto; /* Allow the height to adjust proportionally */
             transition: transform 1s ease;
