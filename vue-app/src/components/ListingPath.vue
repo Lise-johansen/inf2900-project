@@ -20,7 +20,7 @@
                 </button>
                 <!-- Redirect to edit page -->
                 <!-- First check if the user is the owner of the item -->
-                <div class="edit-button" v-if="listing.owner === this.user.id">
+                <div class="edit-button" v-if="listing.owner === this.user.username">
                     <button @click="redirectToEditPage" class="btn">Edit Listing</button>
                 </div>
             </div>

@@ -80,6 +80,7 @@ def get_user(request):
     # Prepare the user data to return
     data = {
         'id': user.id,
+        'username': user.username,
     }
     
     return JsonResponse(data, status=200)
@@ -1125,7 +1126,7 @@ def get_listing(request, item_id):
         "location": item.location,
         "category": item.category,
         "postal_code": item.postal_code,
-        "owner": item.owner.id,
+        "owner": item.owner.username,
         "condition": item.condition,
         "availability": item.availability,
         "images": images,
