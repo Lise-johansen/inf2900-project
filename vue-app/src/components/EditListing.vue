@@ -99,7 +99,7 @@ export default {
         async updateListingData(data) {
             const ListingID = this.$route.params.id;
             try {
-                const response = await axios.put(`edit_listing/${ListingID}/`, data);
+                const response = await axios.put(`EditListing/${ListingID}/`, data);
                 console.log(response);
             } catch (error) {
                 console.error('Error updating listing:', error); // you are the problem here.
