@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('airfinn', '0006_message_image'),
+        ('airfinn', '0007_order'),
     ]
 
     operations = [

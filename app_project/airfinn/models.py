@@ -86,3 +86,14 @@ class Message(models.Model):
     message = models.TextField(default='')
     image = models.URLField(default='')
     created_at = models.DateTimeField(auto_now_add=True)
+    
+class Order(models.Model):
+    id = models.AutoField(primary_key=True)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='item_order')
+    renter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='renter_order')
+    period = models.JSONField(default=dict)
+    
+class Favourites(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favourites')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='favourites')
