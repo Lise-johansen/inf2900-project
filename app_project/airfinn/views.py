@@ -7,7 +7,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Item, ItemImage, User, Message, Conversation, Order
+from .models import Item, ItemImage, User, Message, Conversation, Order, Favourites
 from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
@@ -1241,3 +1241,128 @@ def reserved_listings(request):
 
     print("listings: ", listings)
     return JsonResponse(listings, safe=False)
+
+        
+def add_favourites(request):
+    # Add the listing to the favourties table
+    
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    data = json.loads(request.body)
+    item_id = data.get('listing_id')
+    
+    print(f"Data: {data}")
+    print(f"Item ID: {item_id}")
+    
+    # Get the user ID from the token
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    # Check if the item and user exist
+    item = get_object_or_404(Item, id=item_id)
+    user = get_object_or_404(User, id=user_id)
+    
+    print(f"Item: {item}, User: {user}")
+    
+    # Check if the item is already in the user's favourites
+    if Favourites.objects.filter(item=item, user=user).exists():
+        return JsonResponse({'error': 'Item already in favourites'}, status=400)
+    
+    # Add the item to the user's favourites
+    favourite_item = Favourites.objects.create(item=item, user=user)
+    
+    # Return a success response with the item ID
+    return JsonResponse({'message': 'Item added to favourites'}, status=201)
+
+def get_favourites(request):
+    # Get all the items in the favourites table for the user
+    
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the user ID from the token
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    # Get the user object
+    user = get_object_or_404(User, id=user_id)
+    
+    # Get all the items in the favourites table for the user
+    favourites = Favourites.objects.filter(user=user)
+    
+    # Prepare the data to return
+    data = []
+    for favourite in favourites:
+        item = favourite.item
+        item_data = {
+            'id': item.id,
+            'name': item.name,
+            'description': item.description,
+            'price_per_day': item.price_per_day,
+            'location': item.location,
+            'postal_code': item.postal_code,
+            'category': item.category,
+            'image': ItemImage.objects.filter(item=item).first().image_url
+        }
+        data.append(item_data)
+        
+    print(f"Favourites: {data}")
+        
+    return JsonResponse(data, safe=False)
+
+def remove_favourites(request, item_id):
+    # Remove the item from the favourites table
+    if request.method != 'DELETE':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the user ID from the token
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    # Get the user object
+    user = get_object_or_404(User, id=user_id)
+    
+    # Get the item object
+    item = get_object_or_404(Item, id=item_id)
+    
+    # Check if the item is in the user's favourites
+    favourite = Favourites.objects.filter(item=item, user=user).first()
+    if not favourite:
+        return JsonResponse({'error': 'Item not in favourites'}, status=404)
+    
+    # Delete the item from the user's favourites
+    favourite.delete()
+    
+    # Return a success response
+    return JsonResponse({'message': 'Item removed from favourites'}, status=200)

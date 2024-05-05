@@ -26,7 +26,7 @@
 
       <div class="button-grid">
         <router-link to="/listings" class="button-link">My listings</router-link>
-        <router-link to="/favorites" class="button-link">My favorites</router-link>
+        <router-link to="/favourites" class="button-link">My favorites</router-link>
         <router-link to="/my-account" class="button-link">My account</router-link>
         <router-link to="/privacy-policy" class="button-link">Privacy policy</router-link>
       </div>
