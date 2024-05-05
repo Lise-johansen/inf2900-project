@@ -962,6 +962,7 @@ def create_item(request):
         availability = data.get('availability')
         condition = data.get('condition')
         location = data.get('location')
+        postal_code = data.get('postal_code')
         category = data.get('category')
         owner_id = user_id
 
@@ -972,6 +973,7 @@ def create_item(request):
                                     condition=condition,
                                     price_per_day=price_per_day,
                                     location=location,
+                                    postal_code=postal_code,
                                     category=category,
                                     owner_id=owner_id
         )
@@ -1069,6 +1071,7 @@ def get_listing(request, item_id):
         "price_per_day": item.price_per_day,
         "location": item.location,
         "category": item.category,
+        "postal_code": item.postal_code,
         "owner": item.owner.username,
         "condition": item.condition,
         "availability": item.availability,
