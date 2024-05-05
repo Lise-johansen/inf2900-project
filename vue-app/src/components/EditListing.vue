@@ -1,5 +1,5 @@
 <template>
-    <div v-if="userLoggedIn" class="contact-form">
+    <div class="contact-form">
         <h1 class="form-title">Update Listing</h1>
         <div class="form-wrapper">
             <div class="form-container">
@@ -34,17 +34,11 @@
             </div>
         </div>
     </div>
-
-    <div v-else>
-        <div class="login-container">
-            <h2 class="encouraging-title login-title animated-fade-in">Please log in first to update your listing.</h2>
-            <router-link to="/login" class="login-btn btn">Log In</router-link>
-        </div>
-    </div>
 </template>
 
 <script>
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default {
     name: "EditListing",
@@ -77,8 +71,30 @@ export default {
         }
     },
 
+    beforeRouteEnter(to, from, next) {
+        if (Cookies.get('token')) {
+            axios.get(`verify-user/`, {
+                params: { 
+                    item_id: to.params.id 
+                } 
+            })
+            .then(response => {
+                // User is authorized, proceed to the route
+                console.log('User verified:', response.data);
+                next();
+            })
+            .catch(error => {
+                // User is not authorized, redirect to login
+                console.error('Error verifying user:', error);
+                next('/listing/' + to.params.id);
+            });
+        } else {
+            // No token found, redirect to login
+            next('/login');
+        }
+    },
+
     created() {
-        this.checkLoggedIn();
         this.fetchListingDetails();
     },
 
@@ -104,32 +120,6 @@ export default {
             } catch (error) {
                 console.error('Error updating listing:', error); // you are the problem here.
             }
-        },
-        checkLoggedIn() {
-            const token = this.getTokenFromCookies();
-            if (token) {
-                this.userLoggedIn = true;
-            }
-            else {
-                this.redirectToLogin();
-            }
-        },
-
-        redirectToLogin() {
-            if (confirm("You must be logged in to view this page.")) {
-                this.$router.push("/login");
-            }
-        },
-
-        getTokenFromCookies() {
-            const cookies = document.cookie.split('; ');
-            for (const cookie of cookies) {
-                const [name, value] = cookie.split('=');
-                if (name === 'token') {
-                    return value;
-                }
-            }
-            return null;
         },
 
         async fetchListingDetails() {
