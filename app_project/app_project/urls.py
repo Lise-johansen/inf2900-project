@@ -17,8 +17,6 @@ Including another URLconf
 from django.contrib import admin
 from airfinn import views
 from airfinn import utils
-
-
 from django.urls import path, include  # Ensure include is imported
 from django.conf.urls.static import static
 from django.conf import settings
@@ -40,10 +38,14 @@ urlpatterns = [
     path('api/edit_listing/<int:item_id>/', views.edit_listing, name='edit_listing'),
     path('api/delete_item/<int:item_id>', views.delete_listing, name='delete_listing'),
     path('api/contact_us_message/', views.contact_us_message, name='contact_us_message'),
-    path('api/get-conversations/', views.get_conversations, name='get_conversations'),
-    path('api/get-messages/', views.get_messages, name='get_messages'),
-    path('api/send-messages/', views.send_messages, name='send_messages'),
     path('api/update_user/', views.update_user, name='update_user'),
     path('api/delete_user/', views.delete_user, name='delete_user'),
     path('api/get_items/<str:category>', views.get_listings, name='get_listings'),
+    path('api/get-conversations/', views.get_conversations, name='get_conversations'),
+    path('api/get-messages/', views.get_messages, name='get_messages'),
+    path('api/send-messages/', views.send_messages, name='send_messages'),
+    path('api/create-item/', views.create_item, name='create_item'),
+    path('api/get_listing/<int:item_id>/', views.get_listing, name='get_listing'),
+    path('api/upload_image/', views.upload_image, name='upload_image'),
+    path('api/ordered-listings/', views.reserved_listings, name='reserved_listings'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -14,11 +14,13 @@ import ContactUs from './components/ContactUs.vue'; // Import Contact Us compone
 // import LogoutScript from './components/LogoutScript.vue';
 import EditListing from './components/EditListing.vue'; // Import Edit Listing component
 import CreateItem from './components/CreateItem.vue';
-import MailBox from './components/MailBox.vue';
 import MyAccount from './components/MyAccount.vue';
 import SearchPage from './components/SearchPage.vue';
 import PrivacyPolicy from './components/PrivacyPolicy.vue';
-import LeafletMap from './components/LeafletMap.vue';
+import MailBox from './components/MailBox.vue';
+import ListingPath from './components/ListingPath.vue';
+import ErrorPage from './components/ErrorPage.vue';
+
 
 const routes = [
   {
@@ -72,11 +74,6 @@ const routes = [
     name: 'create-listing',
     component: CreateItem
   },
-  // {
-  //   path: '/listings/:id',
-  //   name: 'listings',
-  //   component: Listings,
-  // },
   {
     path: '/about',
     name: 'about',
@@ -98,6 +95,11 @@ const routes = [
     component: ContactUs,
   },
   {
+    path: '/inbox',
+    name: 'inbox',
+    component: MailBox,
+  },
+  {
     path: '/my-account',
     name: 'my-account',
     component: MyAccount,
@@ -113,11 +115,29 @@ const routes = [
     component: PrivacyPolicy,
   },
   {
+    path: '/listing/:id/', // Ensure this matches the path used in navigation
+    name: 'listingPage',
+    component: ListingPath,
+  },
+  {
+    path: '/odered-listings/',
+    name: 'ordered-listings',
+    component: UserDashboard,
+  },
+  {
     path: '/map',
     name: 'map',
     component: LeafletMap,
   },
   // Other routes
+
+  // Wildcard route to catch any requests to a page that does not exist.
+  // This should be the last route in the array
+  {
+    path: '/:catchAll(.*)',
+    name: 'error',
+    component: ErrorPage,
+  }
 ];
 
 const router = createRouter({

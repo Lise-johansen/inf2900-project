@@ -1,13 +1,14 @@
 <template>
-    <div class="mailbox">
-      <!-- Left side: Display list of conversations -->
-      <div class="left-panel">
-        <div class="inbox">
-          <h3>Inbox</h3>
-          <div v-if="filteredConversations.length === 0">No conversations</div>
-          <div v-else>
-            <div v-for="conversation in filteredConversations" :key="conversation.id" @click="fetchMessages(conversation.id)">
-              <div class="conversation">
+  <div class="mailbox">
+    <!-- Left side: Display list of conversations -->
+    <div class="left-panel">
+      <div class="inbox">
+        <h3>Inbox</h3>
+        <div v-if="filteredConversations.length === 0">No conversations</div>
+        <div v-else>
+          <div class="conversation-box">
+            <div v-for="conversation in filteredConversations" :key="conversation.id" @click="openConversation(conversation)">
+              <div class="conversation-details">
                 <!-- Display the name of the other participant in the conversation -->
                 <div class="participant">
                   {{ getParticipantName(conversation) }}
@@ -15,28 +16,55 @@
                 <!-- Display item id and date -->
                 <div class="details">
                   Listing: {{ conversation.item.name }}
+                  <br>
+                  <div v-if="conversation.sender.name === 'You'">
+                    <div>You: {{ conversation.latest_message.message }}</div>
+                  </div>
+                  <div v-else>
+                    <div>{{ conversation.latest_message.message }}</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-  
-      <!-- Right side: Display selected conversation messages and input for new message -->
-      <div class="right-panel">
-        <div class="inbox">
+    </div>
+
+    <!-- Right side: Display selected conversation messages and input for new message -->
+    <div :class="{ 'right-panel': true, 'active': showRightPanel }">
+      <div class="message-box">
+      <div v-if="selectedConversation">
+        <router-link :to="'/listing/' + selectedConversation.item.id" class="item-link">
+        <h2> {{ selectedConversation.item.name }} </h2></router-link>
           <div class="mail-details" v-if="selectedConversation">
-            <h2> <router-link :to="'/listings/' + selectedConversation.item.id" class="item-link">
-                {{ selectedConversation.item.name }}
-            </router-link></h2>
-            <div class="conversation-area" ref="messageContainer">
+            <div class="mail-box"  ref="messageContainer">
               <div v-for="message in selectedConversation.messages" :key="message.id">
                 <div class="message">
                   <!-- Check if there are messages -->
                   <div v-if="selectedConversation.messages.length !== 0">
-                    <div class="sender">{{ message.sender.name }}</div>
-                    <div class="content">{{ message.message }}</div>
-                    <div class="date" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>                  </div>
+                    <div v-if="message.sender.name === 'You'">
+                      <div class="date-sender" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>
+                      <div class="sender">
+                          {{ message.sender.name }}
+                          <div class="message-content-sender">{{ message.message }}</div>
+                          <div v-if="message.image" class="image-container">
+                            <Image :src="message.image" alt="Image Preview" width="250" preview />
+                          </div>
+                      </div>
+                  </div>
+                    <div v-else>
+                      <div class="date-receiver" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>   
+                      <div class="receiver">
+                        {{ message.sender.name }}
+                        <div class="message-content-receiver">{{ message.message }}</div>
+                          <div v-if="message.image" class="image-container">
+                            <Image :src="message.image" alt="Image Preview" class="message-image" preview />
+                          </div>
+                      </div>
+                    </div>
+                    
+                  </div>
                   <div v-else>
                     <p class="error-message">{{ errorMessage }}</p>
                   </div>
@@ -44,36 +72,82 @@
               </div>
             </div>
             <div class="input-box">
-              <textarea v-model="newMessage" placeholder="Type your message..."></textarea>
-              <button @click="sendMessage">Send</button>
+              <Textarea v-model="newMessage" autoResize rows="2" cols="100" placeholder="Type your message..."/>
+                <!-- Add image upload input button by the send message -->
+                <div class="send-and-upload-buttons">
+                  <!-- File input for image uploading -->
+                  <input type="file" accept="image/*" style="display: none;" ref="fileInput" @change="handleImageUpload">
+                  
+                  <!-- Button for triggering file selection -->
+                  <Button class="upload-button" icon="pi pi-link" outlined @click="$refs.fileInput.click()"/>
+
+                  <!-- Button for sending message -->
+                  <Button label="Send" raised @click="sendMessage"/>
+                  
+                  <!-- Image preview dialog -->
+                  <Dialog v-model:visible="displayImagePreview" modal>
+                    <img :src="selectedImage" alt="Image Preview" style="width: 500px; margin: 10px;"/>
+                    <div class="p-d-flex p-jc-between p-mt-2">
+                      <div class="close-and-send-preview">
+                        <Button label="Cancel" class="p-button-text" @click="closeImagePreviewDialog" />
+                        <Button label="Send" class="p-button-primary" @click="sendImage" />
+                      </div>
+                    </div>
+                  </Dialog>
+                </div>
             </div>
           </div>
-        </div>
       </div>
-
-      <!-- Popup for displaying error message -->
-      <div v-if="showPopup" class="popup">
-        <div class="popup-content">
-          <p class="error-message">{{ errorMessage }}</p>
-          <button @click="hidePopup">OK</button>
-        </div>
       </div>
     </div>
+
+    <!-- Popup for displaying error message -->
+    <div v-if="showPopup" class="popup">
+      <div class="popup-content">
+        <p class="error-message">{{ errorMessage }}</p>
+        <button @click="hidePopup">OK</button>
+      </div>
+    </div>
+  </div>
 </template>
-  
+
 <script>
+  import 'primeicons/primeicons.css';
   import axios from 'axios';
+  import Image from 'primevue/image';
+  import Button from 'primevue/button';
+  import Dialog from 'primevue/dialog';
+  import Textarea from 'primevue/textarea';
   
   export default {
+    components: {
+      Image, Button, Dialog, Textarea
+    },
     data() {
       return {
         conversations: [], // Array to store conversations with messages
         selectedConversation: null, // Object to store selected conversation
         newMessage: '', // New message input
         errorMessage: '', // Error message to display in popup
-        showPopup: false // Flag to show/hide popup
+        showPopup: false, // Flag to show/hide popup
+        showRightPanel: false, // Flag to show/hide right panel
+        image: '', // Image data to be sent if available
+        displayImagePreview: false, // Flag to show/hide image preview dialog
       };
     },
+
+    created() {
+      // Check if logged in
+      const token = this.loginCheck();
+      
+      // Redirect to login page if not logged in
+      if (!token) {
+        this.errorMessage = 'Please login to view your inbox.';
+        this.showPopup = true;
+        return;
+      }
+    },
+
     mounted() {
       // Fetch conversations when component is mounted
       this.fetchConversations();
@@ -95,7 +169,6 @@
             }
             });
 
-            console.log("Grouped conversations:", groupedConversations);
             // Convert the grouped conversations object to an array
             return Object.values(groupedConversations);
         }
@@ -108,17 +181,11 @@
         // Scroll the message container to the bottom
         messageContainer.scrollTop = messageContainer.scrollHeight;
       },
-      fetchConversations() {
-        // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
 
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to view your inbox.';
-          this.showPopup = true;
-          return;
-        }
+      fetchConversations() {
+        
+        // Get the authentication token from cookies
+        const token = this.loginCheck();
 
         // Make API request to fetch conversations with messages
         axios.get('get-conversations/', {
@@ -132,7 +199,6 @@
           if (data && Array.isArray(data) && data.length > 0) {
             // Assign the received conversations directly
             this.conversations = data;
-            console.log("Conversations with messages:", this.conversations);
 
             // Update selectedConversation to reflect the first conversation (if available)
             if (!this.selectedConversation && this.conversations.length > 0) {
@@ -152,23 +218,18 @@
           console.error('Error fetching conversations with messages:', error);
         });
       },
+
       openConversation(conversation) {
         // Set selectedConversation to the clicked conversation to display messages
         this.selectedConversation = conversation;
-        console.log("Selected conversation:", this.selectedConversation);
+        this.showRightPanel = true;
         this.fetchMessages(conversation.id);
       },
+
       fetchMessages(conversation_id){
-        // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
         
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to view messages.';
-          this.showPopup = true;
-          return;
-        }
+        // Get the authentication token from cookies
+        const token = this.loginCheck();
   
         // Make API request to fetch messages for the selected conversation
         axios.get(`get-messages/`, {
@@ -185,7 +246,12 @@
           if (data && Array.isArray(data) && data.length > 0) {
             // Assign the received messages to the selected conversation
             this.selectedConversation.messages = data;
-            console.log("Messages for conversation:", this.selectedConversation.messages);
+
+            // Scroll to the bottom after messages have been fetched
+            this.$nextTick(() => {
+                this.scrollToBottom();
+            });
+
           } else {
             // Handle unexpected response format
             console.error('Unexpected response format:', data);
@@ -196,28 +262,15 @@
           console.error('Error fetching messages:', error);
           this.errorMessage = 'Error fetching messages.';
         });
-        
-        // After opening conversation, scroll to the bottom
-        this.$nextTick(() => {
-          this.scrollToBottom();
-        });
       },
+
       sendMessage() {
         // Get the authentication token from cookies
-        const token = this.getTokenFromCookies();
-        
-        // Make sure token is available
-        if (!token) {
-          // Handle error - user is not logged in
-          this.errorMessage = 'Please login to send a message.';
-          this.showPopup = true;
-          return;
-        }
+        const token = this.loginCheck();
   
         // Make sure newMessage is not empty
-        if (!this.newMessage) {
-          this.errorMessage = 'Please enter a message.';
-          this.showPopup = true;
+        if (!this.newMessage && !this.image) {
+          alert('Please enter a message.');
           return;
         }
   
@@ -226,6 +279,7 @@
           sender_id: this.selectedConversation.sender.id,
           receiver_id: this.selectedConversation.receiver.id,
           message: this.newMessage,
+          image: this.image,
           item_id: this.selectedConversation.item.id,
           conversation_id: this.selectedConversation.id
         }, 
@@ -236,31 +290,43 @@
         })
         .then(response => {
           // Handle successful response
-          console.log('Message sent:', response.data);
           
           // Append the new message to the selected conversation
           this.selectedConversation.messages.push({
             sender: { name: "You" },
             message: this.newMessage,
+            image: this.image,
             created_at: response.data.created_at
           });
           
           // Clear the new message input
           this.newMessage = '';
+          this.image = '';
+
+          // Scroll to the bottom after sending the message
+          this.$nextTick(() => {
+            this.scrollToBottom();
+          });
         })
         .catch(error => {
           // Handle error
           console.error('Error sending message:', error);
         });
       },
+
+      sendImage(){
+        this.image = this.selectedImage;
+        this.displayImagePreview = false;
+        
+        // Send the message with the image
+        this.sendMessage();
+      },
+
       RedirectToLogin() {
         // Redirect to login page
         this.$router.push('/login');
       },
-      isLoggedIn() {
-        // Check if user is logged in by checking the token in cookies
-        return this.getTokenFromCookies() !== null;
-      },
+
       getTokenFromCookies() {
         const cookies = document.cookie.split('; ');
         for (const cookie of cookies) {
@@ -271,11 +337,13 @@
         }
         return null; // Token not found in cookies
       },
+
       hidePopup() {
         this.errorMessage = ''; // Clear the error message
         this.showPopup = false;
         this.RedirectToLogin();
       },
+
       formatDateString(dateString) {
         // Create a new Date object from the date string
         const date = new Date(dateString);
@@ -283,134 +351,309 @@
         // Format the date to a more readable format
         return date.toLocaleString();
       },
+
       getParticipantName(conversation) {
         // Return the name of the other participant in the conversation
         return conversation.sender.name === "You" ? conversation.receiver.name : conversation.sender.name;
       },
+
+      handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+          // Read the file as a data URL
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const imageData = reader.result;
+
+            // Set the selected image for preview
+            this.selectedImage = imageData;
+
+            // Open the image preview dialog
+            this.displayImagePreview = true;
+          };
+          reader.readAsDataURL(file);
+        }
+      },
+
+      closeImagePreviewDialog() {
+        this.displayImagePreview = false;
+      },
+
+      loginCheck() {
+        // Get the authentication token from cookies
+        const token = this.getTokenFromCookies();
+
+        // Make sure token is available
+        if (!token) {
+          // Handle error - user is not logged in
+          this.errorMessage = 'Please login to view your inbox.';
+          this.showPopup = true;
+          return null;
+        }
+        return token;
+      }
     }
   };
 </script>
   
 <style scoped>
     .mailbox {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        height: calc(100vh - 200px); /* Adjust based on the height of the banner and footer */
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
     }
 
     .left-panel {
-        max-width: 25%;
-        transition: max-width 0.3s ease, margin-left 0.3s ease;
+      margin-left: 0%;
+      margin-right: 5px;
+      margin-top: 20px;
+      width: 20%;
+      transition: max-width 0.3s ease, margin-left 0.3s ease;
+      box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 30px;
+      overflow: auto;
     }
 
     .right-panel {
-        max-width: 75%; /* Adjusted to accommodate both mail details and input box */
-        transition: max-width 0.3s ease, margin-right 0.3s ease;
+      width: 0%;
+      overflow: hidden;
+      overflow-y: auto;
+      transition: max-width 0.3s ease, margin-left 0.3s ease;
+    }
+
+    .right-panel.active {
+      margin-top: 20px;
+      margin-right: 0; /* Reset margin-right */
+      margin-left: 0; /* Reset margin-left */
+      width: 40%; /* Adjusted width when panel is active */
+      margin-right: 0; /* Reset margin-right */
+      box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 30px;
+      backdrop-filter: blur(10px);
     }
 
     .inbox {
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.13);
-        border-radius: 30px;
-        backdrop-filter: blur(10px);
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
-        padding: 20px; /* Adjusted padding */
+      height: 100%;
+      max-width: 800px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Add animation for right panel opening */
+    .right-panel {
+      animation: slideInRight 0.3s forwards;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 100;
+      }
     }
 
     .inbox * {
-        font-family: 'Poppins', sans-serif;
-        color: #676767;
-        letter-spacing: 0.5px;
-        outline: none;
-        border: none;
+      font-family: 'Poppins', sans-serif;
+      color: #676767;
+      letter-spacing: 0.5px;
+      outline: none;
+      border: none;
     }
 
     .inbox h3 {
-        font-size: 35px;
-        font-weight: bolder;
-        line-height: 42px;
-        text-align: center;
-        font-family: 'louis_george_cafe', sans-serif;
-        background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
-        -webkit-text-fill-color: transparent;
-        -webkit-background-clip: text;
+      font-size: 35px;
+      font-weight: bolder;
+      line-height: 42px;
+      text-align: center;
+      font-family: 'louis_george_cafe', sans-serif;
+      background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
     }
 
-    .mail {
-        cursor: pointer;
-        margin-bottom: 20px;
-        padding: 10px;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        background-color: #f9f9f9;
-        transition: background-color 0.3s ease;
+    .message-box {
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .mail:hover {
-        background-color: #e0e0e0;
+    .message-box * {
+      font-family: 'Poppins', sans-serif;
+      color: #676767;
+      letter-spacing: 0.5px;
+      outline: none;
+      border: none;
     }
 
-    .sender {
-        font-weight: bold;
+    .message-box h2 {
+      font-size: 30px;
+      font-weight: bolder;
+      line-height: 42px;
+      text-align: center;
+      font-family: 'louis_george_cafe', sans-serif;
+      background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
     }
-
-    .date {
-        margin-top: 5px;
-        color: #888;
-    }
-
-    .mail-details {
-      margin-top: 20px; /* Adjusted margin */
-      padding: 20px;
-      background-color: #f9f9f9;
-      border: 2px solid #ccc;
-      border-radius: 30px;
-    }
-
+    
     .mail-details h2 {
         font-size: 24px;
         font-weight: bold;
     }
 
-    .conversation-area {
-      max-height: calc(100vh - 400px); /* Adjusted maximum height */
-      overflow-y: scroll; /* Enable vertical scrolling */
+    .mail-details {
+      max-width: 100%;
+    }
+
+    .sender, .receiver {
+      font-family: 'Poppins', sans-serif;
+      display: inline-block;
+      position: relative;
+      font-display: swap;
+      padding: 10px;
+      border-radius: 20px;
+      word-wrap: break-word;
+      margin-bottom: 5px;
+    }
+
+    .sender::after, .receiver::after {
+      display: inline-block;
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      position: absolute;
+    }
+
+    .sender {
+      background-color: #007bff;
+      color: #fff;
+      text-align: right;
+      float: right;
+    }
+
+    .sender::after {
+      border-left: 8px solid #007bff;
+      right: -15px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .message-content-sender {
+      background-color: #007bff;
+      color: #fff;
+      text-align: right;
+      margin-left: auto;
+    }
+
+    .receiver {
+      background-color: #868686;
+      color: #fff;
+      text-align: left;
+      float: left;
+    }
+
+    .receiver::after {
+      border-right: 8px solid #868686;
+      left: -15px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .message-content-receiver {
+      color: #fff;
+      text-align: left;
+      margin-right: auto;
+    }
+
+    .date-sender {
+      margin-bottom: 5px;
+      margin-right: 5px;
+      color: #888;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .date-receiver {
+      margin-bottom: 5px;
+      margin-right: 5px;
+      color: #888;
+      font-size: 12px;
+      text-align: left;
     }
 
     .message {
-        margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      margin-top: 20px;
+      border-radius: 20px;
+      overflow-wrap: break-word;
+      padding: 15px;
     }
 
+    .mail-box {
+      margin-top: 20px;
+      max-width: 100%;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      max-height: calc(100vh - 450px);
+      overflow-y: scroll;
+    }
+
+    .conversation-details {
+      margin-bottom: 10px;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #f0f0f0;
+      transition: background-color 0.3s ease;
+    }
+
+    .conversation-box {
+      margin-top: 10px;
+      max-width: 100%;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      max-height: calc(100vh - 450px);
+      overflow-y: scroll;
+    }
+
+    .conversation-details:hover {
+        background-color: #e0e0e0;
+    }
+
+
     .input-box {
-      margin-top: 20px; /* Adjusted margin */
+      margin-top: 20px;
       padding: 20px;
       background-color: #f9f9f9;
       border: 2px solid #ccc;
       border-radius: 30px;
+      display: flex;
     }
 
-    textarea {
-        flex: 1;
-        resize: none;
-        padding: 10px;
-        border: 2px solid #ccc;
-        border-radius: 5px;
+    .send-and-upload-buttons {
+      display: flex;
+      align-items: right;
+      justify-content: space-between;
+      margin-right: 10px;
+      padding: 2px;
     }
 
-    button {
-        padding: 10px 20px;
-        margin-left: 10px;
-        border: none;
-        border-radius: 5px;
-        background-color: #007bff;
-        color: white;
-        cursor: pointer;
+    .upload-button {
+      scale: 0.8;
     }
 
-    button:hover {
-        background-color: #0056b3;
+    .close-and-send-preview {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px;
     }
 
     .popup {
@@ -447,14 +690,18 @@
         -webkit-background-clip: text;
     }
 
-    .item-name {
-        font-family: 'louis_george_cafe', sans-serif;
-        font-weight: bold;
-        font-size: 16px;
-        padding-bottom: 5px;
-        padding-top: 5px;
-        list-style: none;
-        margin-left: 0;
-        padding-left: 0;
+    .item-link {
+      text-decoration: none;
+      color: #000;
+      max-width: 100%;
+    }
+
+    /* Define fade animation */
+    .fade-enter-active, .fade-leave-active {
+      transition: opacity 0.5s;
+    }
+
+    .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+      opacity: 0;
     }
 </style>

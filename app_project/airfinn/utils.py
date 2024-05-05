@@ -1,5 +1,4 @@
-
-from .models import Item, User
+from .models import Item, User, Order
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.core.serializers import serialize
 from django.views.decorators.csrf import csrf_exempt
@@ -68,3 +67,11 @@ def upload_profile_picture(request):
     else:
          print('in else')
          return JsonResponse({'error': 'Failed to upload profile picture'}, status=400)
+
+
+def get_reserved_items(user):
+    order = Order.objects.filter(renter_id=user)
+    items = [order.item for order in order]
+    data = serialize('json', items)
+
+    return data

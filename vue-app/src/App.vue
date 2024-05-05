@@ -5,11 +5,15 @@
 			<div class="air air3"></div>
 			<div class="air air4"></div>
 		</section>
-		<RentopiaHeader />
+		<header>
+			<RentopiaHeader />
+		</header>
 		<main>
 			<router-view/>
 		</main>
-		<RentopiaFooter/>
+		<footer>
+			<RentopiaFooter/>
+		</footer>
 </template>
 
 <script>
@@ -111,5 +115,4 @@ padding: 0;
 		height: 100%;
 		z-index: -1; /* Place it behind other content */
 	}
-
 </style> 

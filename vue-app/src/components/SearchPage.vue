@@ -11,7 +11,7 @@
     <div class="card" v-for="item in filteredResults" :key="item.pk">
       <router-link :to="`/listing/${item.pk}`" class="card-link">
         <div class="card-image">
-          <img :src="item.fields.imageUrl" alt="item.fields.name">
+          <img :src="item.fields.image" alt="item.fields.name">
         </div>
         <div class="card-body">
           <h2 class="card-title">{{ item.fields.name }}</h2>
@@ -48,32 +48,36 @@ export default {
       searchTerm: this.$route.query.q || '',
     };
   },
-
-
+  
+  mounted() {
+    // Fetch all listings when the component is mounted and no search is performed
+    if (!this.searchTerm) this.handleSearch('');
+  },
+  
   methods: {
 
     async handleSearch(searchTerm) {
-    this.isLoading = true;
-    try {
-      const url = new URL('/api/search-page/', window.location.origin);
-      url.searchParams.append('q', searchTerm);
+      this.isLoading = true;
+      try {
+        const url = new URL('/api/search-page/', window.location.origin);
+        url.searchParams.append('q', searchTerm);
 
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch');
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Failed to fetch');
 
-      const data = await response.json();
-      this.searchResults = JSON.parse(data); // Assume data is already in the correct format
+        // const data = await response.json();
+        this.searchResults = await response.json();
 
-      console.log('Current active filters:', this.currentFilters);
-    
-      // Initially set filteredResults to be the same as searchResults
-      this.handleFilterUpdate(this.currentFilters);
-    } catch (error) {
-      console.error('Error fetching search results:', error);
-    } finally {
-      this.isLoading = false;
-    }
-  },
+        console.log('Current active filters:', this.currentFilters);
+      
+        // Initially set filteredResults to be the same as searchResults
+        this.handleFilterUpdate(this.currentFilters);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
 
     formatCurrency(value) {
       const formatter = new Intl.NumberFormat('no-NB', {

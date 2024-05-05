@@ -1,7 +1,14 @@
 <template>
   <div class="my-account">
       <div class="input-container">
-        <h3>Feel free to change your account information here!</h3>
+        <h3>Change your account information here!</h3>
+        <h4>Profile picture:</h4>
+        <div class="profilepicture-container">
+          <div class="profile-picture-outline">
+            <img v-if="profilePicture" :src="profilePicture" alt="Avatar" class="profile-picture">
+            <input type="file" accept="image/jpeg,image/png" name="image" @change="handleImageUpload" :style="{ display: profilePicture ? 'none' : 'block' }">
+          </div>
+        </div>
         <h4>First name:</h4>
         <input v-model="user.firstName" placeholder="First name..." class="input-field"/>
         <h4>Last name:</h4>
@@ -33,7 +40,9 @@
       <div v-if="showPopup" class="popup">
       <div class="popup-content">
         <p class="error-message">{{ errorMessage }}</p>
-        <button @click="hidePopup">OK</button>
+        <router-link to="/dashboard" class="button-link">
+          <button @click="hidePopup">OK</button>
+        </router-link> 
       </div>
     </div>
   </div>
@@ -82,14 +91,28 @@
         },
 
         handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                    this.profilePicture = reader.result;
-                };
-            }
+          const file = event.target.files[0];
+          if (file) {
+              // Read the file as a data URL
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                  const imageData = reader.result;
+                  // Send the image data to the backend
+                  axios.put('upload_image/', { image: imageData }, {
+                      headers: {
+                          'Content-Type': 'application/json'
+                      }
+                  })
+                  .then(response => {
+                      console.log('Image uploaded:', response);
+                      this.profilePicture = response.data.image_url;
+                  })
+                  .catch(error => {
+                      console.error('Error uploading image:', error);
+                  });
+              };
+              reader.readAsDataURL(file);
+          }
         },
       
         saveChanges() {
@@ -218,9 +241,9 @@
   }
 
   .profilepicture-container, .profile-picture {
-    width: 150px;
-    height: 150px;
-    margin-top: 20px;
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
   }
 
   .profilepicture-container {
@@ -230,7 +253,7 @@
   }
 
   .profile-picture {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     border-radius: 50%;
     object-fit: cover;
     object-position: center;
@@ -255,7 +278,7 @@
   .input-field {
     display: block;
     height: 50px;
-    width: 96%;
+    width: 100%;
     background-color: rgba(255,255,255,0.07);
     border-radius: 3px;
     padding: 0 10px;
@@ -266,8 +289,7 @@
   }
 
   .input-container {
-    height: 600px;
-    width: 600px;
+    max-width: 600px;
     background-color: rgba(255,255,255,0.13);
     position: absolute;
     transform: translate(-50%,-50%);
@@ -277,6 +299,7 @@
     backdrop-filter: blur(10px);
     border: 2px solid rgba(255,255,255,0.1);
     box-shadow: 0 0 40px rgba(8,7,16,0.6);
+    margin: 0 auto;
     padding: 50px 35px;
   }
 

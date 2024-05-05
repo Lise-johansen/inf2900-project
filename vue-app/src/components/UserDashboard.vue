@@ -5,7 +5,6 @@
       <div class="profilepicture-container">
         <div class="profile-picture-outline">
           <img v-if="profilePicture" :src="profilePicture" alt="Avatar" class="profile-picture">
-          <input type="file" accept="image/*" @change="handleImageUpload" :style="{ display: profilePicture ? 'none' : 'block' }">
         </div>
       </div>
       
@@ -34,49 +33,64 @@
       
       <button class="logout-button" @click="logout">Logout</button>
 
+    <div class="divider"></div>
+
+    <div class="Realname">Reserved Listings:</div>
+    <div class="spacing"></div>
+    <div v-for="listing in orderedListings" :key="listing">
+      <ListingCard :listing="listing"  />
+      <div class="spacing"></div>
+    </div>
+    <div class="divider"></div>
     </div>
 </template>
 
 
 <script>
   import axios from 'axios';
+  import ListingCard from './ReservedListing.vue'
+
 
   export default {
     data() {
-        return {
+      return {
         user: {
-            firstName: '',
-            lastName: '',
-            email: '',
-            phone: '',
-            address: '',
-            profilepicture: '',
-            verified: false,
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          address: '',
+          profilePicture: '',
+          verified: false,
         },
-        profilePicture: null
-        };
+        orderedListings: [], // Make this a top-level data property
+        profilePicture: null,
+        listings_id: []
+      };
+    },
+    components: {
+      ListingCard
     },
 
     methods: {
-        logout() {
+      logout() {
         axios.get('logout/')
         .then(response => {
-            document.cookie = `token=${response.data.token}`;
-            document.cookie = `auth_user=${response.data.auth_user}`;
             this.$router.push('/');
-        })
-        },
-
-        handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                    this.profilePicture = reader.result;
-                };
-            }
+            alert(response.data.message);
+          })
+      },
+      
+      getTokenFromCookies() {
+        const cookies = document.cookie.split('; ');
+        for (const cookie of cookies) {
+          const [name, value] = cookie.split('=');
+          if (name === 'token') {
+            return value;
+          }
         }
+        return null; // Token not found in cookies
+      }
     },
 
     mounted() {
@@ -84,6 +98,18 @@
         axios.get('dashboard/')
         .then(response => {
             this.user = response.data;
+            console.log('User data:', this.user);
+            this.profilePicture = response.data.profilePicture;
+            axios.get('ordered-listings/')
+              .then(response => {
+                  this.orderedListings = response.data;
+                  this.listings_id = response.data;
+                  console.log('Listings id:', this.listings_id);
+                  console.log('Ordered listings:', this.orderedListings);
+              })
+              .catch(error => {
+                  console.error('Error fetching ordered listings:', error);
+              });
         })
         .catch(error => {
             console.error('Error fetching user data:', error);
@@ -189,4 +215,9 @@
     font-size: 1em;
     margin-top: 2em;
   }
+
+  .spacing {
+  padding: 1em;
+  }
+
 </style> 

@@ -1,7 +1,7 @@
 <template>
-  <div id="map"></div>
-  <div>Latitude: {{ latitude }}</div>
-  <div>Longitude: {{ longitude }}</div>
+  <div class="wrapper">
+    <div id="map"></div>
+  </div>
 </template>
 
 <script>
@@ -17,29 +17,26 @@ export default {
     };
   },
   mounted() {
-    this.getLocationCoordinates('Tromsø');
+    this.getLocationCoordinates('8610, Norway');
   },
   methods: {
-    getLocationCoordinates(city) {
+    async getLocationCoordinates(city) {
       const apiKey = '661d0b57ae725462506558qak8f7522';
-      const apiURL = `https://geocode.maps.co/search?q=${encodeURIComponent(city)}&api_key=${apiKey}`;
-  
-      axios.get(apiURL)
-        .then(response => {
-          console.log('API Response:', response.data); // Log the response to inspect its structure
+      const apiURL = `https://geocode.maps.co/search?q=${city}&api_key=${apiKey}`;
+    
+        try {
+          const response = await axios.get(apiURL, {withCredentials: false})
           // Extract latitude and longitude from the response
-          const lat = response.data[0].lat;
-          const lon = response.data[0].lon;
 
-          this.latitude = lat;
-          this.longitude = lon;
+          this.latitude = response.data[0].lat;
+          this.longitude = response.data[0].lon;
 
           // Initialize the map with the retrieved coordinates
-          this.initializeMap(lat, lon);
-        })
-        .catch(error => {
-          console.error('Error fetching location coordinates:', error);
-        });
+          this.initializeMap(this.latitude, this.longitude);
+        }
+        catch{
+          console.error('Error fetching location coordinates:');
+        }
     },
 
     initializeMap(lat, lon) {
@@ -56,9 +53,18 @@ export default {
 </script>
 
 <style scoped>
+.wrapper{
+height: 100dvh;
+display: flex;
+border: 2px solid rgba(255,255,255,0.1);
+justify-content: center;
+align-items: center;
+}
 #map {
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(8,7,16,0.6);
   height: 400px;
-  width: 100%;
+  width: 700px;
 }
 </style>
 

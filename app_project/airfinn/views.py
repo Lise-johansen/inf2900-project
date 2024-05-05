@@ -7,15 +7,19 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Item, User, Message, Conversation
+from .models import Item, ItemImage, User, Message, Conversation, Order
 from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
-import json
-import jwt
-from airfinn.utils import get_user_by_id, email_checks, password_checks
-import random
+import os, json, jwt, random, base64, boto3, uuid
+from airfinn.utils import get_user_by_id, email_checks, password_checks, get_reserved_items
+from botocore.exceptions import ClientError
 from django.db.models import Q
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 def index(request):
     return JsonResponse({'message': 'Welcome to Rentopia!'})
@@ -28,10 +32,11 @@ def get_user_id_for_token_auth(request):
     # Pull token from request cookies and decode it to get the user info
     token = request.COOKIES.get('token')
     # Decode the token
-    secret_key = 'St3rkP@ssord'
+    secret_key = settings.SECRET_KEY
     try:
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = payload['user_id']
+        print(f"This is the user id: {user_id}")
         return user_id
 
     except Exception as e:
@@ -63,7 +68,7 @@ def dashboard(request):
     if type(user) != type(User): 
         JsonResponse({'success': False, 'error': 'User does not exist'}, status=401)
 
-    return JsonResponse({'email': user.email, 'firstName': user.first_name, 'lastName': user.last_name, 'address': user.address, 'phone': user.phone, 'verified': user.is_verified})
+    return JsonResponse({'email': user.email, 'firstName': user.first_name, 'lastName': user.last_name, 'address': user.address, 'phone': user.phone, 'verified': user.is_verified, 'profilePicture': user.profile_picture_url})
 
 
 """
@@ -73,10 +78,10 @@ The result is that the token is invalidated and the user cant access the dashboa
 """
 def logout(request):
     # Create a response object with an empty dictionary or a simple message
-    response = JsonResponse({'message': 'Logged out successfully'}, safe=False)
+    response = JsonResponse({'message': 'Logged out successfully'})
     
     # Clear all cookies by setting their expiration time to a past date
-    response.set_cookie('token', '', expires=0)
+    response.delete_cookie('token')
     
     return response
 
@@ -553,22 +558,44 @@ def delete_user(request):
     
 def get_listings(request, category):
     try:
-        # Get all item id's in the specified category.
+        # Get all item ids in the specified category that are available.
         all_items = list(Item.objects.filter(category=category, availability=True).values_list('id', flat=True))
 
-        # Create a random sample of 12 item id's.
-        sample_ids = random.sample(all_items, 12)
+        # Limit the number of items to 12 or the total number of available items if less than 12.
+        num_items_to_display = min(len(all_items), 8)
+        
+        # Randomly select the item ids to display.
+        sample_ids = random.sample(all_items, num_items_to_display)
 
-        # Get the items with the sampled id's and sort them in random order.
+        # Get the items with the sampled ids and sort them in random order.
         random_data = Item.objects.filter(id__in=sample_ids).order_by('?')
         
-        # Create a list of dictionaries with the item data.
-        data = [{'id': item.id, 'name': item.name, 'description': item.description, 'price_per_day': item.price_per_day, 'location': item.location, 'category': item.category} for item in random_data]
-
+        # Get the images for the items.
+        images = ItemImage.objects.filter(item__in=random_data)
+        
+        # Prepare the data to return.
+        data = []
+        for item in random_data:
+            # Get the first image URL for each item.
+            image = images.filter(item=item).first()
+            image_url = image.image_url if image else None
+            
+            # Prepare the item data.
+            item_data = {
+                'id': item.id,
+                'name': item.name,
+                'description': item.description,
+                'price_per_day': item.price_per_day,
+                'location': item.location,
+                'category': item.category,
+                'image': image_url
+            }
+            data.append(item_data)
+        
         # Return the data as a JSON response.
         return JsonResponse(data, safe=False, status=200)
 
-    # Exception handling for when the item does not exist.    
+    # Exception handling for when the category does not exist.    
     except Item.DoesNotExist:
         return JsonResponse({'error': 'Category does not exist'}, status=404)
     
@@ -579,8 +606,11 @@ def search_page(request):
     query = request.GET.get('q', '')
 
     items = Item.objects.all()
+    item_images = ItemImage.objects.all()
+    
     if category:
         items = items.filter(category=category)
+        images = item_images.filter(item_id=items.id)
     if query:
         items = items.filter(
             Q(name__icontains=query) | 
@@ -589,4 +619,622 @@ def search_page(request):
         ).distinct()  # Use distinct() to avoid duplicate results
 
     data = serialize('json', items)
+    
+    # Add the first image URL for each item to the serialized data
+    data = json.loads(data)
+    for item in data:
+        image = item_images.filter(item_id=item['pk']).first()
+        
+        # Add the image URL to the item data field
+        item['fields']['image'] = image.image_url if image else None
+    
     return JsonResponse(data, safe=False)
+
+
+def get_conversations(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get session token and decode it.
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+  
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    print(f"Conversations for user: {user_id}")
+    
+    # Retrieve the user object corresponding to the user ID
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    # Get all conversations where the user is a participant
+    conversations = Conversation.objects.filter(user1=user) | Conversation.objects.filter(user2=user)
+    
+    # Prepare data
+    data = []
+    for conversation in conversations:
+        # Assign sender and receiver names
+        sender_name = 'You' if conversation.user1 == user else f"{conversation.user1.first_name} {conversation.user1.last_name}"
+        receiver_name = 'You' if conversation.user2 == user else f"{conversation.user2.first_name} {conversation.user2.last_name}"
+        
+        # Get the latest message in the conversation
+        latest_message = Message.objects.filter(conversation=conversation).order_by('-created_at').first()
+        
+        # Prepare conversation data
+        conversation_data = {
+            'id': conversation.id,
+            'item': {
+                'id': conversation.item.id,
+                'name': conversation.item.name
+            },
+            'sender': {
+                'id': conversation.user1.id,
+                'username': conversation.user1.username,
+                'name': sender_name
+            },
+            'receiver': {
+                'id': conversation.user2.id,
+                'username': conversation.user2.username,
+                'name': receiver_name
+            },
+            'latest_message': {
+                'message': latest_message.message,
+                'created_at': latest_message.created_at.strftime('%Y-%m-%d %H:%M:%S') if latest_message else None
+            }
+        }
+        data.append(conversation_data)
+        print(f"Conversation: {conversation_data}")
+        
+    # Return the data as JSON response
+    return JsonResponse(data, safe=False)
+
+def get_messages(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get session token and decode it.
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+  
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    print(f"Messages for user: {user_id}")
+    
+    # Retrieve the user object corresponding to the user ID
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    # Retrieve the conversation ID from query parameters
+    conversation_id = request.GET.get('conversation_id')
+    
+    if not conversation_id:
+        return JsonResponse({'error': 'Conversation ID not provided'}, status=400)
+    
+    # Retrieve the conversation object by ID
+    conversation = get_object_or_404(Conversation, id=conversation_id)
+    
+    # Check if the user is a participant in the conversation
+    if user not in [conversation.user1] + [conversation.user2]:
+        return JsonResponse({'error': 'Conversation not found'}, status=404)
+    
+    else:
+        # Get all messages in the conversation
+        messages = Message.objects.filter(conversation=conversation).order_by('created_at')
+        
+        # Sort messages from oldest to newest
+        messages = sorted(messages, key=lambda x: x.created_at)
+        
+        # Prepare data
+        data = []
+        for message in messages:
+            # Get the sender and receiver names
+            sender_name = 'You' if message.sender == user else f"{message.sender.first_name} {message.sender.last_name}"
+            receiver_name = 'You' if message.receiver == user else f"{message.receiver.first_name} {message.receiver.last_name}"
+            
+            # Prepare message data
+            message_data = {
+                'id': message.id,
+                'sender': {
+                    'id': message.sender.id,
+                    'username': message.sender.username,
+                    'name': sender_name
+                },
+                'receiver': {
+                    'id': message.receiver.id,
+                    'username': message.receiver.username,
+                    'name': receiver_name
+                },
+                'listing': {
+                    'id': conversation.item.id,
+                    'name': conversation.item.name
+                },
+                'conversation': {
+                    'id': conversation.id,
+                    'created_at': conversation.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                },
+                'message': message.message,
+                'image': message.image if message.image else '',
+                'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')  # Convert to string format
+            }
+            data.append(message_data)
+            print(f"Message: {message_data}")
+        
+    # Return the data as JSON response
+    return JsonResponse(data, safe=False)  
+    
+
+def send_messages(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    data = json.loads(request.body)
+    sender_id = data.get('sender_id')
+    receiver_id = data.get('receiver_id')
+    message_text = data.get('message')
+    message_image = data.get('image')
+    item_id = data.get('item_id')
+    conversation_id = data.get('conversation_id')
+    
+    # Get session token and decode it.
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+  
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    print(f"Messages for user: {user_id}")
+    
+    # Retrieve the user object corresponding to the user ID
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    # Check if the sender_id corresponds to the user_id
+    if sender_id != user_id:
+        receiver_id = sender_id
+        sender_id = user_id
+        
+    # Retrieve the sender and receiver objects
+    sender = get_user_by_id(sender_id)
+    receiver = get_user_by_id(receiver_id)
+    
+    # Check if the sender and receiver exist
+    if not sender or not receiver:
+        return JsonResponse({'error': 'Sender or receiver not found'}, status=404)
+    
+    # Retrieve the item object
+    item = get_object_or_404(Item, id=item_id)
+    
+    # Check if the conversation ID is provided
+    if conversation_id:
+        # Get the conversation object by ID
+        conversation = get_object_or_404(Conversation, id=conversation_id)
+    else:
+        # Check if there is an existing conversation between sender and receiver for this item
+        conversation = Conversation.objects.filter(user1=sender, user2=receiver, item=item).first()
+    
+    # If no existing conversation found, create a new one
+    if not conversation:
+        conversation = Conversation.objects.create(user1=sender, user2=receiver, item=item)
+        
+    # Create a new message
+    message = Message.objects.create(conversation=conversation, sender=sender, receiver=receiver, message=message_text, image=message_image)
+    
+    # Upload the image to the S3 bucket if there is one
+    if message_image:
+        # Initialize the S3 client with your credentials and endpoint
+        ACCOUNT_ID = os.getenv('ACCOUNT_ID')
+        ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+        SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+
+        s3 = boto3.client('s3', 
+                        region_name='auto',
+                        endpoint_url=f'https://{ACCOUNT_ID}.r2.cloudflarestorage.com',
+                        aws_access_key_id=ACCESS_KEY_ID,
+                        aws_secret_access_key=SECRET_ACCESS_KEY)
+        
+        # Split the data to extract only the base64 part
+        base64_data = message_image.split(',')[1]
+        
+        # Decode the base64-encoded image data
+        image_binary = base64.b64decode(base64_data)
+        
+        # Check if the image size exceeds the limit (2MB)
+        if len(image_binary) > 2 * 1024 * 1024:
+            return JsonResponse({'error': 'Image size exceeds the limit of 2MB'}, status=400)
+        
+        # Get correct file extension
+        if message_image.startswith('data:image/png'):
+            file_extension = 'png'
+        elif message_image.startswith('data:image/jpeg'):
+            file_extension = 'jpeg'
+        elif message_image.startswith('data:image/jpg'):
+            file_extension = 'jpg'
+        else:
+            return JsonResponse({'error': 'Invalid image format'}, status=400)
+        
+        # Generate a unique filename for the image
+        image_token_name = uuid.uuid4().hex
+        file_name = f'message/{message.id}/{image_token_name}.{file_extension}'
+        
+        # Create a new bucket for each message
+        bucket_name = 'rentopia-files'
+        
+        try:
+            # Upload the image data to the specified bucket
+            response = s3.put_object(Bucket=bucket_name, Key=file_name, Body=image_binary)
+            URL = os.getenv('URL_DOMAIN')
+            message.image = f'{URL}/{file_name}'
+            message.save()
+        except ClientError as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    # Prepare message data
+    message_data = {
+        'id': message.id,
+        'sender': {
+            'id': sender.id,
+            'username': sender.username,
+            'name': f"{sender.first_name} {sender.last_name}"
+        },
+        'receiver': {
+            'id': receiver.id,
+            'username': receiver.username,
+            'name': f"{receiver.first_name} {receiver.last_name}"
+        },
+        'listing': {
+            'id': item.id,
+            'name': item.name
+        },
+        'conversation': {
+                    'id': conversation.id,
+                    'created_at': conversation.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        },
+        'message': message.message,
+        'image': message.image if message.image else '',
+        'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')  # Convert to string format
+    }
+    
+    print(f"Message: {message_data}")
+    print(f"Sender ID: {message_data.get('sender').get('id')}, Receiver ID: {message_data.get('receiver').get('id')}")
+    print(f"Sender name {message_data.get('sender').get('name')}. Receiver name {message_data.get('receiver').get('name')}")
+    # Return the message data as JSON response
+    return JsonResponse(message_data, status=201)
+
+def create_item(request):
+    # Check if the request method is POST
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    try:
+        # Load the JSON data from the request body
+        data = json.loads(request.body)
+
+        # Pull token from request cookies and decode it to get the user info
+        token = request.COOKIES.get('token')
+
+        # Decode the token
+        secret_key = settings.SECRET_KEY
+        try:
+            payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+            user_id = payload['user_id']
+
+        except jwt.ExpiredSignatureError:
+            return JsonResponse({'error': 'Token has expired'}, status=401)
+        except jwt.InvalidTokenError:
+            return JsonResponse({'error': 'Invalid token'}, status=401)
+
+
+        # Get the data from the request body
+        name = data.get('name')
+        price_per_day = data.get('price_per_day')
+        description = data.get('description')
+        availability = data.get('availability')
+        condition = data.get('condition')
+        location = data.get('location')
+        category = data.get('category')
+        owner_id = user_id
+
+        # Create a new item
+        item = Item.objects.create( name=name,
+                                    description=description,
+                                    availability=availability,
+                                    condition=condition,
+                                    price_per_day=price_per_day,
+                                    location=location,
+                                    category=category,
+                                    owner_id=owner_id
+        )
+    
+        # Get the uploaded images form data from the request
+        uploaded_images = data.get('images')
+        
+        print(f"Uploaded images: {uploaded_images}")
+
+        # Check if any images were provided
+        if not uploaded_images:
+            return JsonResponse({'error': 'Images not provided'}, status=400)
+
+        # Initialize the S3 client with your credentials and endpoint
+        ACCOUNT_ID = os.getenv('ACCOUNT_ID')
+        ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+        SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+        s3 = boto3.client('s3', 
+                        region_name='auto',
+                        endpoint_url=f'https://{ACCOUNT_ID}.r2.cloudflarestorage.com',
+                        aws_access_key_id=ACCESS_KEY_ID,
+                        aws_secret_access_key=SECRET_ACCESS_KEY)
+
+        # Initialize a list to store the URLs of uploaded images
+        uploaded_image_urls = []
+
+        # Iterate over each uploaded image
+        for uploaded_image in uploaded_images:
+            # Split the data to extract only the base64 part
+            base64_data = uploaded_image.split(',')[1]
+            
+            # Decode the base64-encoded image data
+            image_binary = base64.b64decode(base64_data)
+            
+            # Check if the image size exceeds the limit (2MB)
+            if len(image_binary) > 2 * 1024 * 1024:
+                return JsonResponse({'error': 'Image size exceeds the limit of 2MB'}, status=400)
+
+            # Get correct file extension
+            if uploaded_image.startswith('data:image/png'):
+                file_extension = 'png'
+            elif uploaded_image.startswith('data:image/jpeg'):
+                file_extension = 'jpeg'
+            elif uploaded_image.startswith('data:image/jpg'):
+                file_extension = 'jpg'
+            else:
+                return JsonResponse({'error': 'Invalid image format'}, status=400)
+            
+            # Generate a unique filename for the image
+            image_token_name = uuid.uuid4().hex
+            file_name = f'listing/{item.id}/{image_token_name}.{file_extension}'
+            
+            # Create a new bucket for each listing
+            bucket_name = 'rentopia-files'
+
+            try:
+                # Upload the image data to the specified bucket
+                response = s3.put_object(Bucket=bucket_name, Key=file_name, Body=image_binary)
+                URL = os.getenv('URL_DOMAIN')
+                image_url = f'{URL}/{file_name}'
+                
+                # Add the image URL to the list
+                uploaded_image_urls.append(image_url)
+            except ClientError as e:
+                return JsonResponse({'error': str(e)}, status=500)
+
+        # Add the image URLs to the item
+        for image_url in uploaded_image_urls:
+            ItemImage.objects.create(item=item, image_url=image_url)
+
+        return JsonResponse({'message': 'Item created'})
+
+    except json.decoder.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+    
+
+def get_listing(request, item_id):    
+    if request.method != "GET":
+        # Return a 405 Method Not Allowed response for non-GET requests
+        return JsonResponse({"error": "Method Not Allowed"}, status=405)
+
+    item = get_object_or_404(Item, id=item_id)
+    
+    # Get all images for the listing
+    images = ItemImage.objects.filter(item=item)
+    
+    # Create a list of image URLs
+    images = [image.image_url for image in images]
+    
+    # Return the item data as JSON
+    data = {
+        "id": item.id,
+        "name": item.name,
+        "description": item.description,
+        "price_per_day": item.price_per_day,
+        "location": item.location,
+        "category": item.category,
+        "owner": item.owner.username,
+        "condition": item.condition,
+        "availability": item.availability,
+        "images": images,
+        "rating": item.rating,
+    }
+    return JsonResponse(data, safe=False)
+
+def upload_image(request):
+    if request.method == 'PUT':
+        # Get the image data from the request body
+        image_data = json.loads(request.body).get('image')
+        if not image_data:
+            return JsonResponse({'error': 'Image not provided'}, status=400)
+        
+        # Split the data to extract only the base64 part
+        base64_data = image_data.split(',')[1]
+
+        # Decode the base64-encoded image data
+        image_binary = base64.b64decode(base64_data)
+        
+        # Check if the image size exceeds the limit (2MB)
+        if len(image_binary) > 2 * 1024 * 1024:
+            return JsonResponse({'error': 'Image size exceeds the limit of 2MB'}, status=400)
+        
+        # Get session token and decode it.
+        token = request.COOKIES.get('token')
+        if not token:
+            return JsonResponse({'error': 'User not authenticated'}, status=401)
+        
+        secret_key = settings.SECRET_KEY
+        try:
+            payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+            user_id = payload['user_id']
+    
+        except jwt.ExpiredSignatureError:
+            return JsonResponse({'error': 'Token has expired'}, status=401)
+        except jwt.InvalidTokenError:
+            return JsonResponse({'error': 'Invalid token'}, status=401)
+                
+        # Retrieve the user object corresponding to the user ID
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        
+        # Delete the previous image
+        previous_image_url = user.profile_picture_url
+        
+        # Extract the filename from the URL
+        if previous_image_url:
+            previous_image_filename = previous_image_url.split('/')[-1]
+            
+            # Delete the previous image from the S3 bucket
+            delete_image(previous_image_filename)
+        
+        # Initialize the S3 client with your credentials and endpoint
+        ACCOUNT_ID = os.getenv('ACCOUNT_ID')
+        ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+        SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+        
+        s3 = boto3.client('s3', 
+                          region_name='auto',
+                          endpoint_url=f'https://{ACCOUNT_ID}.r2.cloudflarestorage.com',
+                          aws_access_key_id=ACCESS_KEY_ID,
+                          aws_secret_access_key=SECRET_ACCESS_KEY)
+
+        # Get correct file extension
+        if image_data.startswith('data:image/png'):
+            file_extension = 'png'
+        elif image_data.startswith('data:image/jpeg'):
+            file_extension = 'jpeg'
+        elif image_data.startswith('data:image/jpg'):
+            file_extension = 'jpg'
+        else:
+            return JsonResponse({'error': 'Invalid image format'}, status=400)
+        
+        image_token_name = uuid.uuid4().hex
+        file_name = f'user/{user.id}/{image_token_name}.{file_extension}'
+        bucket_name = 'rentopia-files'
+
+        try:
+            # Upload the image data to the specified bucket
+            response = s3.put_object(Bucket=bucket_name, Key=file_name, Body=image_binary, ContentType='image/png')
+            URL = os.getenv('URL_DOMAIN')
+            image_url = f'{URL}/{file_name}'
+            
+            # Assuming you want to save the image URL to the user profile
+            user_profile = User.objects.get(pk=user_id)
+            user_profile.profile_picture_url = image_url
+            user_profile.save()
+            
+            return JsonResponse({'image_url': image_url}, status=201)
+        except ClientError as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def delete_image(filename):
+    # Initialize the S3 client with your credentials and endpoint
+    ACCOUNT_ID = os.getenv('ACCOUNT_ID')
+    ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+    SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+    
+    s3 = boto3.client('s3', 
+                      region_name='auto',
+                      endpoint_url=f'https://{ACCOUNT_ID}.r2.cloudflarestorage.com',
+                      aws_access_key_id=ACCESS_KEY_ID,
+                      aws_secret_access_key=SECRET_ACCESS_KEY)
+    
+    bucket_name = 'rentopia-files'
+
+    try:
+        # Delete the previous image from the specified bucket
+        s3.delete_object(Bucket=bucket_name, Key=filename)
+    except ClientError as e:
+        print(f"Error deleting previous image: {str(e)}")
+
+
+
+def reserved_listings(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get session token and decode it.
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+  
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+
+    reserved_listings = get_reserved_items(user_id)
+
+    listing_id = json.loads(reserved_listings)
+
+    listings = []
+
+
+    for listing in listing_id:
+        item = get_object_or_404(Item, id=listing['pk'])
+
+        images = ItemImage.objects.filter(item=item).values_list('image_url', flat=True)
+        images = list(images)
+
+        listing = {
+            "id": item.id,
+            "name": item.name,
+            "description": item.description,
+            "price_per_day": item.price_per_day,
+            "location": item.location,
+            "category": item.category,
+            "owner": item.owner.username,
+            "condition": item.condition,
+            "availability": item.availability,
+            "images": images,
+            "rating": item.rating,
+        }
+        listings.append(listing)
+
+    print("listings: ", listings)
+    return JsonResponse(listings, safe=False)
