@@ -1,5 +1,5 @@
 <template>
-  <div class="map-wrapper">
+  <div class="wrapper">
     <div id="map"></div>
   </div>
 </template>
@@ -17,18 +17,13 @@ export default {
     };
   },
   mounted() {
-    this.fetchListingData()
-      .then(() => {
-        console.log('Postal Code:', this.listing.postal_code);
-        this.getLocationCoordinates(`${this.listing.postal_code}, Norway`);
-      });
+    this.getLocationCoordinates('8610, Norway');
   },
   methods: {
     async getLocationCoordinates(city) {
       const apiKey = '661d0b57ae725462506558qak8f7522';
       const apiURL = `https://geocode.maps.co/search?q=${city}&api_key=${apiKey}`;
-
-      
+    
         try {
           const response = await axios.get(apiURL, {withCredentials: false})
           // Extract latitude and longitude from the response
@@ -42,20 +37,6 @@ export default {
         catch{
           console.error('Error fetching location coordinates:');
         }
-    },
-
-    fetchListingData() {
-            // Fetch listing data from the server
-            const ListingID = this.$route.params.id;
-            return axios.get(`get_listing/${ListingID}/`)
-                .then(response => {
-                    // Update the listing data based on the response
-                    this.listing = response.data;
-                    console.log('Listing data:', this.listing);
-                })
-                .catch(error => {
-                    console.error('Error fetching listing data:', error);
-                })
     },
 
     initializeMap(lat, lon) {
@@ -72,13 +53,12 @@ export default {
 </script>
 
 <style scoped>
-.map-wrapper{
-height: 35dvh;
+.wrapper{
+height: 100dvh;
 display: flex;
 border: 2px solid rgba(255,255,255,0.1);
 justify-content: center;
 align-items: center;
-position: relative;
 }
 #map {
   border-radius: 5px;

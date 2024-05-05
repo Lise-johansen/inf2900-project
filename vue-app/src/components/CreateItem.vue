@@ -12,10 +12,7 @@
                 <input type="number" id="price_per_day" v-model="price_per_day" placeholder="Price per Day">
             </div>
             <div class="form-group">
-                <input type="text" id="location" v-model="location" placeholder="City">
-            </div>
-            <div class="form-group">
-                <input type="text" id="postal_code" v-model="postal_code" placeholder="Postal code">
+                <input type="text" id="location" v-model="location" placeholder="Location">
             </div>
             <div class="form-group">
                 <select id="category" v-model="category" class="custom-select">
@@ -54,7 +51,6 @@ export default {
             description: '',
             price_per_day: '',
             location: '',
-            postal_code: '',
             availability: true,
             image: [],
             condition: '',
@@ -65,7 +61,7 @@ export default {
             uploadedFileCount: 0,
             maxFiles: 2,
             // Define the available categories
-            categories: ['Summer', 'Winter', 'Tools', 'Electronics', 'Clothing', 'Furniture', 'Sports Equipment', 'Books', 'Other'],
+            categories: ['Summer', 'Winter', 'Tools', 'Electronics', 'Clothing', 'Furniture', 'Sports Equipment', 'Books'],
             conditions: ['New', 'Used', 'Refurbished']
         }
     },
@@ -84,7 +80,6 @@ export default {
                 description: this.description,
                 price_per_day: this.price_per_day,
                 location: this.location,
-                postal_code: this.postal_code,
                 availability: this.availability,
                 condition: this.condition,
                 category: this.category,
@@ -158,7 +153,6 @@ export default {
             this.description = '';
             this.price_per_day = '';
             this.location = '';
-            this.postal_code = '';
             this.availability = true;
             this.image = '';
             this.condition = '';
