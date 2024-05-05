@@ -51,4 +51,5 @@ urlpatterns = [
     path('api/add-favourites/', views.add_favourites, name='add_to_favourites'),
     path('api/get-favourites/', views.get_favourites, name='get_favourites'),
     path('api/remove-from-favourites/<int:item_id>/', views.remove_favourites, name='remove_favourites'),
+    path('api/verify-user/', views.verify_user, name='verify_user'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
