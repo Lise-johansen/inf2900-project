@@ -20,6 +20,7 @@ import PrivacyPolicy from './components/PrivacyPolicy.vue';
 import MailBox from './components/MailBox.vue';
 import ListingPath from './components/ListingPath.vue';
 import ErrorPage from './components/ErrorPage.vue';
+import FavouriteListings from './components/FavouriteListings.vue';
 
 
 const routes = [
@@ -118,6 +119,11 @@ const routes = [
     path: '/listing/:id/', // Ensure this matches the path used in navigation
     name: 'listingPage',
     component: ListingPath,
+  },
+  {
+    path: '/favourites',
+    name: 'favourites',
+    component: FavouriteListings,
   },
   // Other routes
 
