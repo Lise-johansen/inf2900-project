@@ -6,6 +6,8 @@ from django.core.serializers import serialize
 import re
 import json
 from django.contrib.auth import get_user_model
+from datetime import datetime
+from django.db.models import Q
 
 def get_user_by_id(user_id):
     User = get_user_model()  # Get the custom user model
@@ -75,3 +77,18 @@ def get_reserved_items(user):
     data = serialize('json', items)
 
     return data
+
+def is_item_available(item, start_date, end_date):
+    # Ensure input dates are datetime objects
+    if isinstance(start_date, str):
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    if isinstance(end_date, str):
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+    # Query to check for any overlapping orders
+    # First use the Q objects combined by the '&' operator inside the filter method
+    orders = Order.objects.filter(
+        Q(end_date__gte=start_date) & Q(start_date__lte=end_date),
+        item=item  # Make sure 'item' comes after the Q objects
+    )
+    return not orders.exists()  # Returns True if no overlapping orders found
