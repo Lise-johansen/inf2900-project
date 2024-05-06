@@ -1,7 +1,7 @@
 <template>
   <div class="user-dashboard">
     <!-- Verify Email banner -->
-    <verification-banner v-if="!user.verified"/>
+    <verification-banner v-if="!user.verified || !isDismissed"/>
     
     <div class="flex-container">
       <div class="profilepicture-container">
@@ -69,11 +69,17 @@
         },
         orderedListings: [], // Make this a top-level data property
         profilePicture: null,
-        listings_id: []
+        listings_id: [],
       };
     },
     components: {
       ListingCard, VerificationBanner
+    },
+
+    created() {
+      // Check if the banner is dismissed from local storage
+      const dismissed = localStorage.getItem('verificationBannerDismissed');
+      this.isDismissed = dismissed === 'true';
     },
 
     methods: {
