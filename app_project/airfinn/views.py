@@ -12,7 +12,7 @@ from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
 import os, json, jwt, random, base64, boto3, uuid
-from airfinn.utils import get_user_by_id, email_checks, password_checks, get_reserved_items
+from airfinn.utils import get_user_by_id, email_checks, password_checks, get_reserved_items, is_item_available
 from botocore.exceptions import ClientError
 from django.db.models import Q
 from dotenv import load_dotenv
@@ -1366,3 +1366,89 @@ def remove_favourites(request, item_id):
     
     # Return a success response
     return JsonResponse({'message': 'Item removed from favourites'}, status=200)
+
+
+def get_reserved_dates(request, listing):
+    print("Listing: ", listing)
+    print("listing type", type(listing))
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the item object
+    item = get_object_or_404(Item, id=listing)
+
+    # Get all the reservations for the item
+    reservations = Order.objects.filter(item=item)
+
+    # Prepare the data to return
+    data = []
+    print("Starting data: ", data)
+    for reservation in reservations:
+        reservation_data = {
+            'id': reservation.id,
+            'start_date': reservation.start_date,
+            'end_date': reservation.end_date,
+        }
+        print(reservation_data)
+        data.append(reservation_data)
+    print("data: ", data)
+
+    return JsonResponse(data, safe=False)
+
+def order_listing(request, listing):
+
+    print("Ordering Listing: ", listing)
+
+    if request.method != 'POST':
+        print("Method Not Allowed")
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    print("Requesting body")
+    data = json.loads(request.body)
+    print("Data: ", data)
+
+    # Get the user ID from the token
+    token = request.COOKIES.get('token')
+    if not token:
+        print("User not authenticated" )
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        print("Token has expired")
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        print("Invalid token")
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+
+    # Get the user object
+    user = get_object_or_404(User, id=user_id)
+    print("User: ", user)
+
+    # Get the item object
+    item = get_object_or_404(Item, id=listing)
+    print("Item: ", item)
+
+    # Get the start and end dates from the request data
+    start_date = data.get('startDate')
+    start_date = start_date.split('T')[0]
+    print("Start Date: ", start_date)
+    end_date = data.get('endDate')
+    end_date = end_date.split('T')[0]
+    print("End Date: ", end_date)
+
+    # Check if the item is available for the specified dates
+    if not is_item_available(item, start_date, end_date):
+        print("Item not available for specified dates")
+        return JsonResponse({'error': 'Item not available for specified dates'}, status=400)
+
+    # Create a new order
+    order = Order.objects.create(item=item, renter_id=user_id, start_date=start_date, end_date=end_date)
+    print("Order: ", order.id, order.item, order.user_id, order.start_date, order.end_date)
+
+    # Return a success response
+    return JsonResponse({'message': 'Order created successfully'}, status=201)
