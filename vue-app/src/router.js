@@ -82,8 +82,8 @@ const routes = [
     component: AboutUs,
   },
   {
-    path: '/EditListing',
-    name: 'EditListing',
+    path: '/EditListing/:id',
+    name: 'edit_listing',
     component: EditListing,
   },
   {
