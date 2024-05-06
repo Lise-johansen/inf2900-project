@@ -6,7 +6,8 @@
                 <input type="text" id="title" v-model="title" placeholder="Short Title">
             </div>
             <div class="form-group">
-                <textarea id="description" v-model="description" placeholder="Creative Description" rows="6"></textarea>
+                <textarea id="description" v-model="description" placeholder="Creative Description" rows="6" :maxlength="maxTextLength" @input="handleInput"></textarea>
+                <p>{{ remainingCharacters }} characters remaining</p>
             </div>
             <div class="form-group">
                 <input type="number" id="price_per_day" v-model="price_per_day" placeholder="Price per Day">
@@ -15,7 +16,7 @@
                 <input type="text" id="location" v-model="location" placeholder="Location">
             </div>
             <div class="form-group">
-                <input type="text" id="postal_code" v-model="postal_code" placeholder="Postal code">
+                <input type="number" id="postal_code" v-model="postal_code" placeholder="Postal code">
             </div>
             <div class="form-group">
                 <select id="category" v-model="category" class="custom-select">
@@ -63,10 +64,16 @@ export default {
             imagePreview: null,
             imagePreviews: [],
             uploadedFileCount: 0,
-            maxFiles: 2,
+            maxFiles: 5,
             // Define the available categories
             categories: ['Summer', 'Winter', 'Tools', 'Electronics', 'Clothing', 'Furniture', 'Sports Equipment', 'Books', 'Other'],
-            conditions: ['New', 'Used', 'Refurbished']
+            conditions: ['New', 'Used', 'Refurbished'],
+            maxTextLength: 2000 // Maximum allowed characters
+        }
+    },
+    computed: {
+        remainingCharacters() {
+            return this.maxTextLength - this.description.length;
         }
     },
     created() {
@@ -125,9 +132,22 @@ export default {
         handleFileUpload(event) {
             const files = event.target.files;
 
+            // Check if the number of files exceeds the maximum allowed
+            if (files.length + this.uploadedFileCount > this.maxFiles) {
+                window.alert(`You can only upload a maximum of ${this.maxFiles} files.`);
+                return; // Stop further processing
+            }
+
             // Iterate over each file and handle it individually
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
+
+                // Check if the file type is allowed (png, jpeg, jpg)
+                const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+                if (!allowedTypes.includes(file.type)) {
+                    window.alert('Only PNG, JPEG, or JPG files are allowed for upload.');
+                    return; // Stop further processing
+                }
                 if (file) {
                     // Create a new FileReader instance for each file
                     const reader = new FileReader();
@@ -164,7 +184,17 @@ export default {
             this.condition = '';
             this.category = '';
             this.owner_id = '';
-        }
+            this.imagePreview = null;
+            this.imagePreviews = [];
+            this.uploadedFileCount = 0;
+        },
+        handleInput() {
+            // Ensure text does not exceed the maximum length
+            if (this.description.length > this.maxTextLength) {
+                this.description = this.description.slice(0, this.maxTextLength);
+            }
+        },
+
     }
 }
 </script>
