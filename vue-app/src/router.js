@@ -6,7 +6,6 @@ import PasswordReset from './components/PasswordReset.vue'; // Import Password R
 import UserDashboard from './components/UserDashboard.vue';
 import IndexPath from './components/IndexPath.vue';
 import PasswordResetForm from './components/PasswordResetForm.vue'; // Import Password Reset Form component
-import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email component
 // import Listing from '.components/Listing.vue'; // Import Listing component
 import AboutUs from './components/AboutUs.vue'; // Import About Us component
 import DeleteListing from './components/DeleteListing.vue'; // Import Delete Listing component
@@ -67,11 +66,6 @@ const routes = [
     meta: { requiresAuth: false }, // Add this if authentication is required
   },
   {
-    path: '/verify-email',
-    name: 'verifyemail',
-    component: VerifyEmail,
-  },
-  {
     path: '/create-listing',
     name: 'create-listing',
     component: CreateItem
@@ -82,8 +76,8 @@ const routes = [
     component: AboutUs,
   },
   {
-    path: '/EditListing',
-    name: 'EditListing',
+    path: '/EditListing/:id',
+    name: 'edit_listing',
     component: EditListing,
   },
   {
