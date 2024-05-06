@@ -74,6 +74,8 @@ export default {
             imagePreviews: [],
             uploadedFileCount: 0,
             maxFiles: 5,
+            // Change size if needed
+            maxSizeInBytes: 2 * 1024 * 1024, // 2MB
             // Define the available categories
             categories: ['Summer', 'Winter', 'Tools', 'Electronics', 'Clothing', 'Furniture', 'Sports Equipment', 'Books', 'Other'],
             conditions: ['New', 'Used', 'Refurbished'],
@@ -92,12 +94,12 @@ export default {
 
     beforeRouteEnter(to, from, next) {
         // Check if the user is logged in
-        if (Cookies.get('token')) {
+        const token = Cookies.get('token');
+        if (token) {
             next();
-        } 
-        else {
-            alert("Please log in to create a listing");
-            next('/login')
+        } else {
+            alert('You must be logged in to create a listing');
+            next('/login');
         }
     },
 
@@ -162,22 +164,33 @@ export default {
         handleFileUpload(event) {
                 const files = event.target.files;
 
-                // Check if the number of files exceeds the maximum allowed
-                if (files.length + this.uploadedFileCount > this.maxFiles) {
-                    this.showPopup = true; // Display the popup
-                    this.popupMessage = `You can only upload a maximum of ${this.maxFiles} files.`;
-                    return; // Stop further processing
-                }
-
+                
                 // Iterate over each file and handle it individually
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
+                    
+                    // Check if the number of files exceeds the maximum allowed
+                    if (files.length + this.uploadedFileCount > this.maxFiles) {
+                        this.showPopup = true; // Display the popup
+                        this.popupMessage = `You can only upload a maximum of ${this.maxFiles} files.`;
+                        event.target.value = '';
+                        return; // Stop further processing
+                    }
+    
+                    if (file.size > this.maxSizeInBytes) {
+                        this.showPopup = true; // Display the popup
+                        this.popupMessage = 'File size exceeds the limit (2MB). Please choose a smaller file.';
+                        // Clear the file input to allow the user to select a different file
+                        event.target.value = '';
+                        return;
+                    }
 
                     // Check if the file type is allowed (png, jpeg, jpg)
                     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
                     if (!allowedTypes.includes(file.type)) {
                         this.showPopup = true; // Display the popup
                         this.popupMessage = 'Only PNG, JPEG, or JPG files are allowed for upload.';
+                        event.target.value = '';
                         return; // Stop further processing
                     }
                     if (file) {
