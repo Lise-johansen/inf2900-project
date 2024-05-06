@@ -108,18 +108,10 @@ class CreateItemTestCase(TestCase):
 
         # Get token
         token = response.json().get('token') 
-        
-        # Simulated image data
+
+        # Simulate image file data
         image_data = b'fake image data'
-
-        # Encode image data to base64
-        base64_data = base64.b64encode(image_data).decode()
-
-        # Construct base64 URL
-        base64_url = f"data:image/jpeg;base64,{base64_data}"
-
-        # Create a simulated image file with base64 content
-        image_file = SimpleUploadedFile("fake_image.jpg", base64.b64decode(base64_data), content_type="image/jpeg")
+        base64_image = base64.b64encode(image_data).decode('utf-8')
 
         # Create item data with the simulated image file
         item_data = {
@@ -132,13 +124,13 @@ class CreateItemTestCase(TestCase):
             'postal_code': '0910',
             'category': 'Test Category',
             'owner': self.owner.id,
-            'images': image_file
+            'images': [f'data:image/jpeg;base64,{base64_image}']
         }
         print(f"item_data: {item_data}")
 
 
         # Make POST request to create item
-        response = self.client.post(self.url, data=item_data)
+        response = self.client.post(self.url, data=json.dumps(item_data), content_type='application/json')
         print(f"Response: {response}")
 
         # Check if item is created successfully
