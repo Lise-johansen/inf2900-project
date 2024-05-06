@@ -145,6 +145,7 @@
         deleteAccount() {
           axios.delete('delete_user/')
           .then(response => {
+            localStorage.removeItem('verificationBannerDismissed');
             console.log('Account deleted successfully:', response);
           })
           .catch(error => {
