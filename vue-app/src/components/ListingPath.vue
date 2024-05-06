@@ -27,11 +27,11 @@
                 <!-- Display selected dates -->
                 <div v-if="selectedDates">
                 <p>Selected Dates: {{ formatDate(selectedDates) }}</p>
-                </div>
                 <!-- Redirect to edit page -->
                 <!-- First check if the user is the owner of the item -->
                 <div class="edit-button" v-if="listing.owner === this.user.username">
                     <button @click="redirectToEditPage" class="btn">Edit Listing</button>
+                </div>
                 </div>
             </div>
         </header>
@@ -85,6 +85,9 @@ export default {
             newRating: 0, // New rating to be added
             newDescription: '', // New description to be added
             favourites: [],
+            showCalendar: true,
+            selectedDates: null,
+            user: '',
         };
     },
 
@@ -320,5 +323,22 @@ export default {
 
 .btn:hover {
     background: linear-gradient(to right, #ffa500 0, #ff5733 50%, #ffa500 100%);
+}
+
+.calendar-order {
+  background: rgb(216, 155, 131);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.calendar-order .p-calendar {
+  width: 100%;
+}
+
+
+.edit-button {
+    margin-top: 10px;
+    text-align: left;
 }
 </style>
