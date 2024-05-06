@@ -1496,3 +1496,51 @@ def order_listing(request, listing):
     
     # Return a success response
     return JsonResponse({'message': 'Order created successfully'}, status=201)
+
+def get_user_listings(request):
+    # Get all the listings for the user
+    
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the user ID from the token
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    # Get the user object
+    user = get_object_or_404(User, id=user_id)
+    
+    # Get all the listings for the user
+    listings = Item.objects.filter(owner=user)
+    
+    # Prepare the data to return
+    data = []
+    
+    for listing in listings:
+        images = ItemImage.objects.filter(item=listing).values_list('image_url', flat=True)
+        images = list(images)
+        
+        listing_data = {
+            'id': listing.id,
+            'name': listing.name,
+            'description': listing.description,
+            'price_per_day': listing.price_per_day,
+            'location': listing.location,
+            'postal_code': listing.postal_code,
+            'category': listing.category,
+            'images': images
+        }
+        data.append(listing_data)
+        
+    return JsonResponse(data, safe=False)
