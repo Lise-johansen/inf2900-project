@@ -296,7 +296,7 @@ class DeleteListingTestCase(TestCase):
         self.userWithItem = User.objects.create_user(**self.user1)
         self.userNoItem = User.objects.create_user(**self.user2)
         # Create a test item
-        self.item = Item.objects.create(name="Test Item", description="This is a test item", availability=True, condition="New", price_per_day=5.00, images="images/default.jpg", owner=self.userWithItem, location="Test Location")
+        self.item = Item.objects.create(name="Test Item", description="This is a test item", availability=True, condition="New", price_per_day=5.00, owner=self.userWithItem, location="Test Location")
         self.url = reverse('delete_listing', args=[self.item.id])
         self.client = Client()    
 
