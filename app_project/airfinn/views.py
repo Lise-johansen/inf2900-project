@@ -200,7 +200,7 @@ def register(request):
         
         verification_token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256')
         
-        verification_link = f"{settings.FRONTEND_URL}/verify-email?token={verification_token}"
+        verification_link = f"{settings.FRONTEND_URL}/dashboard?token={verification_token}"
         
         # Load HTML content from template
         html_content = render_to_string('verification_email.html', {'verification_link': verification_link, 'username': username})
@@ -312,10 +312,15 @@ def verify_email(request):
         user_id = decoded_token.get('user_id')
         
         user = User.objects.get(id=user_id)
+        
+        # Check if the user is already verified
+        if user.is_verified:
+            return JsonResponse({'message': 'Email already verified', 'verified': True}, status=200)
+        
         user.is_verified = True
         user.save()
 
-        return JsonResponse({'message': 'Email verified successfully'}, status=200)
+        return JsonResponse({'message': 'Email verified successfully', 'verified': True}, status=200)
     except jwt.ExpiredSignatureError:
         return JsonResponse({'message': 'Verification link has expired'}, status=400)
     except jwt.DecodeError:
