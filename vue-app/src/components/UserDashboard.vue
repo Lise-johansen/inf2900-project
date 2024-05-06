@@ -1,5 +1,7 @@
 <template>
   <div class="user-dashboard">
+    <!-- Verify Email banner -->
+    <verification-banner v-if="!user.verified"/>
     
     <div class="flex-container">
       <div class="profilepicture-container">
@@ -13,14 +15,15 @@
         <p>{{ user.email }}</p>
         <p>{{ user.address }}</p>
         <p>{{ user.phone }}</p>
+        <div v-if="user.verified" class="verified">
+          <p>Verified</p> 
+          <svg class="verified-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path fill="blue" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+          </svg>
+        </div>
       </div>
     </div>
 
-    <div class=verify-badge>
-      <svg v-if="user.verified" class="verified-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-        <path fill="blue" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
-      </svg>
-    </div>
 
       <div class="divider"></div>
 
@@ -49,6 +52,7 @@
 <script>
   import axios from 'axios';
   import ListingCard from './ReservedListing.vue'
+  import VerificationBanner from './VerifyEmail.vue';
 
 
   export default {
@@ -69,7 +73,7 @@
       };
     },
     components: {
-      ListingCard
+      ListingCard, VerificationBanner
     },
 
     methods: {
@@ -120,11 +124,19 @@
 
 
 <style scoped>
+  .verified {
+    display: flex;
+    align-items: center;
+  }
+  
+  .verified p {
+    margin-left: 20px;
+  }
+
   .verified-icon {
-    width: 24px; /* Adjust size as needed */
-    height: 24px; /* Adjust size as needed */
-    fill: rgb(0, 197, 219); /* Change color as needed */
-    margin-left: 5px; /* Adjust margin as needed */
+    width: 24px;
+    height: 24px;
+    fill: blue;
   }
   
   .user-dashboard {
