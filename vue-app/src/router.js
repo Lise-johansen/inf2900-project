@@ -122,14 +122,19 @@ const routes = [
     component: ListingPath,
   },
   {
-    path: '/odered-listings/',
+    path: '/ordered-listings/',
     name: 'ordered-listings',
     component: UserDashboard,
   },
   {
     path: '/order-listing/',
     name: 'order-listing',
-    component: UserDashboard,
+    component: ListingPath,
+  },
+  {
+    path: '/reserved-dates/',
+    name: 'reserved-dates',
+    component: ListingPath,
   },
   {
     path: '/map',
