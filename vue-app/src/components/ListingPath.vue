@@ -1,9 +1,9 @@
 <template>
     <div class="listing-container">
         <header class="listing-header">
-        <!-- Use the Galleria component to display the images -->
-        <ImageGallery :images="images_list" />  
-        <!-- <img :src="images" :alt="listing.name" :class="listing-image"> -->
+            <!-- Use the Galleria component to display the images -->
+            <ImageGallery :images="images_list" />
+            <!-- <img :src="images" :alt="listing.name" :class="listing-image"> -->
             <div class="listing-details">
                 <h1 class="listing-title">{{ this.listing.name }}</h1>
                 <div class="rating-container" @click="scrollToRating">
@@ -18,6 +18,11 @@
                     <span v-if="!isInFavourites(listing.id)">Add to Favourites</span>
                     <span v-else>Already in Favourites</span>
                 </button>
+                <!-- Redirect to edit page -->
+                <!-- First check if the user is the owner of the item -->
+                <div class="edit-button" v-if="listing.owner === this.user.username">
+                    <button @click="redirectToEditPage" class="btn">Edit Listing</button>
+                </div>
             </div>
         </header>
 
@@ -69,31 +74,19 @@ export default {
             newRating: 0, // New rating to be added
             newDescription: '', // New description to be added
             favourites: [],
+            user: '',
         };
     },
 
     mounted() {
         this.fetchListingData();
+        this.fetchUser();
         this.fetchFavourites();
     },
-
     methods: {
         scrollToRating() {
             // Scroll to the rating section using smooth behavior
             // You can customize this behavior based on your needs
-        },
-        addNewRating() {
-            // Add a new rating and description to the list
-            if (this.newRating > 0 && this.newDescription.length <= 150) {
-                this.additionalRatings.push({
-                    rating: this.newRating,
-                    description: this.newDescription,
-                });
-
-                // Reset new rating and description
-                this.newRating = 0;
-                this.newDescription = '';
-            }
         },
         fetchListingData() {
             // Fetch listing data from the server
@@ -110,7 +103,24 @@ export default {
                 })
                 .catch(error => {
                     console.error('Error fetching listing data:', error);
-                })
+                });
+        },
+        redirectToEditPage() {
+            const listingID = this.$route.params.id;
+            this.$router.push({ name: 'edit_listing', params: { id: listingID } });
+        },
+        addNewRating() {
+            // Add a new rating and description to the list
+            if (this.newRating > 0 && this.newDescription.length <= 150) {
+                this.additionalRatings.push({
+                    rating: this.newRating,
+                    description: this.newDescription,
+                });
+
+                // Reset new rating and description
+                this.newRating = 0;
+                this.newDescription = '';
+            }
         },
         addToFavourites() {
             // get the listing ID and user ID
@@ -149,8 +159,20 @@ export default {
         isInFavourites(listingId) {
             // Check if the listingId exists in the favourites array
             return this.favourites.some(favorite => favorite.id === listingId);
+        
         },
-
+        fetchUser() {
+            // Fetch the user data from the server
+            axios.get('get-user/')
+                .then(response => {
+                    // Update the user data based on the response
+                    this.user = response.data;
+                    console.log('User data:', this.user);
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                });
+        },
     },
 
     components: {
@@ -262,5 +284,10 @@ export default {
 
 .btn:hover {
     background: linear-gradient(to right, #ffa500 0, #ff5733 50%, #ffa500 100%);
+}
+
+.edit-button {
+    margin-top: 10px;
+    text-align: left;
 }
 </style>

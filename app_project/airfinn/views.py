@@ -41,7 +41,49 @@ def get_user_id_for_token_auth(request):
 
     except Exception as e:
         return None
-
+    
+"""
+Function to check if the user is correct and authenticated.
+Called from edit listing to verify that the user is the owner of the item.
+"""
+def verify_user(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the user ID from the token
+    user_id = get_user_id_for_token_auth(request)
+    
+    # Get the item ID from the request path
+    item_id = request.GET.get('item_id')
+    
+    # Check if the user is the owner of the item
+    item = get_object_or_404(Item, id=item_id)
+    
+    if item.owner.id == user_id:
+        return JsonResponse({'message': 'User is the owner of the item'}, status=200)
+    else:
+        return JsonResponse({'error': 'User is not the owner of the item'}, status=403)
+    
+def get_user(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the user ID from the token
+    user_id = get_user_id_for_token_auth(request)
+    
+    # Get the user object from the database
+    user = get_user_by_id(user_id)
+    
+    if user is None:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    # Prepare the user data to return
+    data = {
+        'id': user.id,
+        'username': user.username,
+    }
+    
+    return JsonResponse(data, status=200)
 
 """
 Pull the token from the request cookies and decode it to get the user info from the database. 
@@ -419,23 +461,35 @@ def edit_listing(request, item_id):
         data = json.loads(request.body)
 
         # Update item fields with data from the request
-        item.name = data.get('name', item.name)
+        # item.name = data.get('name', item.name)
         
         # Update all fileds
         item.name = data.get('name', item.name)
         item.description = data.get('description', item.description)
-        item.price_per_day = data.get('price_per_day', item.price_per_day)
+        
+        price_per_day = data.get('price_per_day', item.price_per_day)
+
+        # Check if price is a number and not negative
+        if not isinstance(price_per_day, (int, float)):
+            return JsonResponse({'error': 'Price must be a number'}, status=400)
+        elif price_per_day < 0:
+            return JsonResponse({'error': 'Price cannot be negative'}, status=400)
+        else:
+            # item.price_per_day = float(price_per_day)
+            item.price_per_day = data.get('price_per_day', float(item.price_per_day))
+
         item.location = data.get('location', item.location)
         item.category = data.get('category', item.category)
+
         
         # Save the changes to the item
         item.save()
 
         # Return a success response
-        return JsonResponse({'message': 'Item updated successfully'})
-    except json.JSONDecodeError:
-        # Handle JSON decoding error
-        return JsonResponse({'message': 'Invalid JSON data'}, status=400)
+        return JsonResponse({'message': 'Item updated successfully'}, status=200)
+    
+    except ValueError:
+        return JsonResponse({'message': 'Invalid type inserted to a field'}, status=400)
     except Exception as e:
         # Handle other potential errors
         return JsonResponse({'message': f'Error updating item: {str(e)}'}, status=500)
