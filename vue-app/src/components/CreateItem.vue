@@ -78,10 +78,8 @@ export default {
     },
     created() {
         // Call the method to redirect if the user is not logged in
-        const token = this.getTokenFromCookies();
-        if (token === 'undefined'){
-            this.redirectIfLoggedIn();
-        }
+        this.redirectIfLoggedIn();
+
     },
     methods: {
         createItem() {
@@ -110,11 +108,16 @@ export default {
                     console.error('Error creating item:', error);
                 });
         },
-        redirectIfLoggedIn() {
-            console.log('User is not logged in');
-            // Token is not found in cookies (user is not logged in)
-            if (confirm('You must be logged in to view this page.')) {
-                this.$router.push('/login');
+        redirectIfLoggedIn()
+        {
+            // Redirect to login page if user is not logged in
+            console.log('Checking if user is logged in...');
+            const token = this.getTokenFromCookies();
+            if (token === 'undefined') {
+                // Token is not found in cookies (user is not logged in)
+                if (confirm('You must be logged in to view this page.')) {
+                    this.$router.push('/login'); 
+                }
             }
         },
         // Get the token from the cookies
