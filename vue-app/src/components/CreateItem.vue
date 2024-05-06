@@ -3,20 +3,20 @@
         <h1 class="title">Create a New Listing</h1>
         <form @submit.prevent="createItem">
             <div class="form-group">
-                <input type="text" id="title" v-model="title" placeholder="Short Title">
+                <input type="text" id="title" v-model="title" placeholder="Short Title (max 100 characters)" :maxlength="maxTitleLength" @input="handleTitleInput">
             </div>
             <div class="form-group">
-                <textarea id="description" v-model="description" placeholder="Creative Description" rows="6" :maxlength="maxTextLength" @input="handleInput"></textarea>
+                <textarea id="description" v-model="description" placeholder="Creative Description (max 2000 characters)" rows="6" :maxlength="maxTextLength" @input="handleDescInput"></textarea>
                 <p>{{ remainingCharacters }} characters remaining</p>
             </div>
             <div class="form-group">
-                <input type="number" id="price_per_day" v-model="price_per_day" placeholder="Price per Day">
+                <input type="text" id="price_per_day" v-model="price_per_day" placeholder="Price per Day" @input="handlePrice">
             </div>
             <div class="form-group">
                 <input type="text" id="location" v-model="location" placeholder="Location">
             </div>
             <div class="form-group">
-                <input type="number" id="postal_code" v-model="postal_code" placeholder="Postal code">
+                <input type="text" id="postal_code" v-model="postal_code" placeholder="Postal code" :maxlength="maxPostalLength" @input="handlePostalCode">
             </div>
             <div class="form-group">
                 <select id="category" v-model="category" class="custom-select">
@@ -43,10 +43,19 @@
             </div>
         </form>
     </div>
+
+    <!-- Popup for displaying various info -->
+    <div v-if="showPopup" class="popup">
+        <div class="popup-content">
+          <p>{{ popupMessage }}</p>
+          <button @click="hidePopup">OK</button>
+        </div>
+    </div>
 </template>
 
 <script>
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 export default {
     data() {
@@ -68,7 +77,11 @@ export default {
             // Define the available categories
             categories: ['Summer', 'Winter', 'Tools', 'Electronics', 'Clothing', 'Furniture', 'Sports Equipment', 'Books', 'Other'],
             conditions: ['New', 'Used', 'Refurbished'],
-            maxTextLength: 2000 // Maximum allowed characters
+            maxTextLength: 2000,
+            maxTitleLength: 100,
+            maxPostalLength: 4  ,
+            showPopup: false,
+            popupMessage: ''
         }
     },
     computed: {
@@ -76,13 +89,27 @@ export default {
             return this.maxTextLength - this.description.length;
         }
     },
-    created() {
-        // Call the method to redirect if the user is not logged in
-        this.redirectIfLoggedIn();
 
+    beforeRouteEnter(to, from, next) {
+        // Check if the user is logged in
+        if (Cookies.get('token')) {
+            next();
+        } 
+        else {
+            alert("Please log in to create a listing");
+            next('/login')
+        }
     },
+
     methods: {
         createItem() {
+            // Check for missing fields
+            if (!this.title || !this.description || !this.price_per_day || !this.location || !this.postal_code || !this.category || !this.condition || this.image.length === 0) {
+                this.showPopup = true;
+                this.popupMessage = 'Please fill in all required fields.';
+                return;
+            }
+
             // Create an object to store item data
             const itemData = {
                 name: this.title,
@@ -102,22 +129,19 @@ export default {
                     // Handle successful creation
                     console.log('Item created successfully');
                     this.clearForm();
+                    this.showPopup = true;
+                    this.popupMessage = 'Item created successfully!';
                 })
                 .catch(error => {
                     // Handle error
                     console.error('Error creating item:', error);
                 });
         },
-        redirectIfLoggedIn()
-        {
-            // Redirect to login page if user is not logged in
-            console.log('Checking if user is logged in...');
-            const token = this.getTokenFromCookies();
-            if (token === 'undefined') {
-                // Token is not found in cookies (user is not logged in)
-                if (confirm('You must be logged in to view this page.')) {
-                    this.$router.push('/login'); 
-                }
+        redirectIfLoggedIn() {
+            console.log('User is not logged in');
+            // Token is not found in cookies (user is not logged in)
+            if (confirm('You must be logged in to view this page.')) {
+                this.$router.push('/login');
             }
         },
         // Get the token from the cookies
@@ -131,49 +155,54 @@ export default {
             }
             return null; // Token not found in cookies
         },
-
+        hidePopup() {
+            this.showPopup = false;
+            this.popupMessage = '';
+        },
         handleFileUpload(event) {
-            const files = event.target.files;
+                const files = event.target.files;
 
-            // Check if the number of files exceeds the maximum allowed
-            if (files.length + this.uploadedFileCount > this.maxFiles) {
-                window.alert(`You can only upload a maximum of ${this.maxFiles} files.`);
-                return; // Stop further processing
-            }
-
-            // Iterate over each file and handle it individually
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-
-                // Check if the file type is allowed (png, jpeg, jpg)
-                const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-                if (!allowedTypes.includes(file.type)) {
-                    window.alert('Only PNG, JPEG, or JPG files are allowed for upload.');
+                // Check if the number of files exceeds the maximum allowed
+                if (files.length + this.uploadedFileCount > this.maxFiles) {
+                    this.showPopup = true; // Display the popup
+                    this.popupMessage = `You can only upload a maximum of ${this.maxFiles} files.`;
                     return; // Stop further processing
                 }
-                if (file) {
-                    // Create a new FileReader instance for each file
-                    const reader = new FileReader();
-                    
-                    // Setup an onloadend event handler for each reader
-                    reader.onloadend = () => {
-                        const imageData = reader.result;
-                        
-                        // Add each image data to the imagePreviews array separately
-                        this.imagePreviews.push(imageData);
 
-                        // Increment the uploadedFileCount
-                        this.uploadedFileCount++;
-                        
-                        // Add the image data to the image array
-                        this.image.push(imageData);
+                // Iterate over each file and handle it individually
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
 
-                    };
-                    
-                    // Read the current file as a data URL
-                    reader.readAsDataURL(file);
+                    // Check if the file type is allowed (png, jpeg, jpg)
+                    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+                    if (!allowedTypes.includes(file.type)) {
+                        this.showPopup = true; // Display the popup
+                        this.popupMessage = 'Only PNG, JPEG, or JPG files are allowed for upload.';
+                        return; // Stop further processing
+                    }
+                    if (file) {
+                        // Create a new FileReader instance for each file
+                        const reader = new FileReader();
+                        
+                        // Setup an onloadend event handler for each reader
+                        reader.onloadend = () => {
+                            const imageData = reader.result;
+                            
+                            // Add each image data to the imagePreviews array separately
+                            this.imagePreviews.push(imageData);
+
+                            // Increment the uploadedFileCount
+                            this.uploadedFileCount++;
+                            
+                            // Add the image data to the image array
+                            this.image.push(imageData);
+
+                        };
+                        
+                        // Read the current file as a data URL
+                        reader.readAsDataURL(file);
+                    }
                 }
-            }
         },
 
         clearForm() {
@@ -191,13 +220,26 @@ export default {
             this.imagePreviews = [];
             this.uploadedFileCount = 0;
         },
-        handleInput() {
+        handleDescInput() {
             // Ensure text does not exceed the maximum length
             if (this.description.length > this.maxTextLength) {
                 this.description = this.description.slice(0, this.maxTextLength);
             }
         },
-
+        handleTitleInput() {
+            // Ensure text does not exceed the maximum length
+            if (this.title.length > this.maxTitleLength) {
+                this.title = this.title.slice(0, this.maxTitleLength);
+            }
+        },
+        handlePrice(event) {
+            // Use a regular expression to allow only integers
+            this.price_per_day = event.target.value.replace(/\D/g, '');
+        },
+        handlePostalCode(event) {
+            // Use a regular expression to allow only integers
+            this.postal_code = event.target.value.replace(/\D/g, '');
+        },
     }
 }
 </script>
@@ -263,6 +305,38 @@ button {
 }
 
 button:hover {
+    background-color: #0056b3;
+}
+/* Add custom styles for the popup */
+.popup {
+    position: fixed;
+    top: 50%; /* Adjust as needed */
+    left: 50%; /* Adjust as needed */
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.popup-content {
+    text-align: center;
+}
+
+.popup button {
+    margin-top: 10px;
+    padding: 8px 20px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.popup button:hover {
     background-color: #0056b3;
 }
 </style>
