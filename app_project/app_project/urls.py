@@ -55,4 +55,5 @@ urlpatterns = [
     path('api/order-listing/<int:listing>/', views.order_listing, name='order_listing'),
     path('api/verify-user/', views.verify_user, name='verify_user'),
     path('api/get-user/', views.get_user, name='get_user'),
+    path('api/get-user-listings/', views.get_user_listings, name='get_user_listings'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
