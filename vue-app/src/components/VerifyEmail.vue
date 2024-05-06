@@ -5,9 +5,12 @@
     </div>
     <div v-if="verificationSuccess" class="verification-success">
       <p>Email verified successfully!</p>
+      <!-- Dismiss button -->
+      <button @click="dismissBanner" class="btn">Dismiss</button>
     </div>
     <div v-if="verificationError" class="verification-error">
       <p>{{ verificationError }}</p>
+      <!-- Retry button -->
       <button @click="retryVerification" class="btn">Retry</button>
     </div>
   </div>
@@ -19,15 +22,14 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      isVisible: false,
       isLoading: true,
       verificationError: null,
-      verificationSuccess: false
+      verificationSuccess: false,
+      isVisible: true,
     };
   },
   mounted() {
     // Start the verification process when the component is mounted
-    this.isVisible = true;
     this.verifyEmail();
   },
   beforeUnmount() {
@@ -53,6 +55,7 @@ export default {
         } else {
         // No token present, stop the verification process
         this.isLoading = false;
+        this.isDismissed = false;
         this.verificationError = 'Email not verified! Please check your email for the verification link or retry.';
       }
     },
@@ -61,6 +64,13 @@ export default {
       this.isLoading = true;
       this.verificationError = null;
       this.verifyEmail();
+    },
+    dismissBanner() {
+      // Dismiss the banner and store the state in local storage
+      this.isDismissed = true;
+      localStorage.setItem('verificationBannerDismissed', 'true');
+      // Hide banner after dismissal
+      this.isVisible = false;
     }
   }
 }
@@ -116,5 +126,14 @@ export default {
 
   .btn:hover {
     background: linear-gradient(to right,#ffa500 0, #ff5733 50%, #ffa500 100%);
+  }
+
+  .dismiss-btn {
+    cursor: pointer;
+    background-color: #ddd;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-top: 10px;
   }
 </style>
