@@ -992,7 +992,9 @@ def create_item(request):
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
     try:
         # Load the JSON data from the request body
+        # print(f"Request: {request.body}")
         data = json.loads(request.body)
+        # print(f"Request data after loads: {data}")
 
         # Pull token from request cookies and decode it to get the user info
         token = request.COOKIES.get('token')
@@ -1039,6 +1041,7 @@ def create_item(request):
 
         # Check if any images were provided
         if not uploaded_images:
+            print("Image not found, you goddamn fucking retard")
             return JsonResponse({'error': 'Images not provided'}, status=400)
 
         # Initialize the S3 client with your credentials and endpoint
@@ -1064,6 +1067,7 @@ def create_item(request):
             
             # Check if the image size exceeds the limit (2MB)
             if len(image_binary) > 2 * 1024 * 1024:
+                print("Image too big")
                 return JsonResponse({'error': 'Image size exceeds the limit of 2MB'}, status=400)
 
             # Get correct file extension
@@ -1101,6 +1105,7 @@ def create_item(request):
         return JsonResponse({'message': 'Item created'})
 
     except json.decoder.JSONDecodeError:
+        print("Invalid json")
         return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
     
 
