@@ -6,7 +6,6 @@ import PasswordReset from './components/PasswordReset.vue'; // Import Password R
 import UserDashboard from './components/UserDashboard.vue';
 import IndexPath from './components/IndexPath.vue';
 import PasswordResetForm from './components/PasswordResetForm.vue'; // Import Password Reset Form component
-import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email component
 // import Listing from '.components/Listing.vue'; // Import Listing component
 import AboutUs from './components/AboutUs.vue'; // Import About Us component
 import DeleteListing from './components/DeleteListing.vue'; // Import Delete Listing component
@@ -65,11 +64,6 @@ const routes = [
     name: 'dashboard',
     component: UserDashboard,
     meta: { requiresAuth: false }, // Add this if authentication is required
-  },
-  {
-    path: '/verify-email',
-    name: 'verifyemail',
-    component: VerifyEmail,
   },
   {
     path: '/create-listing',
