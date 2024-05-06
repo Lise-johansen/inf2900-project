@@ -18,10 +18,20 @@
                     <span v-if="!isInFavourites(listing.id)">Add to Favourites</span>
                     <span v-else>Already in Favourites</span>
                 </button>
+                
+                <!-- Directly display the CalendarOrder component based on toggle -->
+                <div v-if="showCalendar">
+                    <CalendarOrder @dates-selected="setDates" />
+                   <button @click="orderListing" class="btn" :disabled="!selectedDates">Order Listing</button>
+                </div>
+                <!-- Display selected dates -->
+                <div v-if="selectedDates">
+                <p>Selected Dates: {{ formatDate(selectedDates) }}</p>
                 <!-- Redirect to edit page -->
                 <!-- First check if the user is the owner of the item -->
                 <div class="edit-button" v-if="listing.owner === this.user.username">
                     <button @click="redirectToEditPage" class="btn">Edit Listing</button>
+                </div>
                 </div>
             </div>
         </header>
@@ -53,6 +63,7 @@
 
 <script>
 import axios from 'axios';
+import CalendarOrder from './CalendarOrder.vue';
 import StarRating from './StarRating.vue';
 import ImageGallery from './ImagesCarousel.vue';
 import LeafletMap from './LeafletMap.vue';
@@ -74,6 +85,8 @@ export default {
             newRating: 0, // New rating to be added
             newDescription: '', // New description to be added
             favourites: [],
+            showCalendar: true,
+            selectedDates: null,
             user: '',
         };
     },
@@ -82,8 +95,42 @@ export default {
         this.fetchListingData();
         this.fetchUser();
         this.fetchFavourites();
+        this.CalendarOrder = CalendarOrder;
     },
     methods: {
+        formatDate(dates) {
+            if (!dates || dates.length === 0) return 'No dates selected';
+                const [start, end] = dates;
+                return `${new Date(start).toLocaleDateString()} - ${new Date(end).toLocaleDateString()}`;
+        },
+        setDates(dates) {
+            this.selectedDates = dates;
+        },
+        orderListing() {
+            if (this.selectedDates) {
+                const [start, end] = this.selectedDates;
+                const listingId = this.$route.params.id;
+                axios.post(`/order-listing/${listingId}/`, {
+                    listingId: this.listing.id,
+                    startDate: start,
+                    endDate: end
+                }).then(response => {
+                    this.selectedDates = null;
+                    this.response = response.data;
+                    alert('Listing ordered successfully!');
+                    axios.get(`/get_listing/${listingId}/`)
+                        .then(response => {
+                            this.listing = response.data;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching listing data:', error);
+                        });
+                }).catch(error => {
+                    console.error('Error ordering listing:', error);
+                    alert('Failed to order listing.');
+                });
+            }
+        },
         scrollToRating() {
             // Scroll to the rating section using smooth behavior
             // You can customize this behavior based on your needs
@@ -95,11 +142,9 @@ export default {
                 .then(response => {
                     // Update the listing data based on the response
                     this.listing = response.data;
-                    console.log('Listing data:', this.listing);
 
                     // Format the image URLs for Galleria
                     this.images_list = (this.listing.images);
-                    console.log('Images:', this.images);
                 })
                 .catch(error => {
                     console.error('Error fetching listing data:', error);
@@ -179,6 +224,7 @@ export default {
         StarRating,
         ImageGallery,
         LeafletMap,
+        CalendarOrder,
     },
 
 };
@@ -285,6 +331,18 @@ export default {
 .btn:hover {
     background: linear-gradient(to right, #ffa500 0, #ff5733 50%, #ffa500 100%);
 }
+
+.calendar-order {
+  background: rgb(216, 155, 131);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.calendar-order .p-calendar {
+  width: 100%;
+}
+
 
 .edit-button {
     margin-top: 10px;
