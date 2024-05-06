@@ -118,6 +118,13 @@ export default {
                     this.selectedDates = null;
                     this.response = response.data;
                     alert('Listing ordered successfully!');
+                    axios.get(`/get_listing/${listingId}/`)
+                        .then(response => {
+                            this.listing = response.data;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching listing data:', error);
+                        });
                 }).catch(error => {
                     console.error('Error ordering listing:', error);
                     alert('Failed to order listing.');
