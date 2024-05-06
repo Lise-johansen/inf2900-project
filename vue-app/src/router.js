@@ -127,6 +127,11 @@ const routes = [
     component: UserDashboard,
   },
   {
+    path: '/order-listing/',
+    name: 'order-listing',
+    component: UserDashboard,
+  },
+  {
     path: '/map',
     name: 'map',
     component: LeafletMap,
