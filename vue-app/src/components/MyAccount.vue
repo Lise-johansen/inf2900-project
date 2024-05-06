@@ -145,13 +145,18 @@
         deleteAccount() {
           axios.delete('delete_user/')
           .then(response => {
+            localStorage.removeItem('verificationBannerDismissed');
             console.log('Account deleted successfully:', response);
-            this.$router.push('/login');
           })
           .catch(error => {
             console.error('Error deleting user account:', error);
           });
           this.hideConfirmationPopup();
+          axios.get('logout/')
+            .then(response => {
+                this.$router.push('/');
+                console.log(response.data.message);
+              })
         },
 
         redirectToReset() {

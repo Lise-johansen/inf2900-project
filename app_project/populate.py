@@ -161,8 +161,11 @@ def populate_reserved_listings(user_email):
     order = Order.objects.create(
         item=item,
         renter=user,
-        period= {'start': '2021-08-01', 'end': '2021-08-05'}
+        start_date='2024-05-16',
+        end_date='2024-05-23',
     )
+
+    print('Reserved listing created, order:', order)
 
 
 

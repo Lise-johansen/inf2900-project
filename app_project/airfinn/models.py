@@ -91,7 +91,8 @@ class Order(models.Model):
     id = models.AutoField(primary_key=True)
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='item_order')
     renter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='renter_order')
-    period = models.JSONField(default=dict)
+    start_date = models.CharField(max_length=100, default='')
+    end_date = models.CharField(max_length=100, default='')
     
 class Favourites(models.Model):
     id = models.AutoField(primary_key=True)
