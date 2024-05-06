@@ -115,21 +115,7 @@ const routes = [
     name: 'listingPage',
     component: ListingPath,
   },
-  {
-    path: '/ordered-listings/',
-    name: 'ordered-listings',
-    component: UserDashboard,
-  },
-  {
-    path: '/order-listing/',
-    name: 'order-listing',
-    component: ListingPath,
-  },
-  {
-    path: '/reserved-dates/',
-    name: 'reserved-dates',
-    component: ListingPath,
-  },
+
   {
     path: '/map',
     name: 'map',
