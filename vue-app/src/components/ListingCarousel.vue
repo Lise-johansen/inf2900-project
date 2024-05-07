@@ -106,7 +106,8 @@ export default {
     }
 
     .carousel-object{
-        max-width: 1200px ;
+        max-width: 1500px ;
+        min-width: 20%;
         margin : 0 auto;
         margin-bottom: 40px;
     }
@@ -137,6 +138,10 @@ export default {
         border: 3px solid grey;
         border-radius: 25px;
         transition: transform 250ms ease, color 250ms ease, border 250ms ease; 
+        max-width: 300px; /* or whatever width you want */
+        min-width: 300px;
+        min-height: 300px;
+        max-height: 300px;
     }
     .item-data{
         text-align: left;
