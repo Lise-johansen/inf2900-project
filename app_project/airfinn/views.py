@@ -686,7 +686,8 @@ def search_page(request):
         
         # Add the image URL to the item data field
         item['fields']['image'] = image.image_url if image else None
-    
+        print(item )
+
     return JsonResponse(data, safe=False)
 
 
@@ -1296,7 +1297,7 @@ def reserved_listings(request):
             "owner": item.owner.username,
             "condition": item.condition,
             "availability": item.availability,
-            "images": images,
+            "image": images,
             "rating": item.rating,
         }
         listings.append(listing)
@@ -1542,7 +1543,7 @@ def get_user_listings(request):
             'location': listing.location,
             'postal_code': listing.postal_code,
             'category': listing.category,
-            'images': images
+            'image': images
         }
         data.append(listing_data)
         
