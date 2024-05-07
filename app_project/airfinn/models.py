@@ -54,7 +54,7 @@ class User(AbstractBaseUser):
 class Item(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, default='')
-    description = models.TextField(default='')
+    description = models.TextField(max_length=2000, default='')
     availability = models.BooleanField(default=True)
     condition = models.CharField(max_length=100, default='')
     price_per_day = models.FloatField(max_length=1000, default=0.0)

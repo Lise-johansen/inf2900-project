@@ -1061,6 +1061,7 @@ def create_item(request):
 
         # Iterate over each uploaded image
         for uploaded_image in uploaded_images:
+            print(f"Uploaded image size: {(uploaded_image.__sizeof__()/1024):.2f} KB")
             # Split the data to extract only the base64 part
             base64_data = uploaded_image.split(',')[1]
             
