@@ -12,7 +12,7 @@ from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
 import os, json, jwt, random, base64, boto3, uuid
-from airfinn.utils import get_user_by_id, email_checks, password_checks, get_reserved_items
+from airfinn.utils import get_user_by_id, email_checks, password_checks, get_reserved_items, is_item_available
 from botocore.exceptions import ClientError
 from django.db.models import Q
 from dotenv import load_dotenv
@@ -242,7 +242,7 @@ def register(request):
         
         verification_token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256')
         
-        verification_link = f"{settings.FRONTEND_URL}/verify-email?token={verification_token}"
+        verification_link = f"{settings.FRONTEND_URL}/dashboard?token={verification_token}"
         
         # Load HTML content from template
         html_content = render_to_string('verification_email.html', {'verification_link': verification_link, 'username': username})
@@ -354,10 +354,15 @@ def verify_email(request):
         user_id = decoded_token.get('user_id')
         
         user = User.objects.get(id=user_id)
+        
+        # Check if the user is already verified
+        if user.is_verified:
+            return JsonResponse({'message': 'Email already verified', 'verified': True}, status=200)
+        
         user.is_verified = True
         user.save()
 
-        return JsonResponse({'message': 'Email verified successfully'}, status=200)
+        return JsonResponse({'message': 'Email verified successfully', 'verified': True}, status=200)
     except jwt.ExpiredSignatureError:
         return JsonResponse({'message': 'Verification link has expired'}, status=400)
     except jwt.DecodeError:
@@ -1058,6 +1063,7 @@ def create_item(request):
 
         # Iterate over each uploaded image
         for uploaded_image in uploaded_images:
+            print(f"Uploaded image size: {(uploaded_image.__sizeof__()/1024):.2f} KB")
             # Split the data to extract only the base64 part
             base64_data = uploaded_image.split(',')[1]
             
@@ -1422,3 +1428,122 @@ def remove_favourites(request, item_id):
     
     # Return a success response
     return JsonResponse({'message': 'Item removed from favourites'}, status=200)
+
+
+def get_reserved_dates(request, listing):
+    print("Listing: ", listing)
+    print("listing type", type(listing))
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the item object
+    item = get_object_or_404(Item, id=listing)
+
+    # Get all the reservations for the item
+    reservations = Order.objects.filter(item=item)
+
+    # Prepare the data to return
+    data = []
+    print("Starting data: ", data)
+    for reservation in reservations:
+        reservation_data = {
+            'id': reservation.id,
+            'start_date': reservation.start_date,
+            'end_date': reservation.end_date,
+        }
+        print(reservation_data)
+        data.append(reservation_data)
+    print("data: ", data)
+
+    return JsonResponse(data, safe=False)
+
+def order_listing(request, listing):
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    data = json.loads(request.body)
+
+    # Get the user ID from the token
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+
+    # Get the user object
+    user = get_object_or_404(User, id=user_id)
+
+    # Get the item object
+    item = get_object_or_404(Item, id=listing)
+    # Get the start and end dates from the request data
+    start_date = data.get('startDate')
+    start_date = start_date.split('T')[0]
+    end_date = data.get('endDate')
+    end_date = end_date.split('T')[0]
+
+    # Check if the item is available for the specified dates
+    if not is_item_available(item, start_date, end_date):
+        return JsonResponse({'error': 'Item not available for specified dates'}, status=400)
+
+    # Create a new order
+    order = Order.objects.create(item=item, renter_id=user_id, start_date=start_date, end_date=end_date)
+    
+    # Return a success response
+    return JsonResponse({'message': 'Order created successfully'}, status=201)
+
+def get_user_listings(request):
+    # Get all the listings for the user
+    
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the user ID from the token
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    # Get the user object
+    user = get_object_or_404(User, id=user_id)
+    
+    # Get all the listings for the user
+    listings = Item.objects.filter(owner=user)
+    
+    # Prepare the data to return
+    data = []
+    
+    for listing in listings:
+        images = ItemImage.objects.filter(item=listing).values_list('image_url', flat=True)
+        images = list(images)
+        
+        listing_data = {
+            'id': listing.id,
+            'name': listing.name,
+            'description': listing.description,
+            'price_per_day': listing.price_per_day,
+            'location': listing.location,
+            'postal_code': listing.postal_code,
+            'category': listing.category,
+            'images': images
+        }
+        data.append(listing_data)
+        
+    return JsonResponse(data, safe=False)

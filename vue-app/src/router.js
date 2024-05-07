@@ -4,9 +4,9 @@ import Login from './components/LoginPath.vue'; // Import your Login component
 import Register from './components/RegisterPath.vue'; // Import your Register component
 import PasswordReset from './components/PasswordReset.vue'; // Import Password Reset component
 import UserDashboard from './components/UserDashboard.vue';
+import MyListings from './components/MyListings.vue';
 import IndexPath from './components/IndexPath.vue';
 import PasswordResetForm from './components/PasswordResetForm.vue'; // Import Password Reset Form component
-import VerifyEmail from './components/VerifyEmail.vue'; // Import Verify Email component
 // import Listing from '.components/Listing.vue'; // Import Listing component
 import AboutUs from './components/AboutUs.vue'; // Import About Us component
 import DeleteListing from './components/DeleteListing.vue'; // Import Delete Listing component
@@ -67,11 +67,6 @@ const routes = [
     meta: { requiresAuth: false }, // Add this if authentication is required
   },
   {
-    path: '/verify-email',
-    name: 'verifyemail',
-    component: VerifyEmail,
-  },
-  {
     path: '/create-listing',
     name: 'create-listing',
     component: CreateItem
@@ -121,11 +116,7 @@ const routes = [
     name: 'listingPage',
     component: ListingPath,
   },
-  {
-    path: '/odered-listings/',
-    name: 'ordered-listings',
-    component: UserDashboard,
-  },
+
   {
     path: '/map',
     name: 'map',
@@ -135,6 +126,11 @@ const routes = [
     path: '/favourites',
     name: 'favourites',
     component: FavouriteListings,
+  },
+  {
+    path: '/listings',
+    name: 'my-listings',
+    component: MyListings,
   },
   // Other routes
 

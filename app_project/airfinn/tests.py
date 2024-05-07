@@ -2,9 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from airfinn.models import User, Item
 import json
-from airfinn.models import ItemImage
 import base64
-from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 
@@ -353,5 +351,103 @@ class EditListingTestCase(TestCase):
         self.assertEqual(Item.objects.get(id=self.item.id).category, 'Test Category')
 
 
+class DeleteListingTestCase(TestCase):
+    def setUp(self):
+        self.user1 = {
+            'username': 'tester@testing.mail.com',
+            'email': 'tester@testing.mail.com',
+            'password': 'password',
+            'first_name': 'testy',
+            'last_name': 'testington',
+            'address': '1234 Test St.',
+            'phone': '12345678'
+        }
 
-   
+        self.user2 = {
+            'username': 'mytestuser@testing.mail.com',
+            'email': 'mytestuser@testing.mail.com',
+            'password': 'password123',
+            'first_name': 'tester',
+            'last_name': 'mctestington',
+            'address': '5678 Test St.',
+            'phone': '22222222'
+        }
+
+        self.userWithItem = User.objects.create_user(**self.user1)
+        self.userNoItem = User.objects.create_user(**self.user2)
+        # Create a test item
+        self.item = Item.objects.create(name="Test Item", description="This is a test item", availability=True, condition="New", price_per_day=5.00, owner=self.userWithItem, location="Test Location")
+        self.url = reverse('delete_listing', args=[self.item.id])
+        self.client = Client()    
+
+
+    def test_wrong_requests_delete_listing(self):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 405)
+        response = self.client.put(self.url)
+        self.assertEqual(response.status_code, 405)
+
+
+    def test_not_logged_in_delete_listing(self):
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 401)
+        
+        try:
+            item = Item.objects.get(id=self.item.id)
+        except Item.DoesNotExist:
+            item = None
+
+        self.assertIsInstance(item, Item)
+
+
+    def test_non_owner_delete_listing(self):
+        login_data = {
+            'username': self.user2['username'],
+            'password': self.user2['password']
+        }
+
+        response = self.client.post(reverse('login'), data=json.dumps(login_data), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+
+        # Extract token from response
+        token = response.json().get('token')
+
+        # Include token in request headers for subsequent requests
+        headers = {'HTTP_AUTHORIZATION': f'Bearer {token}'}
+
+        response = self.client.delete(self.url, **headers)
+        self.assertEqual(response.status_code, 403)
+        
+        try:
+            item = Item.objects.get(id=self.item.id)
+        except Item.DoesNotExist:
+            item = None
+
+        self.assertIsInstance(item, Item)    
+
+
+    def test_owner_delete_listing(self):
+        login_data = {
+            'username': self.user1['username'],
+            'password': self.user1['password']
+        }
+
+        response = self.client.post(reverse('login'), data=json.dumps(login_data), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+        # Extract token from response
+        token = response.json().get('token')
+
+        # Include token in request headers for subsequent requests
+        headers = {'HTTP_AUTHORIZATION': f'Bearer {token}'} 
+
+        response = self.client.delete(self.url, **headers)
+        self.assertEqual(response.status_code, 200)
+
+        try:
+            item = Item.objects.get(id=self.item.id)
+        except Item.DoesNotExist:
+            item = None
+        
+        self.assertIsNone(item)
