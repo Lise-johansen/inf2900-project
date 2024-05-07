@@ -69,7 +69,6 @@
         },
         orderedListings: [], // Make this a top-level data property
         profilePicture: null,
-        listings_id: [],
       };
     },
     components: {
@@ -113,9 +112,6 @@
             axios.get('ordered-listings/')
               .then(response => {
                   this.orderedListings = response.data;
-                  this.listings_id = response.data;
-                  console.log('Listings id:', this.listings_id);
-                  console.log('Ordered listings:', this.orderedListings);
               })
               .catch(error => {
                   console.error('Error fetching ordered listings:', error);

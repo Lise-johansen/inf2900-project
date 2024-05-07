@@ -1,28 +1,18 @@
 <template>
   <div>
     <SearchBox :initialSearchTerm="searchTerm" @search="handleSearch"/>
-    <div class="spacing">
-    </div>
+    <div class="spacing"></div>
     <ItemFilters @filter-change="handleFilterUpdate"/>
-    <div class="spacing">
-    </div>
+    <div class="spacing"></div>
     <div v-if="isLoading">Loading...</div>
-    <div class="cards-container">
-    <div class="card" v-for="item in filteredResults" :key="item.pk">
-      <router-link :to="`/listing/${item.pk}`" class="card-link">
-        <div class="card-image">
-          <img :src="item.fields.image" alt="item.fields.name">
-        </div>
-        <div class="card-body">
-          <h2 class="card-title">{{ item.fields.name }}</h2>
-          <p class="card-location">{{ item.fields.location }}</p>
-          <p class="card-price">{{ formatCurrency(item.fields.price_per_day) }}</p>
-          <p class="card-dates">{{ item.fields.availableDates }}</p>
-          <!-- You can add more item details here -->
-        </div>
-      </router-link>
+      <div class="cards-container">
+      
+    <div v-for="listing in filteredResults" :key="listing">
+      <!-- write out all information from the listing -->
+      <ListingCard :listing="listing.data.fields"  />
+      <div class="spacing"></div>
     </div>
-  </div>
+    </div>
     <div class="spacing"></div>
   </div>
 </template>
@@ -30,13 +20,15 @@
 <script>
 import SearchBox from './SearchBox.vue';
 import ItemFilters from './FilterComponent.vue';
+import ListingCard from './ReservedListing.vue';
+
 
 export default {
   name: 'SearchPage',
   components: {
     SearchBox,
     ItemFilters,
-    
+    ListingCard,
   },
 
   data() {
@@ -67,8 +59,6 @@ export default {
 
         // const data = await response.json();
         this.searchResults = await response.json();
-
-        console.log('Current active filters:', this.currentFilters);
       
         // Initially set filteredResults to be the same as searchResults
         this.handleFilterUpdate(this.currentFilters);
@@ -94,24 +84,25 @@ export default {
     },
 
     applyFilters(filters) {
-      // Start with all results
-      let results = this.searchResults;
+        // Start with all results
+        let results = this.searchResults;
 
-      // Log active filters
-      console.log("Active filters before applying:", filters.filter(f => f.active).map(f => f.label));
+        // Filter results if any filters are active
+        const activeFilters = filters.filter(f => f.active);
+        if (activeFilters.length) {
+            results = this.searchResults.filter(item => {
+                // Here you can add additional filter logic as necessary
+                return activeFilters.some(filter => item.fields?.category === filter.label);
+            });
+        }
 
-      // Filter results if any filters are active
-      const activeFilters = filters.filter(f => f.active);
-      if (activeFilters.length) {
-        results = this.searchResults.filter(item => {
-          // Assumes item.fields.category is the category of the item
-          // and filter.label is the label of the filter
-          return activeFilters.some(filter => item.fields?.category === filter.label);
+        // Map results to include the id and the full item
+        this.filteredResults = results.map(item => {
+            return {
+                id: item.pk,   // Assuming 'pk' is the identifier used, adjust as needed
+                data: item     // Pass the entire item object
+            };
         });
-      }
-
-      // Update filteredResults to trigger the update in the template
-      this.filteredResults = results;
     },
   },
   
@@ -136,50 +127,34 @@ export default {
   justify-content: center;
 }
 
+
 .card {
-  width: 20%; /* fixed width or use percentages for responsiveness */
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden; /* Clip the children to the border radius */
-}
+    color: var(--primary-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 8px;
+    padding: 10px;
+    border: 3px solid grey;
+    border-radius: 25px;
+    transition: transform 250ms ease, color 250ms ease, border 250ms ease;
+    max-width: 300px; /* or whatever width you want */
+    min-width: 300px;
+    min-height: 300px;
+    max-height: 300px;
+    margin: 0 auto; /* to center the card */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* optional, for a subtle shadow */
+  }
+  img {
+    border-radius: 25px;
+    max-width: 300px;
+    max-height: 300px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
 .spacing {
   padding: 1em;
 }
 
-.card-link {
-  text-decoration: none;
-  color: inherit; /* Prevent color change on link */
-}
-
-.card-image img {
-  width: 100%;
-  height: auto;
-  display: block; /* Remove extra space under the image */
-}
-
-.card-body {
-  padding: 0.5rem;
-}
-
-.card-title {
-  margin: 0.5rem 0;
-  font-size: 1.25rem;
-}
-
-.card-location {
-  margin: 0;
-  color: #666;
-  font-size: 1rem;
-}
-
-.card-price {
-  margin: 0.5rem 0;
-  font-weight: bold;
-}
-
-.card-dates {
-  margin: 0;
-  font-size: 0.875rem;
-  color: #666;
-}
 </style>
