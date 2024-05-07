@@ -169,30 +169,36 @@
     -webkit-background-clip: text;
   }
 
-  .profilepicture-container, .profile-picture {
-    width: 150px;
-    height: 150px;
+  .profilepicture-container, .profile-picture-outline, .profile-picture {
+    width: 200px;
+    height: 200px;
     margin-top: 20px;
   }
+
   .profilepicture-container {
     display: flex;
     justify-content: left;
     align-items: center;
   }
 
-  .profile-picture {
+  .profile-picture, .profile-picture-outline {
     margin-bottom: 20px;
     border-radius: 50%;
     object-fit: cover;
     object-position: center;
-    overflow: hidden;
-    border: 2px solid #ccc;
-    box-sizing: border-box;
+  }
+
+  .profile-picture-outline {
+    border: 10px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   
   .user-info {
     text-align: left;
   }
+  
   .divider {
     height: 3px; /* Adjust the height of the border */
     margin-top: 20px;
