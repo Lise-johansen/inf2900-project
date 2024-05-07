@@ -5,7 +5,7 @@
       <div class="card-details">
         <div class="item-name">{{ listing.name }}</div>
         <!-- Make sure `listing.image` has the correct data -->
-        <img :src="listing.images" style="max-width: 100%;" :alt="listing.name"/>
+        <img :src="listing.image" style="max-width: 100%;" :alt="listing.name"/>
         <div class="card-footer">
           <div class="item-price">{{ listing.price_per_day }} kr/day</div>
           <div class="item-location">{{ listing.location }}</div>
@@ -16,22 +16,19 @@
 </template>
 
 <script>
+
 export default {
   props: {
     listing: {
-      listing_id: '',
-      name: '',
-      image: '',
-      price_per_day: '',
-      location: ''
-      
+      type: Object,
+      required: true,
     }
   },
 }
 </script>
   
   <style scoped>
-  .card {
+.card {
     color: var(--primary-color);
     cursor: pointer;
     display: flex;
@@ -43,11 +40,15 @@ export default {
     border-radius: 25px;
     transition: transform 250ms ease, color 250ms ease, border 250ms ease;
     max-width: 300px; /* or whatever width you want */
+    min-width: 300px;
+    min-height: 300px;
+    max-height: 300px;
     margin: 0 auto; /* to center the card */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* optional, for a subtle shadow */
   }
   
   .card-content {
+    color: var(--primary-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -66,6 +67,8 @@ export default {
   
   img {
     border-radius: 25px;
+    max-width: 300px;
+    max-height: 220px;
     padding-top: 5px;
     padding-bottom: 5px;
   }
@@ -80,7 +83,7 @@ export default {
     color: var(--secondary-color);
     scale: 1.03;
     border: 3px solid var(--primary-color);
-  }
+  } 
 
 
   .refresh-button{
