@@ -1186,11 +1186,10 @@ def upload_image(request):
             
         else:
             # Extract the filename from the URL
-            if previous_image_url:
-                previous_image_filename = previous_image_url.split('/')[-1]
-                
-                # Delete the previous image from the S3 bucket
-                delete_image(previous_image_filename)
+            previous_image_filename = previous_image_url.split('/')[-1]
+            
+            # Delete the previous image from the S3 bucket
+            delete_image(previous_image_filename)
         
         # Initialize the S3 client with your credentials and endpoint
         ACCOUNT_ID = os.getenv('ACCOUNT_ID')
