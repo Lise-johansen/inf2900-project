@@ -997,7 +997,9 @@ def create_item(request):
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
     try:
         # Load the JSON data from the request body
+        # print(f"Request: {request.body}")
         data = json.loads(request.body)
+        # print(f"Request data after loads: {data}")
 
         # Pull token from request cookies and decode it to get the user info
         token = request.COOKIES.get('token')
