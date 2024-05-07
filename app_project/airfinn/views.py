@@ -1184,7 +1184,6 @@ def upload_image(request):
         if user.profile_picture_url != 'https://rentopia-images.dybedahlserver.net/default_profile_picture.jpg':
             previous_image_url = user.profile_picture_url
             
-        else:
             # Extract the filename from the URL
             previous_image_filename = previous_image_url.split('/')[-1]
             
