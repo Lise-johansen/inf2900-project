@@ -3,12 +3,11 @@
       <div class="input-container">
         <h3>Change your account information here!</h3>
         <h4>Profile picture:</h4>
-        <div class="profilepicture-container">
-          <div class="profile-picture-outline">
-            <img v-if="profilePicture" :src="profilePicture" alt="Avatar" class="profile-picture">
-            <input type="file" accept="image/jpeg,image/png" name="image" @change="handleImageUpload" :style="{ display: profilePicture ? 'none' : 'block' }">
-          </div>
+        <div v-if="profilePicture" class="profilepicture-container">
+          <div class="profile-picture-outline"></div>
+          <img v-if="profilePicture" :src="profilePicture" alt="Avatar" class="profile-picture">
         </div>
+        <input class="image-upload-button" type="file" accept="image/jpeg,image/png" name="image" @change="handleImageUpload">
         <h4>First name:</h4>
         <input v-model="user.firstName" placeholder="First name..." class="input-field"/>
         <h4>Last name:</h4>
@@ -245,26 +244,37 @@
     -webkit-background-clip: text;
   }
 
-  .profilepicture-container, .profile-picture {
+  .profilepicture-container, .profile-picture-outline, .profile-picture {
     width: 100px;
     height: 100px;
-    margin-top: 10px;
+    margin-top: 20px;
   }
 
   .profilepicture-container {
     display: flex;
     justify-content: left;
     align-items: center;
+    position: relative;
   }
 
-  .profile-picture {
-    margin-bottom: 10px;
+  .profile-picture-outline {
+    border: 5px solid #ccc;
+    position: absolute;
+  }
+
+  .profile-picture, .profile-picture-outline {
+    margin-bottom: 20px;
     border-radius: 50%;
     object-fit: cover;
     object-position: center;
-    overflow: hidden;
-    border: 2px solid #ccc;
-    box-sizing: border-box;
+  }
+
+  .profile-picture {
+    padding: 2px;
+  }
+
+  .image-upload-button {
+    margin-top: 20px;
   }
   
   .user-info {
@@ -306,6 +316,7 @@
     box-shadow: 0 0 40px rgba(8,7,16,0.6);
     margin: 0 auto;
     padding: 50px 35px;
+    text-align: left;
   }
 
   .button-link {
