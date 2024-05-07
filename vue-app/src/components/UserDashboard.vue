@@ -5,9 +5,8 @@
     
     <div class="flex-container">
       <div class="profilepicture-container">
-        <div class="profile-picture-outline">
+        <div class="profile-picture-outline"></div>
           <img v-if="profilePicture" :src="profilePicture" alt="Avatar" class="profile-picture">
-        </div>
       </div>
       
       <div class="user-info">
@@ -179,6 +178,12 @@
     display: flex;
     justify-content: left;
     align-items: center;
+    position: relative;
+  }
+
+  .profile-picture-outline {
+    border: 5px solid #ccc;
+    position: absolute;
   }
 
   .profile-picture, .profile-picture-outline {
@@ -188,13 +193,10 @@
     object-position: center;
   }
 
-  .profile-picture-outline {
-    border: 10px solid #ccc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .profile-picture {
+    padding: 2px;
   }
-  
+
   .user-info {
     text-align: left;
   }
