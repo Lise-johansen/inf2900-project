@@ -1180,15 +1180,17 @@ def upload_image(request):
         except User.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
         
-        # Delete the previous image
-        previous_image_url = user.profile_picture_url
-        
-        # Extract the filename from the URL
-        if previous_image_url:
-            previous_image_filename = previous_image_url.split('/')[-1]
+        # Delete the previous image if the picture is not the default image
+        if user.profile_picture_url != 'https://rentopia-images.dybedahlserver.net/default_profile_picture.jpg':
+            previous_image_url = user.profile_picture_url
             
-            # Delete the previous image from the S3 bucket
-            delete_image(previous_image_filename)
+        else:
+            # Extract the filename from the URL
+            if previous_image_url:
+                previous_image_filename = previous_image_url.split('/')[-1]
+                
+                # Delete the previous image from the S3 bucket
+                delete_image(previous_image_filename)
         
         # Initialize the S3 client with your credentials and endpoint
         ACCOUNT_ID = os.getenv('ACCOUNT_ID')
