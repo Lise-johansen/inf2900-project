@@ -100,14 +100,9 @@ export default {
 </script>
   
 <style scoped>
-    .about-us {
-        width: 70%;
-        margin: 0 auto;
-    }
-
     .page-title {
         font-size: 3.5rem;
-        background: linear-gradient(to right, #ff5733 0%, #ffa500 25%, #4169e1 75%);
+        background: linear-gradient(to right, #ff5733 0%, #ffa500 50%, #4169e1 100%);
         -webkit-text-fill-color: transparent; 
         -webkit-background-clip: text;
     }
@@ -137,8 +132,13 @@ export default {
     }
 
     .card-content {
+        color: var(--primary-color);
         width: 100%;
         text-decoration: none;
+    }
+
+    .card-content:hover {
+        color: var(--secondary-color);
     }
 
     .card-details {
