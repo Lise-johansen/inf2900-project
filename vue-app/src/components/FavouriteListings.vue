@@ -137,8 +137,13 @@ export default {
     }
 
     .card-content {
+        color: var(--primary-color);
         width: 100%;
         text-decoration: none;
+    }
+
+    .card-content:hover {
+        color: var(--secondary-color);
     }
 
     .card-details {
