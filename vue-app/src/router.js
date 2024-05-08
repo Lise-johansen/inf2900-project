@@ -92,7 +92,7 @@ const routes = [
     component: ContactUs,
   },
   {
-    path: '/inbox',
+    path: '/inbox/:id?',
     name: 'inbox',
     component: MailBox,
   },
