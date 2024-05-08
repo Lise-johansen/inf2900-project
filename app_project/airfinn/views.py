@@ -1353,7 +1353,7 @@ def get_favourites(request):
     for favourite in favourites:
         item = favourite.item
         if ItemImage.objects.filter(item=item).first() is None:
-            image = 'https://rentopia-images.dybedahlserver.net/default_profile_picture.jpg'
+            image = 'https://rentopia-images.dybedahlserver.net/default_item_picture.jpg'
         else:
             image = ItemImage.objects.filter(item=item).first().image_url
         item_data = {
