@@ -75,6 +75,14 @@ export default {
                 });
         },
     },
+
+     watch: {
+        category() {
+            // When the category prop changes, fetch new listings
+            this.refreshListings();
+        }
+    },
+
     created() {
         axios.get('/get_items/' + this.category)
             .then(response => {
@@ -89,7 +97,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     .refresh-button{
         scale:0.8;
         transition: transform 100ms ease;
