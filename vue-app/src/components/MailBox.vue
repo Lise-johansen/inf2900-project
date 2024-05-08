@@ -85,7 +85,7 @@
                             </div>
                         </div>
                         <div class="input-box">
-                        <Textarea v-model="newMessage" autoResize rows="2" cols="100" placeholder="Type your message..."/>
+                        <Textarea v-model="newMessage" aria-setsize="20" rows="2" cols="85" placeholder="Type your message..."/>
                             <!-- Add image upload input button by the send message -->
                             <div class="send-and-upload-buttons">
                                 <!-- File input for image uploading -->
@@ -529,6 +529,7 @@ export default {
     margin-right: 0; /* Reset margin-right */
     margin-left: 0; /* Reset margin-left */
     width: 40%; /* Adjusted width when panel is active */
+    min-height: 600px;
     margin-right: 0; /* Reset margin-right */
     box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
@@ -579,6 +580,7 @@ export default {
 
 .message-box {
     border: 1px solid rgba(255, 255, 255, 0.1);
+    height: 100%;
 }
 
 .message-box * {
@@ -618,6 +620,7 @@ export default {
     border-radius: 20px;
     word-wrap: break-word;
     margin-bottom: 5px;
+    max-width: 70%;
 }
 
 .sender-name, .receiver-name {
@@ -724,6 +727,8 @@ export default {
     border-radius: 20px;
     overflow-wrap: break-word;
     padding: 15px;
+    min-width: 0%;
+    max-width: 100%;
 }
 
 .mail-box {
@@ -733,6 +738,7 @@ export default {
     background-color: #f9f9f9;
     border: 2px solid #ccc;
     border-radius: 10px;
+    min-height: calc(100vh - 850px);
     max-height: calc(100vh - 450px);
     overflow-y: scroll;
 }
@@ -742,6 +748,7 @@ export default {
     padding: 15px;
     border-radius: 10px;
     background-color: #f0f0f0;
+    width: 100%;
     transition: background-color 0.3s ease;
 }
 
@@ -756,6 +763,11 @@ export default {
     overflow-y: scroll;
 }
 
+.details {
+    max-width: 100%;
+    overflow: hidden;
+}
+
 .conversation-details:hover {
     background-color: #e0e0e0;
 }
@@ -768,6 +780,7 @@ export default {
     border: 2px solid #ccc;
     border-radius: 30px;
     display: flex;
+    max-height: 8em;
 }
 
 .send-and-upload-buttons {
