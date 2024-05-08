@@ -2,12 +2,20 @@
     <div class="listing-container">
         <ImageGallery :images="images_list" />  
             <div class="listing-details">
+
                 <h1 class="listing-title">{{ this.listing.name }}</h1>
                 <p class="listing-price"> {{ this.listing.price_per_day }}</p>
-                <button :disabled="isInFavourites(listing.id)" @click="addToFavourites" class="favorite-btn">
-                    <span v-if="!isInFavourites(listing.id)">Add to Favourites</span>
-                    <span v-else>Already in Favourites</span>
-                </button>
+                
+                <div class="btn-wrapper">
+                    <button :disabled="isInFavourites(listing.id)" @click="addToFavourites" class="favorite-btn">
+                        <span v-if="!isInFavourites(listing.id)">Add to Favourites</span>
+                        <span v-else>Already in Favourites</span>
+                    </button>
+                    
+                    <div v-if="listing.owner === this.user.username">
+                        <button @click="redirectToEditPage" class="edit-btn">Edit Listing</button>
+                    </div>
+                </div>
 
                 <div class="divider"></div>
 
@@ -16,12 +24,24 @@
                     <p class="listing-description">{{ this.listing.description }}</p>
                 </div>
 
-
                 <div class="reverse-divider"></div>
+
             <div class="wrapper">
                 <div class="calendar-container">
-                    
+                    <div v-if="showCalendar">
+                        <CalendarOrder @dates-selected="setDates" />
+                        
+                        <div class="selecteddates-container">
+                            <p>Selected Dates:</p>
+                            <div v-if="selectedDates && selectedDates[0] && selectedDates[1]" class="formatted-date">
+                                <p>{{ formatDate(selectedDates) }}</p>
+                            </div>
+                        </div>
+                        
+                        <button @click="orderListing" class="order-btn" :disabled="!selectedDates">Order Listing</button>
+                    </div>
                 </div>
+
                 <div class="seller-container">
                     <div class="profilepicture-container">
                         <img :src="this.profilepicture" alt="Profile picture" class="profile-picture">
@@ -29,38 +49,25 @@
                     <p class="firstname"> Rent from: {{ listing.firstname }} </p>
 
                     <button class="profile-btn">Send message</button>
-                
-                <!-- Directly display the CalendarOrder component based on toggle -->
-                <div v-if="showCalendar">
-                    <CalendarOrder @dates-selected="setDates" />
-                   <button @click="orderListing" class="btn" :disabled="!selectedDates">Order Listing</button>
                 </div>
-                <!-- Display selected dates -->
-                <div v-if="selectedDates">
-                <p>Selected Dates: {{ formatDate(selectedDates) }}</p>
-                <!-- Redirect to edit page -->
-                <!-- First check if the user is the owner of the item -->
-                <div class="edit-button" v-if="listing.owner === this.user.username">
-                    <button @click="redirectToEditPage" class="btn">Edit Listing</button>
-                </div>
-                </div>
+            </div>
+            <div class="divider"></div>
+    
+            <div class="map-container">
+                <h3>Location: {{ listing.postal_code }}, {{ listing.location }}</h3>
+                <h3 class="address-details">For more accurate address details, please contact the seller directly.</h3>
+                <LeafletMap />
+            </div>
+    
+            <div class="reverse-divider"></div>
+    
+            <div class="listing-carousel">
+                <h2>Similar Listings</h2>
+                <ListingCarousel :category= "this.category" />
             </div>
         </div>
 
-        <div class="divider"></div>
-
-        <div class="map-container">
-            <h3>Location: {{ listing.postal_code }}, {{ listing.location }}</h3>
-            <LeafletMap />
-        </div>
-
-        <div class="reverse-divider"></div>
-
-        <div class="listing-carousel">
-            <h2>Similar Listings</h2>
-            <ListingCarousel :category= "this.category" />
-        </div>
-            </div>
+            
             
     </div>
 </template>
@@ -96,7 +103,8 @@ export default {
         formatDate(dates) {
             if (!dates || dates.length === 0) return 'No dates selected';
                 const [start, end] = dates;
-                return `${new Date(start).toLocaleDateString()} - ${new Date(end).toLocaleDateString()}`;
+                const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+                return `${new Date(start).toLocaleDateString('en-GB', options)} - ${new Date(end).toLocaleDateString('en-GB', options)}`;
         },
         setDates(dates) {
             this.selectedDates = dates;
@@ -173,6 +181,7 @@ export default {
                     alert(error.response.data.error);
                 });
         },
+
         fetchFavourites() {
             // Fetch the user's favourite listings
             axios.get('get-favourites/')
@@ -185,11 +194,13 @@ export default {
                     console.error('Error fetching favourites:', error);
                 });
         },
+
         isInFavourites(listingId) {
             // Check if the listingId exists in the favourites array
             return this.favourites.some(favorite => favorite.id === listingId);
         
         },
+
         fetchUser() {
             // Fetch the user data from the server
             axios.get('get-user/')
@@ -297,14 +308,15 @@ export default {
     
     .calendar-container {
         flex-basis: 42%;
+        padding: 1em;
         background-color: #f9f9f9;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         border-radius: 15px;
     }
 
     .seller-container {
-        padding: 20px;
         flex-basis: 42%;
+        padding: 1em;
         background-color: #f9f9f9;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         border-radius: 15px;
@@ -324,6 +336,7 @@ export default {
         border-radius: 50%;
         width: 150px;
         height: 150px;
+        margin-bottom: 1em;
     }
 
     .profile-picture {
@@ -340,7 +353,7 @@ export default {
         -webkit-background-clip: text;
     }
     .profile-btn,
-    .favorite-btn {
+    .favorite-btn, .edit-btn, .order-btn {
         margin-top: 10px;
         border-radius: 5px;
         cursor: pointer;
@@ -354,8 +367,8 @@ export default {
     .favorite-btn{
         align-self: flex-start;
     }
-
-    .favorite-btn:hover, .profile-btn:hover {
+    
+    .favorite-btn:hover, .profile-btn:hover, .edit-btn:hover, .order-btn:hover {
         background: linear-gradient(to right, #ffa500 0, #ff5733 50%, #ffa500 100%);
     }
 
@@ -374,21 +387,39 @@ export default {
         width: 100%;
     }
     
+    .calendar-order, .p-calendar {
+    width: 100%;
+    }
 
-.calendar-order {
-  background: rgb(216, 155, 131);
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 10px;
-}
+    .btn-wrapper {
+        display: flex;
+        gap: 10px; 
+    }
 
-.calendar-order .p-calendar {
-  width: 100%;
-}
+    .selecteddates-container {
+        Margin-top: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        padding: 1em;
+        display:flex;
+        justify-content: space-between;
+    }
 
+    .formatted-date {
+        text-align: right;
+    }
+    .map-container, .listing-carousel {
+        font-family: 'louis_george_cafe', sans-serif;
+    }
+    .map-container {
+        font-size: 25px;
+    }
 
-.edit-button {
-    margin-top: 10px;
-    text-align: left;
-}
+    .listing-carousel {
+        font-size: 20px;
+    }
+
+    .address-details {
+        font-size: 20px;
+    }
 </style>
