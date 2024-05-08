@@ -744,7 +744,12 @@ def get_conversations(request):
                 'profile_picture': conversation.user2.profile_picture_url
             },
             'latest_message': {
-                'message': latest_message.message if latest_message else None,
+                'sender': {
+                    'id': latest_message.sender.id,
+                    'username': latest_message.sender.username,
+                    'name': 'You' if latest_message.sender == user else f"{latest_message.sender.first_name} {latest_message.sender.last_name}"
+                },
+                'message': latest_message.message,
                 'created_at': latest_message.created_at.strftime('%Y-%m-%d %H:%M:%S') if latest_message else None
             }
         }
