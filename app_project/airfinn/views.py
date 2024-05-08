@@ -36,7 +36,6 @@ def get_user_id_for_token_auth(request):
     try:
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = payload['user_id']
-        print(f"This is the user id: {user_id}")
         return user_id
 
     except Exception as e:
@@ -104,8 +103,6 @@ def dashboard(request):
 
     # Get the user from the database
     user = get_user_by_id(user_id)
-    print(user)
-    print("usertype: ", type(user))
 
     if type(user) != type(User): 
         JsonResponse({'success': False, 'error': 'User does not exist'}, status=401)
@@ -147,7 +144,6 @@ def login(request):
     encrypted_password = fernet.encrypt(data.get('password').encode())
 
     pword = fernet.decrypt(encrypted_password).decode()
-    print(f"data.get.password: {data.get('password')}, data.get.username: {data.get('username')}")
     # Authenticate user
     user = authenticate(request, username=data.get('username'), password=data.get('password'))
     
@@ -238,7 +234,6 @@ def register(request):
         # Set the token as a cookie in the response
         response = JsonResponse({'token': token})
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
-        print(response.cookies)
         
         verification_token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256')
         
@@ -686,7 +681,6 @@ def search_page(request):
         
         # Add the image URL to the item data field
         item['fields']['image'] = image.image_url if image else None
-        print(item )
 
     return JsonResponse(data, safe=False)
 
@@ -710,7 +704,6 @@ def get_conversations(request):
     except jwt.InvalidTokenError:
         return JsonResponse({'error': 'Invalid token'}, status=401)
     
-    print(f"Conversations for user: {user_id}")
     
     # Retrieve the user object corresponding to the user ID
     try:
@@ -754,7 +747,6 @@ def get_conversations(request):
             }
         }
         data.append(conversation_data)
-        print(f"Conversation: {conversation_data}")
         
     # Return the data as JSON response
     return JsonResponse(data, safe=False)
@@ -777,8 +769,6 @@ def get_messages(request):
         return JsonResponse({'error': 'Token has expired'}, status=401)
     except jwt.InvalidTokenError:
         return JsonResponse({'error': 'Invalid token'}, status=401)
-    
-    print(f"Messages for user: {user_id}")
     
     # Retrieve the user object corresponding to the user ID
     try:
@@ -839,7 +829,6 @@ def get_messages(request):
                 'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')  # Convert to string format
             }
             data.append(message_data)
-            print(f"Message: {message_data}")
         
     # Return the data as JSON response
     return JsonResponse(data, safe=False)  
@@ -871,8 +860,6 @@ def send_messages(request):
         return JsonResponse({'error': 'Token has expired'}, status=401)
     except jwt.InvalidTokenError:
         return JsonResponse({'error': 'Invalid token'}, status=401)
-    
-    print(f"Messages for user: {user_id}")
     
     # Retrieve the user object corresponding to the user ID
     try:
@@ -986,9 +973,6 @@ def send_messages(request):
         'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S')  # Convert to string format
     }
     
-    print(f"Message: {message_data}")
-    print(f"Sender ID: {message_data.get('sender').get('id')}, Receiver ID: {message_data.get('receiver').get('id')}")
-    print(f"Sender name {message_data.get('sender').get('name')}. Receiver name {message_data.get('receiver').get('name')}")
     # Return the message data as JSON response
     return JsonResponse(message_data, status=201)
 
@@ -998,9 +982,7 @@ def create_item(request):
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
     try:
         # Load the JSON data from the request body
-        # print(f"Request: {request.body}")
         data = json.loads(request.body)
-        # print(f"Request data after loads: {data}")
 
         # Pull token from request cookies and decode it to get the user info
         token = request.COOKIES.get('token')
@@ -1042,8 +1024,6 @@ def create_item(request):
     
         # Get the uploaded images form data from the request
         uploaded_images = data.get('images')
-        
-        print(f"Uploaded images: {uploaded_images}")
 
         # Check if any images were provided
         if not uploaded_images:
@@ -1064,7 +1044,6 @@ def create_item(request):
 
         # Iterate over each uploaded image
         for uploaded_image in uploaded_images:
-            print(f"Uploaded image size: {(uploaded_image.__sizeof__()/1024):.2f} KB")
             # Split the data to extract only the base64 part
             base64_data = uploaded_image.split(',')[1]
             
@@ -1314,9 +1293,6 @@ def add_favourites(request):
     data = json.loads(request.body)
     item_id = data.get('listing_id')
     
-    print(f"Data: {data}")
-    print(f"Item ID: {item_id}")
-    
     # Get the user ID from the token
     token = request.COOKIES.get('token')
     if not token:
@@ -1335,7 +1311,6 @@ def add_favourites(request):
     item = get_object_or_404(Item, id=item_id)
     user = get_object_or_404(User, id=user_id)
     
-    print(f"Item: {item}, User: {user}")
     
     # Check if the item is already in the user's favourites
     if Favourites.objects.filter(item=item, user=user).exists():
@@ -1377,6 +1352,10 @@ def get_favourites(request):
     data = []
     for favourite in favourites:
         item = favourite.item
+        if ItemImage.objects.filter(item=item).first() is None:
+            image = 'https://rentopia-images.dybedahlserver.net/default_profile_picture.jpg'
+        else:
+            image = ItemImage.objects.filter(item=item).first().image_url
         item_data = {
             'id': item.id,
             'name': item.name,
@@ -1385,11 +1364,10 @@ def get_favourites(request):
             'location': item.location,
             'postal_code': item.postal_code,
             'category': item.category,
-            'image': ItemImage.objects.filter(item=item).first().image_url
+            'image': image
         }
         data.append(item_data)
         
-    print(f"Favourites: {data}")
         
     return JsonResponse(data, safe=False)
 
@@ -1448,7 +1426,6 @@ def get_reserved_dates(request, listing):
             'start_date': reservation.start_date,
             'end_date': reservation.end_date,
         }
-        print(reservation_data)
         data.append(reservation_data)
 
     return JsonResponse(data, safe=False)
@@ -1531,6 +1508,7 @@ def get_user_listings(request):
         images = list(images)
         
         listing_data = {
+            'pk': listing.id,
             'id': listing.id,
             'name': listing.name,
             'description': listing.description,
