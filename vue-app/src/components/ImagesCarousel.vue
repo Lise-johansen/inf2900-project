@@ -95,7 +95,7 @@
       window.addEventListener('keydown', this.handleKeyDown); // Listen for keydown events
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
       document.removeEventListener('keydown', this.handleKeyDown);
     },
   }
