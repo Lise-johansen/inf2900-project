@@ -17,11 +17,13 @@
                                     <div class="details">
                                     Listing: {{ conversation.item.name }}
                                     <br>
-                                    <div v-if="conversation.sender.name === 'You'">
-                                        <div v-if="conversation.latest_message">You: {{ conversation.latest_message.message }}</div>
-                                    </div>
-                                    <div v-else>
-                                        <div v-if="conversation.latest_message">{{ conversation.latest_message.message }}</div>
+                                    <div v-if="conversation.latest_message">
+                                        <div v-if="conversation.latest_message.sender.name === 'You'">
+                                            <div>You: {{ conversation.latest_message.message }}</div>
+                                        </div>
+                                        <div v-else>
+                                            <div>{{ conversation.latest_message.message }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
