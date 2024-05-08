@@ -18,10 +18,10 @@
                   Listing: {{ conversation.item.name }}
                   <br>
                   <div v-if="conversation.sender.name === 'You'">
-                    <div>You: {{ conversation.latest_message.message }}</div>
+                    <div v-if="conversation.latest_message">You: {{ conversation.latest_message.message }}</div>
                   </div>
                   <div v-else>
-                    <div>{{ conversation.latest_message.message }}</div>
+                    <div v-if="conversation.latest_message">{{ conversation.latest_message.message }}</div>
                   </div>
                 </div>
               </div>
@@ -35,8 +35,14 @@
     <div :class="{ 'right-panel': true, 'active': showRightPanel }">
       <div class="message-box">
       <div v-if="selectedConversation">
-        <router-link :to="'/listing/' + selectedConversation.item.id" class="item-link">
-        <h2> {{ selectedConversation.item.name }} </h2></router-link>
+        <div class="receiver-information">
+          <div class="profilepicture-container">
+          <img :src="selectedConversation.receiver.profile_picture" class="profile-picture" alt="Profile Picture" width="50" height="50"/>
+          </div>
+          <router-link :to="'/listing/' + selectedConversation.item.id" class="item-link">
+          <h2> {{ selectedConversation.item.name }} </h2>
+        </router-link>
+        </div>
           <div class="mail-details" v-if="selectedConversation">
             <div class="mail-box"  ref="messageContainer">
               <div v-for="message in selectedConversation.messages" :key="message.id">
@@ -45,17 +51,17 @@
                   <div v-if="selectedConversation.messages.length !== 0">
                     <div v-if="message.sender.name === 'You'">
                       <div class="date-sender" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>
-                      <div class="sender">
+                      <div class="sender" v-if="selectedConversation.latest_message">
                           {{ message.sender.name }}
                           <div class="message-content-sender">{{ message.message }}</div>
                           <div v-if="message.image" class="image-container">
                             <Image :src="message.image" alt="Image Preview" width="250" preview />
                           </div>
                       </div>
-                  </div>
+                    </div>
                     <div v-else>
                       <div class="date-receiver" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>   
-                      <div class="receiver">
+                      <div class="receiver" v-if="selectedConversation.latest_message"> 
                         {{ message.sender.name }}
                         <div class="message-content-receiver">{{ message.message }}</div>
                           <div v-if="message.image" class="image-container">
@@ -63,10 +69,10 @@
                           </div>
                       </div>
                     </div>
-                    
                   </div>
                   <div v-else>
-                    <p class="error-message">{{ errorMessage }}</p>
+                    <h2> {{ errorMessage }}</h2>
+                    <div class="message-content-sender"></div>
                   </div>
                 </div>
               </div>
@@ -175,6 +181,7 @@
     },
     methods: {
       scrollToBottom() {
+        this.errorMessage = '';
         // Get the message container element using $refs
         const messageContainer = this.$refs.messageContainer;
 
@@ -183,7 +190,7 @@
       },
 
       fetchConversations() {
-        
+        this.errorMessage = '';
         // Get the authentication token from cookies
         const token = this.loginCheck();
 
@@ -205,6 +212,15 @@
               this.selectedConversation = this.conversations[0];
             }
 
+            // If conversation id is provided in the URL, open the conversation
+            const conversationId = this.$route.params.id;
+            if (conversationId) {
+              const conversation = this.findConversationById(conversationId);
+              if (conversation) {
+                this.openConversation(conversation);
+              }
+            }
+
           } else {
             // Handle unexpected response format
             console.error('Unexpected response format:', data);
@@ -220,6 +236,7 @@
       },
 
       openConversation(conversation) {
+        this.errorMessage = '';
         // Set selectedConversation to the clicked conversation to display messages
         this.selectedConversation = conversation;
         this.showRightPanel = true;
@@ -227,7 +244,7 @@
       },
 
       fetchMessages(conversation_id){
-        
+        this.errorMessage = '';
         // Get the authentication token from cookies
         const token = this.loginCheck();
   
@@ -391,317 +408,388 @@
           return null;
         }
         return token;
+      },
+
+      findConversationById(conversationId) {
+        console.log('Searching conversation with ID:', conversationId);
+        console.log('Conversations array:', this.conversations);
+
+        // Parse conversationId to an integer
+        const id = parseInt(conversationId);
+
+        // Find the conversation with the provided ID in the conversations array
+        const conversation = this.conversations.find(conversation => {
+            console.log('Type of conversation.id:', typeof conversation.id);
+            return conversation.id === id;
+        });
+
+        console.log('Found conversation:', conversation);
+        return conversation;
+      },
+
+      deleteConversation() {
+        // Get the authentication token from cookies
+        const token = this.loginCheck();
+        
+        console.log('Conversations:', this.conversations);
+        // Get all conversations without messages
+        const emptyConversations = this.conversations.filter(conversation => conversation.messages.length === 0);
+
+        // Delete all empty conversations
+        emptyConversations.forEach(conversation => {
+          // Make API request to delete the conversation
+          axios.delete('delete-conversation/' + conversation.id, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          .then(() => {
+            // Handle successful response
+            // Remove the conversation from the conversations array
+            this.conversations = this.conversations.filter(c => c.id !== conversation.id);
+          })
+          .catch(error => {
+            // Handle error
+            console.error('Error deleting conversation:', error);
+          });
+        });
       }
     }
   };
 </script>
   
 <style scoped>
-    .mailbox {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-    }
+  .mailbox {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
 
-    .left-panel {
-      margin-left: 0%;
-      margin-right: 5px;
-      margin-top: 20px;
-      width: 20%;
-      transition: max-width 0.3s ease, margin-left 0.3s ease;
-      box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      border-radius: 30px;
-      overflow: auto;
-    }
+  .left-panel {
+    margin-left: 0%;
+    margin-right: 5px;
+    margin-top: 20px;
+    width: 20%;
+    transition: max-width 0.3s ease, margin-left 0.3s ease;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 30px;
+    overflow: auto;
+  }
 
-    .right-panel {
-      width: 0%;
-      overflow: hidden;
-      overflow-y: auto;
-      transition: max-width 0.3s ease, margin-left 0.3s ease;
-    }
+  .right-panel {
+    width: 0%;
+    overflow: hidden;
+    overflow-y: auto;
+    transition: max-width 0.3s ease, margin-left 0.3s ease;
+  }
 
-    .right-panel.active {
-      margin-top: 20px;
-      margin-right: 0; /* Reset margin-right */
-      margin-left: 0; /* Reset margin-left */
-      width: 40%; /* Adjusted width when panel is active */
-      margin-right: 0; /* Reset margin-right */
-      box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      border-radius: 30px;
-      backdrop-filter: blur(10px);
-    }
+  .right-panel.active {
+    margin-top: 20px;
+    margin-right: 0; /* Reset margin-right */
+    margin-left: 0; /* Reset margin-left */
+    width: 40%; /* Adjusted width when panel is active */
+    margin-right: 0; /* Reset margin-right */
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
+  }
 
-    .inbox {
-      height: 100%;
-      max-width: 800px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+  .inbox {
+    height: 100%;
+    max-width: 800px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
 
-    /* Add animation for right panel opening */
-    .right-panel {
-      animation: slideInRight 0.3s forwards;
-    }
+  /* Add animation for right panel opening */
+  .right-panel {
+    animation: slideInRight 0.3s forwards;
+  }
 
-    @keyframes slideInRight {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 100;
-      }
-    }
-
-    .inbox * {
-      font-family: 'Poppins', sans-serif;
-      color: #676767;
-      letter-spacing: 0.5px;
-      outline: none;
-      border: none;
-    }
-
-    .inbox h3 {
-      font-size: 35px;
-      font-weight: bolder;
-      line-height: 42px;
-      text-align: center;
-      font-family: 'louis_george_cafe', sans-serif;
-      background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
-      -webkit-text-fill-color: transparent;
-      -webkit-background-clip: text;
-    }
-
-    .message-box {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .message-box * {
-      font-family: 'Poppins', sans-serif;
-      color: #676767;
-      letter-spacing: 0.5px;
-      outline: none;
-      border: none;
-    }
-
-    .message-box h2 {
-      font-size: 30px;
-      font-weight: bolder;
-      line-height: 42px;
-      text-align: center;
-      font-family: 'louis_george_cafe', sans-serif;
-      background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
-      -webkit-text-fill-color: transparent;
-      -webkit-background-clip: text;
-    }
-    
-    .mail-details h2 {
-        font-size: 24px;
-        font-weight: bold;
-    }
-
-    .mail-details {
-      max-width: 100%;
-    }
-
-    .sender, .receiver {
-      font-family: 'Poppins', sans-serif;
-      display: inline-block;
-      position: relative;
-      font-display: swap;
-      padding: 10px;
-      border-radius: 20px;
-      word-wrap: break-word;
-      margin-bottom: 5px;
-    }
-
-    .sender::after, .receiver::after {
-      display: inline-block;
-      width: 0;
-      height: 0;
-      border-top: 8px solid transparent;
-      border-bottom: 8px solid transparent;
-      position: absolute;
-    }
-
-    .sender {
-      background-color: #007bff;
-      color: #fff;
-      text-align: right;
-      float: right;
-    }
-
-    .sender::after {
-      border-left: 8px solid #007bff;
-      right: -15px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .message-content-sender {
-      background-color: #007bff;
-      color: #fff;
-      text-align: right;
-      margin-left: auto;
-    }
-
-    .receiver {
-      background-color: #868686;
-      color: #fff;
-      text-align: left;
-      float: left;
-    }
-
-    .receiver::after {
-      border-right: 8px solid #868686;
-      left: -15px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .message-content-receiver {
-      color: #fff;
-      text-align: left;
-      margin-right: auto;
-    }
-
-    .date-sender {
-      margin-bottom: 5px;
-      margin-right: 5px;
-      color: #888;
-      font-size: 12px;
-      text-align: right;
-    }
-
-    .date-receiver {
-      margin-bottom: 5px;
-      margin-right: 5px;
-      color: #888;
-      font-size: 12px;
-      text-align: left;
-    }
-
-    .message {
-      display: flex;
-      flex-direction: column;
-      margin-top: 20px;
-      border-radius: 20px;
-      overflow-wrap: break-word;
-      padding: 15px;
-    }
-
-    .mail-box {
-      margin-top: 20px;
-      max-width: 100%;
-      padding: 20px;
-      background-color: #f9f9f9;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      max-height: calc(100vh - 450px);
-      overflow-y: scroll;
-    }
-
-    .conversation-details {
-      margin-bottom: 10px;
-      padding: 15px;
-      border-radius: 10px;
-      background-color: #f0f0f0;
-      transition: background-color 0.3s ease;
-    }
-
-    .conversation-box {
-      margin-top: 10px;
-      max-width: 100%;
-      padding: 20px;
-      background-color: #f9f9f9;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      max-height: calc(100vh - 450px);
-      overflow-y: scroll;
-    }
-
-    .conversation-details:hover {
-        background-color: #e0e0e0;
-    }
-
-
-    .input-box {
-      margin-top: 20px;
-      padding: 20px;
-      background-color: #f9f9f9;
-      border: 2px solid #ccc;
-      border-radius: 30px;
-      display: flex;
-    }
-
-    .send-and-upload-buttons {
-      display: flex;
-      align-items: right;
-      justify-content: space-between;
-      margin-right: 10px;
-      padding: 2px;
-    }
-
-    .upload-button {
-      scale: 0.8;
-    }
-
-    .close-and-send-preview {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 10px;
-    }
-
-    .popup {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .popup-content {
-        background-color: white;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .popup button {
-        margin-top: 10px;
-    }
-
-    .error-message {
-        font-family: 'louis_george_cafe', sans-serif;
-        font-size: 20px;
-        font-weight: bold;
-        font-style: italic;
-        padding: 10px;
-        background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
-        -webkit-text-fill-color: transparent;
-        -webkit-background-clip: text;
-    }
-
-    .item-link {
-      text-decoration: none;
-      color: #000;
-      max-width: 100%;
-    }
-
-    /* Define fade animation */
-    .fade-enter-active, .fade-leave-active {
-      transition: opacity 0.5s;
-    }
-
-    .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
       opacity: 0;
     }
+    to {
+      transform: translateX(0);
+      opacity: 100;
+    }
+  }
+
+  .inbox * {
+    font-family: 'Poppins', sans-serif;
+    color: #676767;
+    letter-spacing: 0.5px;
+    outline: none;
+    border: none;
+  }
+
+  .inbox h3 {
+    font-size: 35px;
+    font-weight: bolder;
+    line-height: 42px;
+    text-align: center;
+    font-family: 'louis_george_cafe', sans-serif;
+    background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+  }
+
+  .message-box {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .message-box * {
+    font-family: 'Poppins', sans-serif;
+    color: #676767;
+    letter-spacing: 0.5px;
+    outline: none;
+    border: none;
+  }
+
+  .message-box h2 {
+    font-size: 30px;
+    font-weight: bolder;
+    line-height: 42px;
+    text-align: center;
+    font-family: 'louis_george_cafe', sans-serif;
+    background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+  }
+  
+  .mail-details h2 {
+      font-size: 24px;
+      font-weight: bold;
+  }
+
+  .mail-details {
+    max-width: 100%;
+  }
+
+  .sender, .receiver {
+    font-family: 'Poppins', sans-serif;
+    display: inline-block;
+    position: relative;
+    font-display: swap;
+    padding: 10px;
+    border-radius: 20px;
+    word-wrap: break-word;
+    margin-bottom: 5px;
+  }
+
+  .sender::after, .receiver::after {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    position: absolute;
+  }
+
+  .sender {
+    background-color: #007bff;
+    color: #fff;
+    text-align: right;
+    float: right;
+  }
+
+  .sender::after {
+    border-left: 8px solid #007bff;
+    right: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .message-content-sender {
+    background-color: #007bff;
+    color: #fff;
+    text-align: right;
+    margin-left: auto;
+    border-top: 1px solid #ffa500;
+  }
+
+  .receiver {
+    background-color: #868686;
+    color: #fff;
+    text-align: left;
+    float: left;
+  }
+
+  .receiver::after {
+    border-right: 8px solid #868686;
+    left: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .profilepicture-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      box-sizing: border-box;
+      border: 3px solid #ccc;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+  }
+
+  .profile-picture {
+      width: 80px;
+      height: 80px;
+  }
+
+  .message-content-receiver {
+    color: #fff;
+    text-align: left;
+    margin-right: auto;
+    border-top: 1px #ffa500;
+  }
+
+  .date-sender {
+    margin-bottom: 5px;
+    margin-right: 5px;
+    color: #888;
+    font-size: 12px;
+    text-align: right;
+  }
+
+  .date-receiver {
+    margin-bottom: 5px;
+    margin-right: 5px;
+    color: #888;
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    border-radius: 20px;
+    overflow-wrap: break-word;
+    padding: 15px;
+  }
+
+  .mail-box {
+    margin-top: 20px;
+    max-width: 100%;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    max-height: calc(100vh - 450px);
+    overflow-y: scroll;
+  }
+
+  .conversation-details {
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #f0f0f0;
+    transition: background-color 0.3s ease;
+  }
+
+  .conversation-box {
+    margin-top: 10px;
+    max-width: 100%;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    max-height: calc(100vh - 450px);
+    overflow-y: scroll;
+  }
+
+  .conversation-details:hover {
+      background-color: #e0e0e0;
+  }
+
+
+  .input-box {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 2px solid #ccc;
+    border-radius: 30px;
+    display: flex;
+  }
+
+  .send-and-upload-buttons {
+    display: flex;
+    align-items: right;
+    justify-content: space-between;
+    margin-right: 10px;
+    padding: 2px;
+  }
+
+  .upload-button {
+    scale: 0.8;
+  }
+
+  .close-and-send-preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px;
+  }
+
+  .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  .popup-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .popup button {
+      margin-top: 10px;
+  }
+
+  .error-message {
+      font-family: 'louis_george_cafe', sans-serif;
+      font-size: 20px;
+      font-weight: bold;
+      font-style: italic;
+      padding: 10px;
+      background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+  }
+
+  .item-link {
+    text-decoration: none;
+    color: #000;
+    max-width: 100%;
+    margin-left: auto; /* Push the item link to the right */
+    margin-right: auto; /* Push the item link to the left */
+  }
+
+  .receiver-information {
+    display: flex;
+    align-items: center; /* Center vertically */
+  }
+
+  /* Define fade animation */
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity 0.5s;
+  }
+
+  .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+    opacity: 0;
+  }
 </style>
