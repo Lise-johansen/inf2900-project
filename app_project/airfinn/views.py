@@ -1301,8 +1301,7 @@ def reserved_listings(request):
             "rating": item.rating,
         }
         listings.append(listing)
-
-    print("listings: ", listings)
+        
     return JsonResponse(listings, safe=False)
 
         
@@ -1432,8 +1431,6 @@ def remove_favourites(request, item_id):
 
 
 def get_reserved_dates(request, listing):
-    print("Listing: ", listing)
-    print("listing type", type(listing))
     if request.method != 'GET':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
     
@@ -1445,7 +1442,6 @@ def get_reserved_dates(request, listing):
 
     # Prepare the data to return
     data = []
-    print("Starting data: ", data)
     for reservation in reservations:
         reservation_data = {
             'id': reservation.id,
@@ -1454,7 +1450,6 @@ def get_reserved_dates(request, listing):
         }
         print(reservation_data)
         data.append(reservation_data)
-    print("data: ", data)
 
     return JsonResponse(data, safe=False)
 
