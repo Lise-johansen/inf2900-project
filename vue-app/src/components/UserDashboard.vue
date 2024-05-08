@@ -1,11 +1,12 @@
 <template>
   <div class="user-dashboard">
+    <!-- Verify Email banner -->
+    <verification-banner v-if="!user.verified || !isDismissed"/>
     
     <div class="flex-container">
       <div class="profilepicture-container">
-        <div class="profile-picture-outline">
+        <div class="profile-picture-outline"></div>
           <img v-if="profilePicture" :src="profilePicture" alt="Avatar" class="profile-picture">
-        </div>
       </div>
       
       <div class="user-info">
@@ -13,14 +14,15 @@
         <p>{{ user.email }}</p>
         <p>{{ user.address }}</p>
         <p>{{ user.phone }}</p>
+        <div v-if="user.verified" class="verified">
+          <p>Verified</p> 
+          <svg class="verified-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path fill="blue" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+          </svg>
+        </div>
       </div>
     </div>
 
-    <div class=verify-badge>
-      <svg v-if="user.verified" class="verified-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-        <path fill="blue" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
-      </svg>
-    </div>
 
       <div class="divider"></div>
 
@@ -49,6 +51,7 @@
 <script>
   import axios from 'axios';
   import ListingCard from './ReservedListing.vue'
+  import VerificationBanner from './VerifyEmail.vue';
 
 
   export default {
@@ -65,11 +68,17 @@
         },
         orderedListings: [], // Make this a top-level data property
         profilePicture: null,
-        listings_id: []
+        listings_id: [],
       };
     },
     components: {
-      ListingCard
+      ListingCard, VerificationBanner
+    },
+
+    created() {
+      // Check if the banner is dismissed from local storage
+      const dismissed = localStorage.getItem('verificationBannerDismissed');
+      this.isDismissed = dismissed === 'true';
     },
 
     methods: {
@@ -120,11 +129,19 @@
 
 
 <style scoped>
+  .verified {
+    display: flex;
+    align-items: center;
+  }
+  
+  .verified p {
+    margin-left: 20px;
+  }
+
   .verified-icon {
-    width: 24px; /* Adjust size as needed */
-    height: 24px; /* Adjust size as needed */
-    fill: rgb(0, 197, 219); /* Change color as needed */
-    margin-left: 5px; /* Adjust margin as needed */
+    width: 24px;
+    height: 24px;
+    fill: blue;
   }
   
   .user-dashboard {
@@ -151,30 +168,39 @@
     -webkit-background-clip: text;
   }
 
-  .profilepicture-container, .profile-picture {
-    width: 150px;
-    height: 150px;
+  .profilepicture-container, .profile-picture-outline, .profile-picture {
+    width: 200px;
+    height: 200px;
     margin-top: 20px;
   }
+
   .profilepicture-container {
     display: flex;
     justify-content: left;
     align-items: center;
+    position: relative;
   }
 
-  .profile-picture {
+  .profile-picture-outline {
+    border: 5px solid #ccc;
+    position: absolute;
+  }
+
+  .profile-picture, .profile-picture-outline {
     margin-bottom: 20px;
     border-radius: 50%;
     object-fit: cover;
     object-position: center;
-    overflow: hidden;
-    border: 2px solid #ccc;
-    box-sizing: border-box;
   }
-  
+
+  .profile-picture {
+    padding: 2px;
+  }
+
   .user-info {
     text-align: left;
   }
+  
   .divider {
     height: 3px; /* Adjust the height of the border */
     margin-top: 20px;

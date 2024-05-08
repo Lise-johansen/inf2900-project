@@ -29,6 +29,21 @@
                     <p class="firstname"> Rent from: {{ listing.firstname }} </p>
 
                     <button class="profile-btn">Send message</button>
+                
+                <!-- Directly display the CalendarOrder component based on toggle -->
+                <div v-if="showCalendar">
+                    <CalendarOrder @dates-selected="setDates" />
+                   <button @click="orderListing" class="btn" :disabled="!selectedDates">Order Listing</button>
+                </div>
+                <!-- Display selected dates -->
+                <div v-if="selectedDates">
+                <p>Selected Dates: {{ formatDate(selectedDates) }}</p>
+                <!-- Redirect to edit page -->
+                <!-- First check if the user is the owner of the item -->
+                <div class="edit-button" v-if="listing.owner === this.user.username">
+                    <button @click="redirectToEditPage" class="btn">Edit Listing</button>
+                </div>
+                </div>
             </div>
         </div>
 
@@ -52,6 +67,7 @@
 
 <script>
 import axios from 'axios';
+import CalendarOrder from './CalendarOrder.vue';
 import ImageGallery from './ImagesCarousel.vue';
 import LeafletMap from './LeafletMap.vue';
 import ListingCarousel from './ListingCarousel.vue';
@@ -64,15 +80,58 @@ export default {
             favourites: [],
             profilepicture: '',
             category: null,
+            showCalendar: true,
+            selectedDates: null,
+            user: '',
         };
     },
 
     mounted() {
         this.fetchListingData();
+        this.fetchUser();
         this.fetchFavourites();
+        this.CalendarOrder = CalendarOrder;
     },
-
     methods: {
+        formatDate(dates) {
+            if (!dates || dates.length === 0) return 'No dates selected';
+                const [start, end] = dates;
+                return `${new Date(start).toLocaleDateString()} - ${new Date(end).toLocaleDateString()}`;
+        },
+        setDates(dates) {
+            this.selectedDates = dates;
+        },
+        orderListing() {
+            if (this.selectedDates) {
+                const [start, end] = this.selectedDates;
+                const listingId = this.$route.params.id;
+                axios.post(`/order-listing/${listingId}/`, {
+                    listingId: this.listing.id,
+                    startDate: start,
+                    endDate: end
+                }).then(response => {
+                    this.selectedDates = null;
+                    this.response = response.data;
+                    alert('Listing ordered successfully!');
+                    axios.get(`/get_listing/${listingId}/`)
+                        .then(response => {
+                            this.listing = response.data;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching listing data:', error);
+                        });
+                }).catch(error => {
+                    console.error('Error ordering listing:', error);
+                    alert('Failed to order listing.');
+                });
+            }
+        },
+
+        redirectToEditPage() {
+            const listingID = this.$route.params.id;
+            this.$router.push({ name: 'edit_listing', params: { id: listingID } });
+        },
+
         fetchListingData() {
             // Fetch listing data from the server
             const ListingID = this.$route.params.id;
@@ -92,7 +151,6 @@ export default {
                     console.error('Error fetching listing data:', error);
                 })
         },
-
         addToFavourites() {
             // get the listing ID and user ID
             const ListingID = this.$route.params.id;
@@ -130,6 +188,19 @@ export default {
         isInFavourites(listingId) {
             // Check if the listingId exists in the favourites array
             return this.favourites.some(favorite => favorite.id === listingId);
+        
+        },
+        fetchUser() {
+            // Fetch the user data from the server
+            axios.get('get-user/')
+                .then(response => {
+                    // Update the user data based on the response
+                    this.user = response.data;
+                    console.log('User data:', this.user);
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                });
         },
     },
 
@@ -137,6 +208,7 @@ export default {
         ImageGallery,
         LeafletMap,
         ListingCarousel,
+        CalendarOrder,
     },
 
 };
@@ -302,4 +374,21 @@ export default {
         width: 100%;
     }
     
+
+.calendar-order {
+  background: rgb(216, 155, 131);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.calendar-order .p-calendar {
+  width: 100%;
+}
+
+
+.edit-button {
+    margin-top: 10px;
+    text-align: left;
+}
 </style>
