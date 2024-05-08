@@ -2,17 +2,16 @@
   <div>
     <SearchBox :initialSearchTerm="searchTerm" @search="handleSearch"/>
     <div class="spacing"></div>
-    <ItemFilters @filter-change="handleFilterUpdate"/>
+      <ItemFilters @filter-change="handleFilterUpdate"/>
     <div class="spacing"></div>
-    <div v-if="isLoading">Loading...</div>
-      <div class="cards-container">
-      
-    <div v-for="listing in filteredResults" :key="listing">
-      <!-- write out all information from the listing -->
-      <ListingCard :listing="listing.data.fields"  />
-      <div class="spacing"></div>
-    </div>
-    </div>
+      <div v-if="isLoading">Loading...</div>
+        <div class="cards-container">
+          <div v-for="listing in filteredResults" :key="listing">
+            <!-- write out all information from the listing -->
+            <ListingCard :listing="listing.data"  />
+          <div class="spacing"></div>
+        </div>
+      </div>
     <div class="spacing"></div>
   </div>
 </template>
@@ -20,7 +19,7 @@
 <script>
 import SearchBox from './SearchBox.vue';
 import ItemFilters from './FilterComponent.vue';
-import ListingCard from './ReservedListing.vue';
+import ListingCard from './SearchPageCard.vue';
 
 
 export default {
@@ -81,6 +80,7 @@ export default {
       // Update the current filters state and then apply these filters
       this.currentFilters = filters;
       this.applyFilters(filters);
+      console.log('Filters:', this.filteredResults[0].data);
     },
 
     applyFilters(filters) {
@@ -122,6 +122,7 @@ export default {
 <style scoped>
 .cards-container {
   display: flex;
+  min-width:600px;
   flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
