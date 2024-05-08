@@ -59,7 +59,11 @@ export default {
 
     initializeMap(lat, lon) {
       // Initialize the map
-      const map = L.map('map').setView([lat, lon], 13);
+      const map = L.map('map', {
+        dragging: false, // Disable dragging
+        scrollWheelZoom: false, // Disable zooming with the scroll wheel
+        doubleClickZoom: false
+      }).setView([lat, lon], 13);
 
       // Add tile layer (using OpenStreetMap tiles)
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -72,12 +76,11 @@ export default {
 
 <style scoped>
 .map-wrapper{
-height: 35dvh;
+margin: 1em;
 display: flex;
 border: 2px solid rgba(255,255,255,0.1);
 justify-content: center;
 align-items: center;
-position: relative;
 }
 
 #map {

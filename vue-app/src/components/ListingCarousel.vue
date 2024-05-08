@@ -27,7 +27,6 @@ import axios from 'axios';
 import Carousel from 'primevue/carousel';
 import Button from 'primevue/button';
 
-
 export default {
     components: {
         Carousel, Button
@@ -75,6 +74,14 @@ export default {
                 });
         },
     },
+
+     watch: {
+        category() {
+            // When the category prop changes, fetch new listings
+            this.refreshListings();
+        }
+    },
+
     created() {
         axios.get('/get_items/' + this.category)
             .then(response => {
@@ -89,7 +96,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     .refresh-button{
         scale:0.8;
         transition: transform 100ms ease;

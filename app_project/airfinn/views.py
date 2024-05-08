@@ -1119,6 +1119,8 @@ def get_listing(request, item_id):
         "availability": item.availability,
         "images": images,
         "rating": item.rating,
+        "profilepicture": item.owner.profile_picture_url,
+        "firstname": item.owner.first_name
     }
     return JsonResponse(data, safe=False)
 
