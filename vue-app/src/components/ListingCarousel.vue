@@ -27,7 +27,6 @@ import axios from 'axios';
 import Carousel from 'primevue/carousel';
 import Button from 'primevue/button';
 
-
 export default {
     components: {
         Carousel, Button
