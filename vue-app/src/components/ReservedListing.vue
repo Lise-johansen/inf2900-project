@@ -6,10 +6,8 @@
         <div class="item-name">{{ listing.name }}</div>
         <!-- Make sure `listing.image` has the correct data -->
         <img :src="listing.image" style="max-width: 100%;" :alt="listing.name"/>
-        <div class="card-footer">
           <div class="item-price">{{ listing.price_per_day }} kr/day</div>
           <div class="item-location">{{ listing.location }}</div>
-        </div>
       </div>
     </router-link>
   </div>
@@ -28,18 +26,24 @@ export default {
 </script>
   
   <style scoped>
+  .cards-container {
+    display: flex;
+    flex-wrap: wrap; /* This ensures that cards will wrap onto the next line */
+    justify-content: center; /* Adjust this to flex-start for left alignment if needed */
+    gap: 1rem; /* Provides space between cards */
+  }
 .card {
     color: var(--primary-color);
     cursor: pointer;
     display: flex;
-    align-items: center;
+    align-items: none;
     justify-content: center;
     margin: 8px;
     padding: 10px;
     border: 3px solid grey;
     border-radius: 25px;
     transition: transform 250ms ease, color 250ms ease, border 250ms ease;
-    max-width: 300px; /* or whatever width you want */
+    max-width: 300px; 
     min-width: 300px;
     min-height: 300px;
     max-height: 300px;
@@ -58,11 +62,6 @@ export default {
   
   .card-details {
     text-align: left;
-  }
-  
-  .card-data {
-    display: flex;
-    justify-content: space-between;
   }
   
   img {
@@ -85,80 +84,10 @@ export default {
     border: 3px solid var(--primary-color);
   } 
 
-
-  .refresh-button{
-        scale:0.8;
-        transition: transform 100ms ease;
-        /* margin-right: 75px; */
-    }
-
-    .title-and-button{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-left: 25px;
-        margin-right: 25px;
-        
-    }
-
-    .carousel-object{
-        max-width: 1200px ;
-        margin : 0 auto;
-        margin-bottom: 40px;
-        min-width: 300px;
-        height: 100%;
-    }
-
-    .refresh-button:hover{
-        animation: spinning 400ms linear infinite;
-    }
-
-    .category-header{
-        font-family: 'louis_george_cafe', sans-serif;
-        margin-top: 0;
-        text-align: left;
-        font-weight: bold;
-        font-size: 28px;
-        /* margin-left: 75px; */
-        color: var(--primary-color);
-        margin-bottom: 0;
-    }
-
-    .carousel-item{
-        color: var(--primary-color);
-        cursor: pointer;
-        display:flex;
-        align-items: center;
-        justify-content: center;
-        margin: 8px;
-        padding: 10px;
-        border: 3px solid grey;
-        border-radius: 25px;
-        transition: transform 250ms ease, color 250ms ease, border 250ms ease; 
-    }
-    .item-data{
-        text-align: left;
-        display:flex;
-        justify-content: space-between;
-    }
-
-    img{
-        border-radius: 25px;
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-
     .item-name{
         text-align: left;
         font-size: 20px;
         font-weight: bold;
     }
-
-    .carousel-item:hover{
-        color: var(--secondary-color);
-        scale: 1.03;
-        border: 3px solid var(--primary-color); 
-
-    }   
   </style>
   
