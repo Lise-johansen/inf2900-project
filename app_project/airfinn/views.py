@@ -729,7 +729,8 @@ def get_conversations(request):
             'id': conversation.id,
             'item': {
                 'id': conversation.item.id,
-                'name': conversation.item.name
+                'name': conversation.item.name,
+                'price_per_day': conversation.item.price_per_day,
             },
             'sender': {
                 'id': conversation.user1.id,
