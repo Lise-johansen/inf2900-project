@@ -113,6 +113,7 @@
             axios.get('ordered-listings/')
               .then(response => {
                   this.orderedListings = response.data;
+                  console.log('Ordered listings:', this.orderedListings);
               })
               .catch(error => {
                   console.error('Error fetching ordered listings:', error);
