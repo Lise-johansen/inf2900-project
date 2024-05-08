@@ -6,7 +6,7 @@
             <router-link :to="'/listing/' + listing.id" class="card-content">
             <div class="card-details">
                 <div class="item-name">{{ listing.name }}</div>
-                <img :src="listing.images" style="max-width: 100%;" :alt="listing.name" />
+                <img :src="listing.image" style="max-width: 100%;" :alt="listing.name" />
                 <div class="card-footer">
                 <div class="item-price">{{ listing.price_per_day }} kr/day</div>
                 <div class="item-location">{{ listing.location }}</div>
@@ -191,6 +191,10 @@
         border-radius: 25px;
         transition: transform 250ms ease, color 250ms ease, border 250ms ease;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* optional, for a subtle shadow */
+        max-width: 300px; 
+        min-width: 300px;
+        min-height: 300px;
+        max-height: 300px;
     }
 
     .card-content {
@@ -211,7 +215,10 @@
         border-radius: 25px;
         padding-top: 5px;
         padding-bottom: 5px;
-        max-width: 100%;
+        max-width: 300px;
+        max-height: 150px;
+        min-height: 150px;
+        min-width: 150px;
     }
 
     .item-name {

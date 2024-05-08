@@ -39,9 +39,11 @@
 
     <div class="Realname">Reserved Listings:</div>
     <div class="spacing"></div>
+    <div class="listing-card">
     <div v-for="listing in orderedListings" :key="listing">
       <ListingCard :listing="listing"  />
       <div class="spacing"></div>
+    </div>
     </div>
     <div class="divider"></div>
     </div>
@@ -68,7 +70,6 @@
         },
         orderedListings: [], // Make this a top-level data property
         profilePicture: null,
-        listings_id: [],
       };
     },
     components: {
@@ -112,8 +113,6 @@
             axios.get('ordered-listings/')
               .then(response => {
                   this.orderedListings = response.data;
-                  this.listings_id = response.data;
-                  console.log('Listings id:', this.listings_id);
                   console.log('Ordered listings:', this.orderedListings);
               })
               .catch(error => {
@@ -153,6 +152,14 @@
     display: flex;
     align-items: center;
   }
+  .listing-card { /* Assuming .listing-card is the class used in ListingCard component */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around; /* Changes from flex-start to space-around for better spacing */
+    align-items: flex-start; /* Keeps items aligned at the top */
+    gap: 20px; /* Manage the spacing between cards */
+    padding: 20px 0; /* Adds padding to the top and bottom for better visual separation from other elements */
+}
 
   p {
     margin-left: 20px;
