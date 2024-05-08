@@ -1,7 +1,7 @@
 <template>
     <div class="calendar-order">
-      <Calendar v-model="dates" selection-mode="range" :min-date="minDate" :max-date="maxDate" :inline="false" :disabled-dates="unavailableDates" @update:modelValue="emitDates" />
-    </div>
+      <Calendar v-model="dates" selection-mode="range" :min-date="minDate" :max-date="maxDate" :inline="true" :disabled-dates="unavailableDates" @update:modelValue="emitDates" />
+    </div>      
 </template>
   
 <script>
