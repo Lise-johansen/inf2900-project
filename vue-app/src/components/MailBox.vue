@@ -57,7 +57,8 @@
                                         <div v-if="message.sender.name === 'You'">
                                             <div class="date-sender" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>
                                             <div class="sender" v-if="selectedConversation.latest_message">
-                                                {{ message.sender.name }}
+                                                <div class="sender-name">{{ message.sender.name }}</div>
+                                                <div class="reverse-divider"></div>
                                                 <div class="message-content-sender">{{ message.message }}</div>
                                                 <div v-if="message.image" class="image-container">
                                                     <Image :src="message.image" alt="Image Preview" width="250" preview />
@@ -67,7 +68,8 @@
                                             <div v-else>
                                             <div class="date-receiver" v-if="message.created_at">{{ formatDateString(message.created_at) }}</div>   
                                             <div class="receiver" v-if="selectedConversation.latest_message"> 
-                                                {{ message.sender.name }}
+                                                <div class="receiver-name">{{ message.sender.name }}</div>
+                                                <div class="divider"></div>
                                                 <div class="message-content-receiver">{{ message.message }}</div>
                                                 <div v-if="message.image" class="image-container">
                                                     <Image :src="message.image" alt="Image Preview" class="message-image" preview />
@@ -77,7 +79,7 @@
                                     </div>
                                     <div v-else>
                                         <h2> {{ errorMessage }}</h2>
-                                        <div class="message-content-sender"></div>
+                                        <div class="divider"></div>
                                     </div>
                                 </div>
                             </div>
@@ -150,6 +152,7 @@ export default {
                 label: 'Report',
                 style: {
                     marginTop: '10px',
+                    marginLeft: '10px',
                     transition: 'background-color 0.3s ease',
                 },
                 command: () => {
@@ -160,6 +163,7 @@ export default {
                 label: 'Delete Conversation',
                 style: {
                     marginTop: '10px',
+                    marginLeft: '10px',
                     marginBottom: '10px',
                 },
                 command: () => {
@@ -616,6 +620,16 @@ export default {
     margin-bottom: 5px;
 }
 
+.sender-name, .receiver-name {
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.sender-name {
+    text-align: right;
+}
+
 .sender::after, .receiver::after {
     display: inline-block;
     width: 0;
@@ -644,7 +658,6 @@ export default {
     color: #fff;
     text-align: right;
     margin-left: auto;
-    border-top: 1px solid #ffa500;
 }
 
 .receiver {
@@ -652,6 +665,10 @@ export default {
     color: #fff;
     text-align: left;
     float: left;
+}
+
+.receiver-name {
+    text-align: left;
 }
 
 .receiver::after {
@@ -682,7 +699,6 @@ export default {
     color: #fff;
     text-align: left;
     margin-right: auto;
-    border-top: 1px #ffa500;
 }
 
 .date-sender {
@@ -827,5 +843,21 @@ export default {
 
 .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
     opacity: 0;
+}
+
+.divider {
+    background: linear-gradient(to right, transparent, #ff5733, #ffa500, #4169e1, transparent);
+}
+
+.reverse-divider {
+        background: linear-gradient(to left, transparent, #ff5733, #ffa500, #4169e1, transparent);
+    }
+
+.divider, .reverse-divider {
+    height: 3px; /* Adjust the height of the border */
+    margin-top: 1px;
+    margin-bottom: 1em;
+    opacity: 0.8;
+    width: 100%;
 }
 </style>
