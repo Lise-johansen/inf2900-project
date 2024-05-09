@@ -729,7 +729,8 @@ def get_conversations(request):
             'id': conversation.id,
             'item': {
                 'id': conversation.item.id,
-                'name': conversation.item.name
+                'name': conversation.item.name,
+                'price_per_day': conversation.item.price_per_day,
             },
             'sender': {
                 'id': conversation.user1.id,
@@ -739,9 +740,15 @@ def get_conversations(request):
             'receiver': {
                 'id': conversation.user2.id,
                 'username': conversation.user2.username,
-                'name': receiver_name
+                'name': receiver_name,
+                'profile_picture': conversation.user2.profile_picture_url
             },
             'latest_message': {
+                'sender': {
+                    'id': latest_message.sender.id,
+                    'username': latest_message.sender.username,
+                    'name': 'You' if latest_message.sender == user else f"{latest_message.sender.first_name} {latest_message.sender.last_name}"
+                },
                 'message': latest_message.message,
                 'created_at': latest_message.created_at.strftime('%Y-%m-%d %H:%M:%S') if latest_message else None
             }
@@ -814,6 +821,7 @@ def get_messages(request):
                 'receiver': {
                     'id': message.receiver.id,
                     'username': message.receiver.username,
+                    'profile_picture': message.receiver.profile_picture_url,
                     'name': receiver_name
                 },
                 'listing': {
@@ -887,7 +895,7 @@ def send_messages(request):
     if conversation_id:
         # Get the conversation object by ID
         conversation = get_object_or_404(Conversation, id=conversation_id)
-    else:
+    elif conversation_id is None:
         # Check if there is an existing conversation between sender and receiver for this item
         conversation = Conversation.objects.filter(user1=sender, user2=receiver, item=item).first()
     
@@ -975,6 +983,47 @@ def send_messages(request):
     
     # Return the message data as JSON response
     return JsonResponse(message_data, status=201)
+
+"""
+Delete a conversation between the user and the owner of the listing.
+"""
+def delete_conversation(request, conversation_id):
+    # Check if the request method is DELETE
+    if request.method != 'DELETE':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the user ID from the token
+    token = request.COOKIES.get('token')
+    if not token:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+    
+    secret_key = settings.SECRET_KEY
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({'error': 'Token has expired'}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({'error': 'Invalid token'}, status=401)
+    
+    # Retrieve the user object corresponding to the user ID
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    # Get the conversation object by ID
+    conversation = get_object_or_404(Conversation, id=conversation_id)
+    
+    # Check if the user is a participant in the conversation
+    if user not in [conversation.user1] + [conversation.user2]:
+        return JsonResponse({'error': 'Conversation not found'}, status=404)
+    
+    # Delete the conversation
+    conversation.delete()
+    
+    # Return a success response
+    return JsonResponse({'message': 'Conversation deleted successfully'}, status=200)
 
 def create_item(request):
     # Check if the request method is POST
@@ -1115,6 +1164,7 @@ def get_listing(request, item_id):
         "category": item.category,
         "postal_code": item.postal_code,
         "owner": item.owner.username,
+        "owner_id": item.owner.id,
         "condition": item.condition,
         "availability": item.availability,
         "images": images,

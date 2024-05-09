@@ -48,7 +48,7 @@
                     </div>
                     <p class="firstname"> Rent from: {{ listing.firstname }} </p>
 
-                    <button class="profile-btn">Send message</button>
+                    <button class="profile-btn" @click="sendMessage">Send message</button>
                 </div>
             </div>
             <div class="divider"></div>
@@ -90,6 +90,7 @@ export default {
             showCalendar: true,
             selectedDates: null,
             user: '',
+            message_text: '',
         };
     },
 
@@ -213,6 +214,38 @@ export default {
                     console.error('Error fetching user data:', error);
                 });
         },
+
+        // Open the mailbox to send a message to the owner of the listing
+        sendMessage() {
+            // Conversation ID is null by default
+            this.conversation_id = null;
+
+            // Image is null by default
+            this.message_image = '';
+
+            // Make a POST request to tell the server to start a conversation
+            axios.post('send-messages/',
+                {
+                    item_id: this.listing.id,
+                    sender_id: this.user.id,
+                    receiver_id: this.listing.owner_id,
+                    message: 'Hi, I am interested in your listing. Can we discuss further?',
+                    image: this.message_image,
+                    conversation_id: this.conversation_id,
+                })
+
+                .then(response => {
+                    console.log('Success!:', response.data);
+                    // Redirect to the mailbox page and attach the conversation ID
+                    this.$router.push({ name: 'inbox', params: { id: response.data.conversation.id } });
+                    // log the route
+                    console.log('Route:', this.$route);
+                })
+
+                .catch(error => {
+                    console.error('Error sending message!:', error);
+                });
+        }
     },
 
     components: {
