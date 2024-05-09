@@ -5,7 +5,7 @@
       <div class="card-details">
         <div class="item-name">{{ listing.name }}</div>
         <!-- Make sure `listing.image` has the correct data -->
-        <img :src="listing.image" style="max-width: 100%;" :alt="listing.name"/>
+        <img :src="listing.image[0]" style="max-width: 100%;" :alt="listing.name"/>
           <div class="item-price">{{ listing.price_per_day }} kr/day</div>
           <div class="item-location">{{ listing.location }}</div>
       </div>
