@@ -115,12 +115,12 @@ export default {
         min-width: 20%;
         margin : 0 auto;
         margin-bottom: 40px;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; /* Ensures no overflow of items */
-    max-width: 1500px;
-    margin: 0 auto;
-    margin-bottom: 40px;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden; /* Ensures no overflow of items */
+        max-width: 1500px;
+        margin: 0 auto;
+        margin-bottom: 40px;
     }
 
     .refresh-button:hover{
@@ -139,6 +139,7 @@ export default {
 
     .carousel-item{
         color: var(--primary-color);
+        text-decoration: none;
         cursor: pointer;
         display: flex;
         align-items: center;
