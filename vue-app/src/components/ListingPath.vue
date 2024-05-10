@@ -95,6 +95,7 @@ export default {
         '$route.params.id'(newId) {
             if (newId) {
                 this.fetchListingData();
+                location.reload()
             }
         }
     },
@@ -104,6 +105,7 @@ export default {
         this.fetchUser();
         this.fetchFavourites();
         this.CalendarOrder = CalendarOrder;
+        window.scrollTo({ top: 0, });
     },
     methods: {
         formatDate(dates) {
