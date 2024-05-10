@@ -27,35 +27,31 @@ export default {
 }
 </script>
   
-    
-<style scoped>
-
+  <style scoped>
   .cards-container {
     display: flex;
     flex-wrap: wrap; /* This ensures that cards will wrap onto the next line */
     justify-content: center; /* Adjust this to flex-start for left alignment if needed */
     gap: 1rem; /* Provides space between cards */
   }
-
-  .card {
-      color: var(--primary-color);
-      cursor: pointer;
-      display: none;
-      align-items: none;
-      justify-content: center;
-      margin: 8px;
-      padding: 10px;
-      border: 3px solid grey;
-      border-radius: 25px;
-      transition: transform 250ms ease, color 250ms ease, border 250ms ease;
-      max-width: 300px; 
-      min-width: 300px;
-      min-height: 300px;
-      max-height: 300px;
-      margin: 0 auto; /* to center the card */
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* optional, for a subtle shadow */
-    }
-  
+.card {
+    color: var(--primary-color);
+    cursor: pointer;
+    display: none;
+    align-items: none;
+    justify-content: center;
+    margin: 8px;
+    padding: 10px;
+    border: 3px solid grey;
+    border-radius: 25px;
+    transition: transform 250ms ease, color 250ms ease, border 250ms ease;
+    max-width: 300px; 
+    min-width: 300px;
+    min-height: 300px;
+    max-height: 300px;
+    margin: 0 auto; /* to center the card */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* optional, for a subtle shadow */
+  }
   
   .card-content {
     color: var(--primary-color);
