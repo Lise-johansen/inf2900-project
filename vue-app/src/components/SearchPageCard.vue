@@ -7,8 +7,8 @@
         <!-- Make sure `listing.image` has the correct data -->
         <img :src="listing.fields.image" style="max-width: 100%;" :alt="listing.fields.name"/>
         <div class="item-data">
-          <div class="item-info">{{ listing.fields.price_per_day }} kr/day</div>
-          <div class="item-info">{{ listing.fields.location }}</div>
+          <div class="item-price">{{ listing.fields.price_per_day }} kr/day</div>
+          <div class="item-location">{{ listing.fields.location }}</div>
         </div>
       </div>
     </router-link>
@@ -34,7 +34,7 @@ export default {
     justify-content: center; /* Adjust this to flex-start for left alignment if needed */
     gap: 1rem; /* Provides space between cards */
   }
-.card {
+  .card {
     color: var(--primary-color);
     cursor: pointer;
     display: none;
@@ -62,19 +62,18 @@ export default {
     text-decoration: none;
   }
 
+  .card-content:hover {
+    color: var(--secondary-color);
+  }
+
   .item-data{
-        text-align: left;
-        display:flex;
-        justify-content: space-between;
+      text-align: left;
+      display:flex;
+      justify-content: space-between;
     }
   
   .card-details {
     text-align: left;
-  }
-
-  .item-info {
-    font-size: 16px;
-    text-align: right;
   }
   
   img {
@@ -96,6 +95,11 @@ export default {
     scale: 1.03;
     border: 3px solid var(--primary-color);
   } 
+
+    .item-name{
+        text-align: left;
+        font-size: 20px;
+        font-weight: bold;
+    }
+  </style>
   
-</style>
-    
