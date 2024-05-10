@@ -2,20 +2,27 @@
     <div class="listing-container">
         <ImageGallery :images="images_list" />  
             <div class="listing-details">
-
-                <h1 class="listing-title">{{ this.listing.name }}</h1>
-                <p class="listing-price"> {{ this.listing.price_per_day }}</p>
+                <div class="flex-box">
+                    <div class="title-price-container">
+                        <h1 class="listing-title">{{ this.listing.name }}</h1>
+                        <p class="listing-price"> {{ this.listing.price_per_day }}</p>
+                    </div> 
+                    <div class="condition-category-container">
+                        <p class="condition"> Condition: {{ this.listing.condition }}</p>
+                        <p class="category"> Category: {{ this.listing.category }}</p>
+                    </div>
+                </div>
                 
                 <div class="btn-wrapper">
                     <button :disabled="isInFavourites(listing.id)" @click="addToFavourites" class="favorite-btn">
                         <span v-if="!isInFavourites(listing.id)">Add to Favourites</span>
                         <span v-else>Already in Favourites</span>
-                    </button>
-                    
+                    </button>    
+                </div>
+
                     <div v-if="listing.owner === this.user.username">
                         <button @click="redirectToEditPage" class="edit-btn">Edit Listing</button>
                     </div>
-                </div>
 
                 <div class="divider"></div>
 
@@ -84,6 +91,7 @@ export default {
             favourites: [],
             profilepicture: '',
             category: null,
+            condition: '',
             showCalendar: true,
             selectedDates: null,
             user: '',
@@ -156,6 +164,7 @@ export default {
                     this.images_list = this.listing.images;
                     this.profilepicture = this.listing.profilepicture;
                     this.category = this.listing.category;
+                    this.condition = this.listing.condition;
                 })
                 .catch(error => {
                     console.error('Error fetching listing data:', error);
@@ -271,6 +280,20 @@ export default {
         border-radius: 15px;
     }
 
+    .flex-box {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .title-price-container {
+        display: flex;
+        flex-direction: column;
+    }
+    .category-condition-container {
+        display: flex;
+        flex-direction: column;
+    }
+
     .listing-header {
         display: flex;
     }
@@ -290,7 +313,6 @@ export default {
 
     .listing-title,
     .listing-description {
-        width: 100%;
         padding-bottom: 5px;
         text-align: left;
     }
@@ -301,15 +323,22 @@ export default {
     }
 
     .listing-title,
-    .listing-price {
+    .listing-price,
+    .condition,
+    .category {
         font-family: 'louis_george_cafe', sans-serif;
         font-weight: bolder;
         background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
         -webkit-text-fill-color: transparent;
         -webkit-background-clip: text;
-
     }
-
+    .condition,
+    .category {
+        font-size: 25px;
+        text-align: right;
+        padding-top: 10px;
+        padding-bottom: 10px,
+    }
     .listing-price {
         font-size: 25px;
         text-align: left; /* Center-align the price */
