@@ -136,4 +136,10 @@
             opacity: 0.4;
             width: 100%; /* Make the border span the entire width of the page */
         }
+        
+        @media (max-width: 600px) {
+            .tagline {
+                display: none;
+            }
+        }
 </style>
