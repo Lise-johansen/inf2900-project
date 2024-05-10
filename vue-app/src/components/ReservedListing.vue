@@ -61,6 +61,10 @@ export default {
     text-decoration: none;
   }
   
+  .card-content:hover {
+    color: var(--secondary-color);
+  }
+
   .card-details {
     text-align: left;
   }
