@@ -149,6 +149,7 @@ export default {
         min-width: 300px;
         min-height: 300px;
         max-height: 300px;
+        text-decoration: none;
     }
     .item-data{
         text-align: left;
