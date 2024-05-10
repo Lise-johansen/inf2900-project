@@ -5,17 +5,26 @@
         <div class="shape"></div>
     </div>
     <form @submit.prevent="register">
-        <h3>Just fill the form!</h3>
-        <input placeholder="First name..." id ="first-name" v-model="firstName" autocomplete="off">
-        <input placeholder ="Last name..." id="last-name" v-model="lastName" autocomplete="off">
-        <input type="newemail" placeholder="Your email..." id="email" v-model="email" autocomplete="off">
-        <input placeholder="Your address..." id="address" v-model="address" autocomplete="off">
-        <input placeholder="Your phone number..." id="phone" v-model="phone" autocomplete="off">
-        <input type="password" placeholder="Your password..." id="password" v-model="password1" autocomplete="off">
-        <input type="password" placeholder="Repeat your password..." id="password" v-model="password2" autocomplete="off">
+      <h3>Just fill the form!</h3>
+      <input placeholder="First name *" id="first-name" v-model="firstName" autocomplete="off" required>
+      
+      <input placeholder="Last name *" id="last-name" v-model="lastName" autocomplete="off" required>
+      
+      <input type="email" placeholder="Your email *" id="email" v-model="email" autocomplete="off" required>
+      
+      <input placeholder="Your address *" id="address" v-model="address" autocomplete="off" required>
+      
+      <input placeholder="Your phone number *" id="phone" v-model="phone" autocomplete="off" required>
+      
+      <input type="password" placeholder="Your password *" id="password" v-model="password1" autocomplete="off" required>
+      
+      <input type="password" placeholder="Repeat your password" id="password-confirm" v-model="password2" autocomplete="off" required>
 
-        <button type="submit"> Register </button>
+      <label class="required-fields"><span>Required fields *</span></label>
+      
+      <button type="submit">Register</button>
     </form>
+
     <div v-if="showPopup" class="popup">
       <div class="popup-content">
         <p v-if="errorMessage">{{ errorMessage }}</p>
@@ -50,46 +59,10 @@ export default {
 
   methods: {
     register() {
-      if (!this.firstName) {
-        this.errorMessage = 'Please enter your first name.';
+      if (!this.validateForm()) {
         this.showPopup = true;
         return;
       }
-
-      if (!this.lastName) {
-        this.errorMessage = 'Please enter your last name.';
-        this.showPopup = true;
-        return;
-      }
-      if (!this.email) {
-        this.errorMessage = 'Please enter your email adress.';
-        this.showPopup = true;
-        return;
-      }
-
-      if (!this.isValidEmail(this.email)) {
-        this.errorMessage = 'Invalid email, please try again.';
-        this.showPopup = true;
-        return;
-      }
-
-      if (!this.address) {
-        this.errorMessage = 'Please enter your address.';
-        this.showPopup = true;
-        return;
-      }
-
-      if (!this.phone) {
-        this.errorMessage = 'Please enter a phone number.';
-        this.showPopup = true;
-        return;
-      }
-
-      if (this.password1 !== this.password2) {
-        this.errorMessage = 'Passwords do not match.';
-        this.showPopup = true;
-        return;
-      } 
       else {
         axios.post('register/', {
           firstName: this.firstName,
@@ -110,6 +83,25 @@ export default {
           this.showPopup = true; // Show the popup if there's an error
         });
       }  
+    },
+
+    validateForm() {
+      if (!this.firstName || !this.lastName || !this.email || !this.address || !this.phone || !this.password1 || !this.password2) {
+        this.errorMessage = 'Please fill in all the required fields.';
+        return false;
+      }
+
+      if (!this.isValidEmail(this.email)) {
+          this.errorMessage = 'Invalid email, please try again.';
+          return false;
+      }
+
+      if (this.password1 !== this.password2) {
+          this.errorMessage = 'Passwords do not match.';
+          return false;
+      }
+
+      return true;
     },
     
     hidePopup() {
@@ -173,7 +165,7 @@ export default {
   }
   
   form {
-    height: 520px;
+    height: auto;
     width: 400px;
     background-color: rgba(255,255,255,0.13);
     position: absolute;
@@ -279,5 +271,9 @@ export default {
 
   .popup button {
     margin-top: 10px;
+  }
+
+  .required-fields {
+    font-size: 12px;
   }
 </style>
