@@ -65,10 +65,7 @@
                 <h2>Similar Listings</h2>
                 <ListingCarousel :category= "this.category" />
             </div>
-        </div>
-
-            
-            
+        </div> 
     </div>
 </template>
 
@@ -77,7 +74,7 @@ import axios from 'axios';
 import CalendarOrder from './CalendarOrder.vue';
 import ImageGallery from './ImagesCarousel.vue';
 import LeafletMap from './LeafletMap.vue';
-import ListingCarousel from './ListingCarousel.vue';
+import ListingCarousel from './SimilarListings.vue';
 
 export default {
     data() {
@@ -93,12 +90,22 @@ export default {
             message_text: '',
         };
     },
+    watch: {
+        // Watch for changes in the route parameters
+        '$route.params.id'(newId) {
+            if (newId) {
+                this.fetchListingData();
+                location.reload()
+            }
+        }
+    },
 
     mounted() {
         this.fetchListingData();
         this.fetchUser();
         this.fetchFavourites();
         this.CalendarOrder = CalendarOrder;
+        window.scrollTo({ top: 0, });
     },
     methods: {
         formatDate(dates) {
@@ -142,23 +149,17 @@ export default {
         },
 
         fetchListingData() {
-            // Fetch listing data from the server
-            const ListingID = this.$route.params.id;
-            axios.get(`get_listing/${ListingID}/`)
+            const listingId = this.$route.params.id;
+            axios.get(`get_listing/${listingId}/`)
                 .then(response => {
-                    // Update the listing data based on the response
                     this.listing = response.data;
-                    console.log('Listing data:', this.listing);
-
-                    // Format the image URLs for Galleria
-                    this.images_list = (this.listing.images);
-                    console.log('Images:', this.images);
+                    this.images_list = this.listing.images;
                     this.profilepicture = this.listing.profilepicture;
                     this.category = this.listing.category;
                 })
                 .catch(error => {
                     console.error('Error fetching listing data:', error);
-                })
+                });
         },
         addToFavourites() {
             // get the listing ID and user ID
