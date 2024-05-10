@@ -135,6 +135,7 @@ export default {
     }
 
     .carousel-item{
+        font-family: 'louis_george_cafe', sans-serif;
         color: var(--primary-color);
         cursor: pointer;
         display:flex;
@@ -149,6 +150,7 @@ export default {
         min-width: 300px;
         min-height: 300px;
         max-height: 300px;
+        text-decoration: none;
     }
     .item-data{
         text-align: left;
