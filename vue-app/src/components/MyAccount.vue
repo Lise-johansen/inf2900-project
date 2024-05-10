@@ -39,8 +39,8 @@
       <div v-if="showPopup" class="popup">
       <div class="popup-content">
         <p class="error-message">{{ errorMessage }}</p>
-        <router-link to="/dashboard" class="button-link">
-          <button @click="hidePopup">OK</button>
+        <router-link to="/dashboard">
+          <button class="button-link" @click="hidePopup">OK</button>
         </router-link> 
       </div>
     </div>
