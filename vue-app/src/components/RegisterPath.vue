@@ -18,7 +18,7 @@
       
       <input type="password" placeholder="Your password *" id="password" v-model="password1" autocomplete="off" required>
       
-      <input type="password" placeholder="Repeat your password" id="password-confirm" v-model="password2" autocomplete="off" required>
+      <input type="password" placeholder="Repeat your password" id="password-confirm" v-model="password2" autocomplete="off">
 
       <label class="required-fields"><span>Required fields *</span></label>
       
