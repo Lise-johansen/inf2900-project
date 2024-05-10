@@ -32,7 +32,8 @@ export default {
     justify-content: center; /* Adjust this to flex-start for left alignment if needed */
     gap: 1rem; /* Provides space between cards */
   }
-.card {
+  .card {
+    font-family: 'louis_george_cafe', sans-serif;
     color: var(--primary-color);
     cursor: pointer;
     display: flex;

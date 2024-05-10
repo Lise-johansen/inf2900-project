@@ -135,6 +135,7 @@ export default {
     }
 
     .carousel-item{
+        font-family: 'louis_george_cafe', sans-serif;
         color: var(--primary-color);
         cursor: pointer;
         display:flex;
