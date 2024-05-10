@@ -32,14 +32,19 @@
 
 <style scoped>
     .pp-container {
-    margin: 0 auto;
-    padding: 20px;
-    max-width: 50%;
+        margin: 0 auto;
+        padding: 20px;
+        max-width: 50%;
+        /* Set the aspect ratio based on screen width */
+        /* Set a minimum height to ensure visibility */
+        min-height: 200px; /* Adjust the minimum height as needed */
+        /* Set a maximum height to prevent overlap with header and footer */
+        flex-direction: column;
     }
-    
+
     .title {
-    font-size: 2em;
-    font-weight: bolder;
+        font-size: 2em;
+        font-weight: bolder;
     }
 
     .date {
@@ -49,9 +54,9 @@
     }
 
     h3 {
-    margin-top: 30px;
-    font-size: 1.2em;
-    align-content: left;
+        margin-top: 30px;
+        font-size: 1.2em;
+        align-content: left;
     }
 
     p {
@@ -63,19 +68,16 @@
     }
 
     .form {
-    height: auto;
-    width: 750px;
-    background-color: rgba(255,255,255,0.13);
-    position: absolute;
-    transform: translate(-50%,-50%);
-    top: 50%;
-    left: 50%;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255,255,255,0.1);
-    box-shadow: 0 0 40px rgba(8,7,16,0.6);
-    padding: 30px 15px;
-  }
+        height: auto;
+        width: 100%; /* Adjust the width to fill the container */
+        background-color: rgba(255, 255, 255, 0.13);
+        border-radius: 10px;
+        box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+        padding: 30px 15px;
+        margin-bottom: 20px;
+        margin-top: 20px;
+    }
+
 </style>
 
   
