@@ -157,6 +157,7 @@
     }
 
     .btn {
+        text-decoration: none;
         padding: 1em 2em;
         align-self: flex-start;
         border: none;
