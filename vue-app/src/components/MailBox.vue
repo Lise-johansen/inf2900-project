@@ -45,6 +45,9 @@
                                     </svg>
                                     <p>Verified</p> 
                                 </div>
+                                <div v-else class="verified">
+                                    <p>Not verified</p>
+                                </div>
                             </div>
                         </div>
                         <div class="center-section">
@@ -763,6 +766,7 @@ export default {
 
     .listing-owner {
         font-size: 20px;
+        text-align: left;
         margin-left: 5px;
         font-weight: bold;
         line-height: 42px;
