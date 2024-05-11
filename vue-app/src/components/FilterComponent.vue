@@ -5,7 +5,7 @@
       v-for="(filter, index) in filters" 
       :key="filter.label" 
       :class="{ 'active': filter.active }" 
-      @click="toggleFilter(index)"
+      @click="toggleFilter(index), filterRoute(filter.label)" 
     >
       <!-- Display the icon associated with the filter -->
       <font-awesome-icon :icon="['fas', filter.icon]" />
@@ -54,9 +54,23 @@ export default {
         this.$emit('filter-change', this.filters);
         console.log('Current active component filters:', this.filters);
       },
+      filterRoute(filterLabel) {
+        this.$router.push({ path: '/search-page/', query: { filter: filterLabel } });
+      },
     },
 
+    mounted() {
+    const filterFromQuery = this.$route.query.filter;
+    if (filterFromQuery) {
+      const filterIndex = this.filters.findIndex(filter => filter.label === filterFromQuery);
+      if (filterIndex !== -1) {
+        this.toggleFilter(filterIndex);
+      }
+    }
+  },
 };
+
+
 
 </script>
 
