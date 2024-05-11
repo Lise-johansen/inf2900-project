@@ -49,6 +49,10 @@
         margin-top: 60px;
     }
 
+    .btn:hover {
+        background: linear-gradient(to right,#ffa500 0, #ff5733 50%, #ffa500 100%);
+    }
+
     /* Scale the image */
     .rentopia-logo {
         margin-top: 20px;
