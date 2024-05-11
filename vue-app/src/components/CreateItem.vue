@@ -102,7 +102,7 @@ export default {
             conditions: ['New', 'Used', 'Refurbished'],
             maxTextLength: 2000,
             maxTitleLength: 100,
-            maxPostalLength: 4  ,
+            maxPostalLength: 4,
             showPopup: false,
             popupMessage: ''
         }
@@ -321,7 +321,7 @@ export default {
     border-radius: 5px;
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
     padding: 20px;
-    margin-top: 15px;
+    margin-top: 20px;
     margin-bottom: 20px;
 }
 
