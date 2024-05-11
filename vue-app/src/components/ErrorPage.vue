@@ -3,11 +3,11 @@
         <h1 class="error-code">404</h1>
         <p class="error-message">Here at Rentopia you can rent anything ... Except hopes and dreams.</p>
 
-        <!-- Add a button to navigate back to the home page -->
-        <router-link to="/" class="btn btn-primary">Homepage</router-link>
-
         <!-- Display http cats 404 jpeg -->
-        <img class="http-cat" src="https://http.cat/images/404.jpg" alt="404" />
+        <img class="rentopia-logo" src="https://django.dybedahlserver.net/img/logo.fb06446f.png" alt="404" />
+        
+        <!-- Add a button to navigate back to the home page -->
+        <router-link to="/" class="btn">Homepage</router-link>
     </div>
 </template>
   
@@ -36,17 +36,28 @@
 
     /* Style for the button */
     .btn {
-        text-size-adjust: 100%;
-        text-align: center;
+        display: inline-block;
+        justify-content: center;
+        padding: 10px 20px;
+        font-family: 'louis_george_cafe', sans-serif;
+        background-color: #ff5733;
+        color: whitesmoke;
+        text-decoration: none;
+        border: none;
+        border-radius: 4px;
         cursor: pointer;
-        size: 300px;
+        margin-top: 60px;
+    }
+
+    .btn:hover {
+        background: linear-gradient(to right,#ffa500 0, #ff5733 50%, #ffa500 100%);
     }
 
     /* Scale the image */
-    .http-cat {
+    .rentopia-logo {
         margin-top: 20px;
-        width: 500px;
-        height: 400px;
+        width: 300px;
+        height: 300px;
         margin-bottom: -60px;
     }
 </style>
