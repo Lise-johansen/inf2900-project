@@ -155,7 +155,7 @@ export default {
                 postal_code: this.postal_code,
                 category: this.category,
                 condition: this.condition,
-                image: this.image,
+                image: this.imagePreviews,
             };
 
             // Update the listing based on the ID
@@ -165,6 +165,9 @@ export default {
         async updateListingData(data) {
             const ListingID = this.$route.params.id;
             try {
+
+                console.log(data);
+
                 const response = await axios.put(`edit_listing/${ListingID}/`, data);
                 console.log(response);
                 this.$router.push(`/listing/${ListingID}`)
@@ -187,8 +190,7 @@ export default {
                     this.category = listingData.category || '';
                     this.condition = listingData.condition || '';
                     this.postal_code = listingData.postal_code || '';
-                    this.images_list = listingData.images || [];
-                    this.imagePreviews = this.images_list.map(image => image_url)
+                    this.imagePreviews = listingData.images || [];
                     
                     console.log('Listing data:', listingData);
                 } catch (error) {
@@ -293,7 +295,9 @@ export default {
                             
                             // Add each image data to the imagePreviews array separately
                             this.imagePreviews.push(imageData);
-
+                            
+                            console.log("Updated imagePreviews:", this.imagePreviews);
+                            
                             // Increment the uploadedFileCount
                             this.uploadedFileCount++;
                             
