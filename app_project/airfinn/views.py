@@ -432,6 +432,9 @@ def edit_listing(request, item_id):
     # Use get_object_or_404 to get the item or return a 404 response if not found
     item = get_object_or_404(Item, id=item_id)
 
+    # Get all images for the listing and store them in a list
+    images = ItemImage.objects.filter(item=item)
+    
     # Only allow PUT requests
     if request.method != 'PUT':
         # Return a 405 Method Not Allowed response for non-PUT requests
@@ -479,9 +482,81 @@ def edit_listing(request, item_id):
             item.price_per_day = data.get('price_per_day', float(item.price_per_day))
 
         item.location = data.get('location', item.location)
+        item.postal_code = data.get('postal_code', item.postal_code)
         item.category = data.get('category', item.category)
+        item.condition = data.get('condition', item.condition)
 
+        # Get the uploaded images form data from the request
+        uploaded_images = data.get('image')
+        if not uploaded_images:
+            return JsonResponse({'error': 'Images not provided'}, status=400)
+
+        # Initialize the S3 client with your credentials and endpoint
+        ACCOUNT_ID = os.getenv('ACCOUNT_ID')
+        ACCESS_KEY_ID = os.getenv('ACCESS_KEY_ID')
+        SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
+        s3 = boto3.client('s3', 
+                        region_name='auto',
+                        endpoint_url=f'https://{ACCOUNT_ID}.r2.cloudflarestorage.com',
+                        aws_access_key_id=ACCESS_KEY_ID,
+                        aws_secret_access_key=SECRET_ACCESS_KEY)
         
+        # Compares the images in the database with the uploaded images, if an image is missing, delete it using remove_image_from_listing()
+        for image in ItemImage.objects.filter(item=item):
+            if image.image_url not in uploaded_images:
+                remove_image_from_listing(item_id, image.id)
+        
+        # Initialize a list to store the URLs of uploaded images
+        uploaded_image_urls = []
+
+        # Iterate over each uploaded image
+        for uploaded_image in uploaded_images:
+            # Check if the image is a base64-encoded string, if not skip to the next image
+            if not uploaded_image.startswith('data:image'):
+                continue
+            # Split the data to extract only the base64 part
+            base64_data = uploaded_image.split(',')[1]
+            
+            # Decode the base64-encoded image data
+            image_binary = base64.b64decode(base64_data)
+            
+            # Check if the image size exceeds the limit (2MB)
+            if len(image_binary) > 2 * 1024 * 1024:
+                return JsonResponse({'error': 'Image size exceeds the limit of 2MB'}, status=400)
+
+            # Get correct file extension
+            if uploaded_image.startswith('data:image/png'):
+                file_extension = 'png'
+            elif uploaded_image.startswith('data:image/jpeg'):
+                file_extension = 'jpeg'
+            elif uploaded_image.startswith('data:image/jpg'):
+                file_extension = 'jpg'
+            else:
+                return JsonResponse({'error': 'Invalid image format'}, status=400)
+            
+            # Generate a unique filename for the image
+            image_token_name = uuid.uuid4().hex
+            file_name = f'listing/{item_id}/{image_token_name}.{file_extension}'
+            
+            # Create a new bucket for each listing
+            bucket_name = 'rentopia-files'
+
+            try:
+                # Upload the image data to the specified bucket
+                response = s3.put_object(Bucket=bucket_name, Key=file_name, Body=image_binary)
+                URL = os.getenv('URL_DOMAIN')
+                image_url = f'{URL}/{file_name}'
+                
+                # Add the image URL to the list
+                uploaded_image_urls.append(image_url)
+            except ClientError as e:
+                return JsonResponse({'error': str(e)}, status=500)
+
+        for image_url in uploaded_image_urls:
+            # Check if the image_url already exist in the database, if not create a new entry
+            if not ItemImage.objects.filter(image_url=image_url).exists():
+                ItemImage.objects.create(item=item, image_url=image_url)
+                
         # Save the changes to the item
         item.save()
 
@@ -494,7 +569,35 @@ def edit_listing(request, item_id):
         # Handle other potential errors
         return JsonResponse({'message': f'Error updating item: {str(e)}'}, status=500)
     
+def remove_image_from_listing(listing_id, image_id):
+    """
+    Function to remove an image from a listing.
+    """
+    # Get the listing and image objects
+    listing = get_object_or_404(Item, id=listing_id)
+    image = get_object_or_404(ItemImage, id=image_id)
     
+    # Check if the image belongs to the listing
+    if image.item != listing:
+        return JsonResponse({'error': 'Image does not belong to the listing'}, status=400)
+    
+    print(image.image_url)
+
+    # Extract the filename from the URL with the folder name
+    previous_image_filename = image.image_url.split('/')[-1]
+
+    # Add the folder name to the filename
+    previous_image_filename = f'listing/{listing_id}/{previous_image_filename}'
+    print(previous_image_filename)
+    
+    # Delete the previous image from the S3 bucket
+    delete_image(previous_image_filename)
+
+    # Delete the image from the database
+    image.delete()
+    
+    return JsonResponse({'message': 'Image removed successfully'}, status=200)
+  
 def contact_us_message(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
@@ -1053,10 +1156,10 @@ def create_item(request):
         price_per_day = data.get('price_per_day')
         description = data.get('description')
         availability = data.get('availability')
-        condition = data.get('condition')
         location = data.get('location')
         postal_code = data.get('postal_code')
         category = data.get('category')
+        condition = data.get('condition')
         owner_id = user_id
 
         # Create a new item
@@ -1281,6 +1384,7 @@ def delete_image(filename):
     try:
         # Delete the previous image from the specified bucket
         s3.delete_object(Bucket=bucket_name, Key=filename)
+        print(f"Previous image {filename} deleted successfully")
     except ClientError as e:
         print(f"Error deleting previous image: {str(e)}")
 
