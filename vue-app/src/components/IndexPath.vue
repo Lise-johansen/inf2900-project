@@ -1,6 +1,9 @@
 <template>
 	<div>
 		<search-filter @filter="applyFilter" />
+		<div class="spacing"></div>
+		<IndexFilters />
+		<div class="spacing"></div>
 		<SmallListing v-for="item in filteredItems" :key="item.id" :imageUrl="item.imageUrl" :title="item.title" :location="item.location" />
         <FilterButtons />
         <ListingCarousel category="Furniture"/>
@@ -15,11 +18,12 @@
 	import SearchFilter from './SearchFilter.vue';
 	import SmallListing from './SmallListing.vue';
     import ListingCarousel from './ListingCarousel.vue';
+	import IndexFilters from './IndexFilters.vue';
 
 
 	export default {
 		name: 'App',
-		components: { SearchFilter, SmallListing, ListingCarousel},
+		components: { SearchFilter, SmallListing, ListingCarousel, IndexFilters},
 		data() {
 			return {
 				filteredItems: [],
@@ -41,7 +45,9 @@
 		-webkit-text-fill-color: transparent;
 		-webkit-background-clip: text;
 	}
-
+	.spacing {
+		padding: 1em;
+	}
 	ul {
 		list-style-type: none;
 		padding: 0;
