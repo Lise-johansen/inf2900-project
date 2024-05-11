@@ -29,6 +29,8 @@ export default {
             { label: 'Toys', icon: 'robot', active: false },
             { label: 'Instruments', icon: 'guitar', active: false},
             { label: 'Town Square', icon: 'tree-city', active: false },
+            { label: 'Winter', icon: 'snowflake', active: false},
+            { label: 'Summer', icon: 'umbrella-beach', active: false}
           ],
         };
     },
@@ -68,8 +70,9 @@ export default {
 .filter-option {
   padding: 10px; /* adjust padding for filter options */
   border: 1px solid #d3d3d3; /* border color */
+  display: flex;
   max-width: 1200px; /* maximum width for the filter options */
-  border-radius: 5px; /* rounded corners for filter options */
+  border-radius: 20px; /* rounded corners for filter options */
   user-select: none; /* prevent text selection */
   cursor: pointer; /* change mouse cursor on hover */
   margin: 0 auto; /* Center the container horizontally */
