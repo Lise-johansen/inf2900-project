@@ -321,7 +321,8 @@ export default {
     border-radius: 5px;
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
     padding: 20px;
-    margin-top: 20px;
+    margin-top: 15px;
+    margin-bottom: 20px;
 }
 
 .title {
@@ -340,6 +341,10 @@ export default {
     flex: auto;
     margin-bottom: 20px;
     max-width: 100%;
+}
+
+input[type="text"], input[type="number"], textarea {
+    outline: none;
 }
 
 input[type="text"],
