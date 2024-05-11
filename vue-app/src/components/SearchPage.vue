@@ -80,7 +80,6 @@ export default {
       // Update the current filters state and then apply these filters
       this.currentFilters = filters;
       this.applyFilters(filters);
-      console.log('Filters:', this.filteredResults[0].data);
     },
 
     applyFilters(filters) {
@@ -124,7 +123,7 @@ export default {
   display: flex;
   min-width:600px;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 3rem;
   justify-content: center;
 }
 
@@ -135,7 +134,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 8px;
+    margin: 30px;
     padding: 10px;
     border: 3px solid grey;
     border-radius: 25px;

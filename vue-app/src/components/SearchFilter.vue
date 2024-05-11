@@ -118,6 +118,10 @@
         border: 3px solid #ccc;
         border-radius: 99999999px;
         box-sizing: border-box;
+        outline: none;
+    }
+    input[type="text"]:focus {
+        border-color: gray; /* Changes border color to gray on focus */
     }
     .results-container {
         margin-top: 10px;

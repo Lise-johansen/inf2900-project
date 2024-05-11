@@ -48,13 +48,17 @@ input  {
       font-weight: bold;
       background: linear-gradient(to right, #ff5733 0%, #ffa500 25%, #ffa500 50%, #4169e1 75%, #ff5733 100%);
       -webkit-text-fill-color: transparent;
-  -webkit-background-clip: text;
+      -webkit-background-clip: text;
       width: 100%;
       max-width: 400px; /* Adjust as needed */
       padding: 1em .5em;
       border: 3px solid #ccc;
       border-radius: 99999999px;
       box-sizing: border-box;
+      outline: none;
+  }
+  input:focus {
+      border-color: gray; /* Changes border color to gray on focus */
   }
 
   .search-box {
