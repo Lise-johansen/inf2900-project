@@ -80,7 +80,6 @@ export default {
       // Update the current filters state and then apply these filters
       this.currentFilters = filters;
       this.applyFilters(filters);
-      console.log('Filters:', this.filteredResults[0].data);
     },
 
     applyFilters(filters) {
