@@ -14,7 +14,7 @@
                 </div>
                 
                 <div class="btn-wrapper">
-                    <button :disabled="isInFavourites(listing.id)" @click="addToFavourites" class="favorite-btn">
+                    <button v-if="user" :disabled="isInFavourites(listing.id)" @click="addToFavourites" class="favorite-btn">
                         <span v-if="!isInFavourites(listing.id)">Add to Favourites</span>
                         <span v-else>Already in Favourites</span>
                     </button>
