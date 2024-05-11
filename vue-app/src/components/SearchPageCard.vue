@@ -40,8 +40,8 @@ export default {
     display: none;
     align-items: none;
     justify-content: center;
-    margin: 8px;
-    padding: 10px;
+    margin: 20px;
+    padding: 20x;
     border: 3px solid grey;
     border-radius: 25px;
     transition: transform 250ms ease, color 250ms ease, border 250ms ease;
