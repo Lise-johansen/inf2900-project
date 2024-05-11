@@ -718,8 +718,23 @@ def get_conversations(request):
     data = []
     for conversation in conversations:
         # Assign sender and receiver names
-        sender_name = 'You' if conversation.user1 == user else f"{conversation.user1.first_name} {conversation.user1.last_name}"
-        receiver_name = 'You' if conversation.user2 == user else f"{conversation.user2.first_name} {conversation.user2.last_name}"
+        sender_name = 'You' if conversation.user1 == user else f"{conversation.user1.first_name}"
+        receiver_name = 'You' if conversation.user2 == user else f"{conversation.user2.first_name}"
+        
+        # Assign the correct profile picture to the receiver
+        receiver_profile_picture = conversation.user2.profile_picture_url if conversation.user2 != user else conversation.user1.profile_picture_url
+        
+        # Check if the receiver and sender is verified
+        receiver_verified = conversation.user2.is_verified if conversation.user2 != user else conversation.user1.is_verified
+        sender_verified = conversation.user1.is_verified if conversation.user1 != user else conversation.user2.is_verified
+        
+        # Assign the correct username to the receiver and sender
+        receiver_username = conversation.user2.username if conversation.user2 != user else conversation.user1.username
+        sender_username = conversation.user1.username if conversation.user1 != user else conversation.user2.username
+        
+        # Assign the correct id to the receiver and sender
+        receiver_id = conversation.user2.id if conversation.user2 != user else conversation.user1.id
+        sender_id = conversation.user1.id if conversation.user1 != user else conversation.user2.id
         
         # Get the latest message in the conversation
         latest_message = Message.objects.filter(conversation=conversation).order_by('-created_at').first()
@@ -733,15 +748,17 @@ def get_conversations(request):
                 'price_per_day': conversation.item.price_per_day,
             },
             'sender': {
-                'id': conversation.user1.id,
-                'username': conversation.user1.username,
-                'name': sender_name
+                'id': sender_id,
+                'username': sender_username,
+                'name': sender_name,
+                'verified': sender_verified
             },
             'receiver': {
-                'id': conversation.user2.id,
-                'username': conversation.user2.username,
+                'id': receiver_id,
+                'username': receiver_username,
                 'name': receiver_name,
-                'profile_picture': conversation.user2.profile_picture_url
+                'profile_picture': receiver_profile_picture,
+                'verified': receiver_verified
             },
             'latest_message': {
                 'sender': {
