@@ -32,16 +32,20 @@ export default {
         flex-wrap: wrap;
         align-content: center;
         justify-content: space-between;
-        max-width: 1200px;
-        margin: auto auto;
+        padding: 10px 10px;
+        border: 3px solid #ccc;
+        border-radius: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 700px;
+        margin: 0 auto;
     }
+
     .p-button {
         margin: 10px;
         transition: outline 200ms ease; 
     }
+    
     .p-button:hover {
         outline: 2px solid var(--primary-color);
     }
-
-
 </style>
