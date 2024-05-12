@@ -1,42 +1,45 @@
 <template>
-    <div>
+    <div class="search-bar-container">
         <div class="spacer">
             <!-- Add a spacer to push the content below the header -->
         </div>
-        <input type="text" 
-        v-model="searchTerm" 
-        @input="handleSearchChange" 
-        placeholder="Search here!" 
-        class="search-input" 
-        @keyup.enter="redirectToSearchPage"
-        style="padding: 0.5em 0.5em;">
-        <div v-if="searchTerm.length === 0">
-            <!-- Just so that the no result text doesn't show up before the user has written anything. -->
-        </div>
-        <div v-else>
-            <div v-if="!loading && filteredItems.length > 0" class="results-container">
-                <!-- Loop through each unique category -->
-                <ul class="search-results">
-                    <li v-for="category in uniqueCategories" :key="category">
-                        <!-- Display the category name -->
-                        <div class="item-category">{{ category }}</div>
-                        <!-- Display the items under this category -->
-                        <ul class="item-name">
-                            <li v-for="item in filteredItemsByCategory(category)" :key="item.pk" class="item-name">
-                                <!-- Display the item name as a clickable link -->
-                                <router-link :to="'/listing/' + item.pk" class="item-link">
-                                    {{ item.fields.name }}
-                                </router-link>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+        <div class="search-container">
+            <input type="text" 
+                v-model="searchTerm" 
+                @input="handleSearchChange" 
+                placeholder="Search here!" 
+                class="search-input" 
+                @keyup.enter="redirectToSearchPage"
+                style="padding: 0.5em 0.5em;">
+            <div v-if="searchTerm.length === 0">
+                <!-- Just so that the no result text doesn't show up before the user has written anything. -->
             </div>
-            <div v-else-if="!loading && filteredItems.length === 0" class="no-results">No results found</div>
-            <div v-else class="loading-text">Searching...</div>
+            <div v-else>
+                <div v-if="!loading && filteredItems.length > 0" class="results-container">
+                    <!-- Loop through each unique category -->
+                    <ul class="search-results">
+                        <li v-for="category in uniqueCategories" :key="category">
+                            <!-- Display the category name -->
+                            <div class="item-category">{{ category }}</div>
+                            <!-- Display the items under this category -->
+                            <ul class="item-name">
+                                <li v-for="item in filteredItemsByCategory(category)" :key="item.pk" class="item-name">
+                                    <!-- Display the item name as a clickable link -->
+                                    <router-link :to="'/listing/' + item.pk" class="item-link">
+                                        {{ item.fields.name }}
+                                    </router-link>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div v-else-if="!loading && filteredItems.length === 0" class="no-results">No results found</div>
+                <i v-else class="pi pi-spin pi-cog" style="font-size: 2.8rem;"></i>
+            </div>
         </div>
     </div>
 </template>
+
 
 
 
@@ -169,13 +172,14 @@
 
     .item-category {
         font-family: 'louis_george_cafe', sans-serif;
-        font-style: bold; 
+        font-style: italic;
+        font-weight: 800;
         font-size: 18px;
         padding-top: 5px;
         padding-bottom: 5px;
         border-bottom: 2px dashed #ebe0e0;
         text-align: left; /* Align text to the left */
-        margin-left: 0; /* Remove any left margin */
+        margin-left: 5px; /* Remove any left margin */
         padding-left: 0; /* Remove any left padding */
         box-sizing: border-box; /* Ensure padding and border are included in width */
     }
@@ -185,6 +189,18 @@
     }
     .spacer {
         height: 30px; /* Set the height of the spacer */
+    }
+    .search-bar-container {
+        text-align: center; /* Center the search bar horizontally */
+    }
+
+    .search-container {
+        display: inline-block; /* Display as block level element */
+        vertical-align: middle; /* Align vertically with inline elements */
+    }
+
+    .search-input {
+        margin-bottom: 10px; /* Add space between search input and results */
     }
 </style>
 
