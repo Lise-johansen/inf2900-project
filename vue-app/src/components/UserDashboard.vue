@@ -45,7 +45,6 @@
       <div class="spacing"></div>
     </div>
     </div>
-    <div class="divider"></div>
     </div>
 </template>
 
