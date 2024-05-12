@@ -14,15 +14,14 @@
                 </div>
                 
                 <div class="btn-wrapper">
-                    <button :disabled="isInFavourites(listing.id)" @click="addToFavourites" class="favorite-btn">
+                    <button v-if="user" :disabled="isInFavourites(listing.id)" @click="addToFavourites" class="favorite-btn">
                         <span v-if="!isInFavourites(listing.id)">Add to Favourites</span>
                         <span v-else>Already in Favourites</span>
-                    </button>    
-                </div>
-
+                    </button>
                     <div v-if="listing.owner === this.user.username">
                         <button @click="redirectToEditPage" class="edit-btn">Edit Listing</button>
                     </div>
+                </div>
 
                 <div class="divider"></div>
 
@@ -276,7 +275,8 @@ export default {
         margin: 0 auto;
         padding-top: 30px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        margin-top: 10px;
+        margin-top: 15px;
+        margin-bottom: 20px;
         border-radius: 15px;
     }
 
