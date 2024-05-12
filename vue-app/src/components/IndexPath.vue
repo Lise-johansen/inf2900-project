@@ -21,14 +21,13 @@
 
 <script>
 	import SearchFilter from './SearchFilter.vue';
-	import SmallListing from './SmallListing.vue';
     import ListingCarousel from './ListingCarousel.vue';
 	import IndexFilters from './IndexFilters.vue';
 
 
 	export default {
 		name: 'App',
-		components: { SearchFilter, SmallListing, ListingCarousel, IndexFilters},
+		components: { SearchFilter, ListingCarousel, IndexFilters},
 		data() {
 			return {
 				filteredItems: [],
