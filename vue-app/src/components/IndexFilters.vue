@@ -66,9 +66,15 @@
   
   <style scoped>
  .filter-box {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px; /* adjust spacing between filter options */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* adjust spacing between filter options */
+    padding: 10px 10px;
+    border: 3px solid #ccc;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 700px;
+    margin: 0 auto;
 }
 
 .filter-option {
