@@ -8,7 +8,7 @@
         </div>
 
             <div class="tagline">
-                <p>Own less, explore more. Rent your next adventure with Rentopia.</p>
+                <p>Own less, explore more.</p>
             </div>
 
         <div class='icon-container'>
@@ -87,8 +87,10 @@
             font-size: 21px;
             font-weight: bold;
             background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
-            -webkit-text-fill-color: transparent;
             -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 300% 300%;
+            animation : AnimationName 6s ease infinite;
         }
         
         .icon-container {
@@ -142,4 +144,5 @@
                 display: none;
             }
         }
+
 </style>
