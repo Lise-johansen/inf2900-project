@@ -20,7 +20,7 @@ export default {
     this.fetchListingData()
       .then(() => {
         console.log('Postal Code:', this.listing.postal_code);
-        this.getLocationCoordinates(`${this.listing.postal_code}, Norway`);
+        this.getLocationCoordinates(`${this.listing.postal_code}, ${this.listing.location}, Norway`);
       });
   },
   methods: {
