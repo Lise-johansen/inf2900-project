@@ -9,18 +9,29 @@
         <img src="@/assets/logo.png" alt="Company Logo" class="company-logo">
       </div>
         <input type="username" placeholder="Your email..." id="username" v-model="username">
-        <input type="password" placeholder="Your password..." id="password" v-model="password">
+        <div class="password-input-container">
+          <span class="password-toggle" @mousedown="showPassword = true" @mouseup="showPassword = false"  @mouseleave="showPassword = false">
 
-        <button type="submit"> Log in </button>
+            <font-awesome-icon v-if="showPassword" icon="fa-solid fa-eye-slash"/>
+            <font-awesome-icon v-else icon="fa-solid fa-eye"/>
+
+          </span>
+
+          <input placeholder="Your password..." id="password" v-model="password" :type="showPassword ? 'text' : 'password'">
+        </div>
+
+        <button type="submit" class="submit-button"> Log in </button>
+
         <div class="register-and-reset">
             <button class="button-link" @click="redirectToRegister"> Register here </button>
             <button class="button-link" @click="redirectToReset"> Reset password </button>
         </div>
     </form>
+
     <div v-if="showPopup" class="popup">
       <div class="popup-content">
         <p class="error-message">{{ errorMessage }}</p>
-        <button @click="hidePopup">OK</button>
+        <button class="popup-button" @click="hidePopup">OK</button>
       </div>
     </div>
   </div>
@@ -35,7 +46,8 @@ export default {
       username: '',
       password: '',
       errorMessage: '',
-      showPopup: false
+      showPopup: false,
+      showPassword: false
     };
   },
   created() {
@@ -170,7 +182,7 @@ export default {
   
   form * {
     font-family: 'Poppins', sans-serif;
-    color: #ffffff;
+    color: #000000;
     letter-spacing: 0.5px;
     outline: none;
     border: none;
@@ -208,8 +220,19 @@ export default {
     font-size: 14px;
     font-weight: 300;
   }
+  .password-input-container {
+    position: relative;
+  }
 
-  button {
+  .password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+
+  .submit-button, .button-link, .popup-button {
     font-family: 'louis_george_cafe', sans-serif;
     font-size: 30px;
     margin-top: 50px;
@@ -226,7 +249,9 @@ export default {
     background-color: rgb(241, 240, 240);
   }
 
-  button:hover {
+  .submit-button:hover,
+  .button-link:hover,
+  .popup-button:hover{
     background-color: #ffffff;
   }
 
@@ -259,6 +284,11 @@ export default {
     background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
     -webkit-text-fill-color: transparent;
     -webkit-background-clip: text;
+  }
+
+  #password {
+    /* stop the password from overlaying with the show password icon */
+    padding-right: 30px;
   }
 
   .error-message {
