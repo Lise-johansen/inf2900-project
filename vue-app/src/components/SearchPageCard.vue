@@ -4,13 +4,14 @@
       <!-- You should use `listing.id` if that's what's being passed, or `listing.pk` if that's what's named in the prop -->
       <div class="card-details">
         <div class="item-name">{{ listing.fields.name }}</div>
-        <!-- Make sure `listing.image` has the correct data -->
-        <img :src="listing.fields.image" style="max-width: 100%;" :alt="listing.fields.name"/>
-        <div class="item-data">
-          <div class="item-price">{{ listing.fields.price_per_day }} kr/day</div>
-          <div class="item-location">{{ listing.fields.location }}</div>
+        <div class="image-container">
+            <img :src="listing.fields.image" style="max-width: 100%;" :alt="listing.fields.name"/>
         </div>
-      </div>
+        <div class ="item-data">
+            <div class="item-price">{{ listing.fields.price_per_day}} kr/day</div>
+            <div class="item-location">{{ listing.fields.location}}</div>
+        </div>
+        </div>
     </router-link>
   </div>
 </template>
@@ -49,7 +50,6 @@ export default {
     min-width: 300px;
     min-height: 300px;
     max-height: 300px;
-    margin: 0 auto; /* to center the card */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* optional, for a subtle shadow */
   }
   
@@ -66,16 +66,22 @@ export default {
     color: var(--secondary-color);
   }
 
-  .item-data{
-      text-align: left;
-      display:flex;
-      justify-content: space-between;
-    }
+  .item-data {
+    width: 270px;
+    align-items: center;
+    text-align: left;
+    display:flex;
+    justify-content: space-between;
+  }
   
   .card-details {
     text-align: left;
   }
-  
+  .image-container {
+        display: flex;
+        justify-content: center;
+    }
+    
   img {
     border-radius: 25px;
     max-width: 300px;

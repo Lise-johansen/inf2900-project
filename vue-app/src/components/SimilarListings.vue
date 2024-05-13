@@ -172,13 +172,18 @@ export default {
         overflow: hidden; /* Hides any overflow */
     }
 
-    img{
+
+    img {
+        align-items: center;
         border-radius: 25px;
+        max-width: 220px;
+        max-height: 100px;
         padding-top: 5px;
         padding-bottom: 5px;
     }
 
     .item-name{
+        display: block;
         text-align: left;
         font-size: 20px;
         font-weight: bold;
