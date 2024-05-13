@@ -2,7 +2,11 @@ from .models import Item, User, Order
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.core.serializers import serialize
 from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string
 from django.core.serializers import serialize
+from django.shortcuts import get_object_or_404
+from django.core.mail import EmailMultiAlternatives
+from fernet import Fernet
 import re
 import json
 from django.contrib.auth import get_user_model
@@ -92,3 +96,131 @@ def is_item_available(item, start_date, end_date):
         item=item  # Make sure 'item' comes after the Q objects
     )
     return not orders.exists()  # Returns True if no overlapping orders found
+
+def send_order_email_notification(order):
+    # Send an email notification to the owner that a new order has been placed
+    # Get the listing from listing id
+    listing = get_object_or_404(Item, id=order.item.id)
+    
+    # Get the item name
+    item_name = listing.name
+    
+    # Get the owner from listing.owner_id
+    owner_id = listing.owner_id
+    
+    # Get the owner object
+    owner_object = get_object_or_404(User, id=owner_id)
+    
+    # Get the owner name
+    owner = owner_object.first_name
+    
+    # Get the renter
+    renter_id = order.renter_id
+    
+    # Get the renter object
+    renter_object = get_object_or_404(User, id=renter_id)
+    
+    # Get the renter name
+    renter = renter_object.first_name
+    
+    # Get the start and end dates
+    start_date = order.start_date
+    end_date = order.end_date
+    
+    # Encrypt the email 
+    key = Fernet.generate_key()
+    fernet =  Fernet(key)
+    email = owner_object.email
+    enc_email = fernet.encrypt(email.encode())
+    
+    # Load the email template
+    html_content = render_to_string('order_receipt_owner.html', {
+        'owner': owner,
+        'renter': renter,
+        'item_name': item_name,
+        'start_date': start_date,
+        'end_date': end_date
+    })
+    
+    # Load the text content
+    text_content = render_to_string('order_receipt_owner.txt', {
+        'owner': owner,
+        'renter': renter,
+        'item_name': item_name,
+        'start_date': start_date,
+        'end_date': end_date
+    })
+    
+    # Create EmailMultiAlternatives object to include both versions
+    subject = "New Order Notification"
+    from_email = "noreply@dybedahlserver.net"
+    to_email = fernet.decrypt(enc_email).decode()
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+    msg.attach_alternative(html_content, "text/html")
+    
+    # Send the email
+    msg.send()
+
+def send_order_email_receipt(order):
+    # Send an email receipt to the renter that the order has been placed
+    # Get the listing from listing id
+    listing = get_object_or_404(Item, id=order.item.id)
+    
+    # Get the item name
+    item_name = listing.name
+    
+    # Get the owner from listing.owner_id
+    owner_id = listing.owner_id
+    
+    # Get the owner object
+    owner_object = get_object_or_404(User, id=owner_id)
+    
+    # Get the owner name
+    owner = owner_object.first_name
+    
+    # Get the renter
+    renter_id = order.renter_id
+    
+    # Get the renter object
+    renter_object = get_object_or_404(User, id=renter_id)
+    
+    # Get the renter name
+    renter = renter_object.first_name
+    
+    # Get the start and end dates
+    start_date = order.start_date
+    end_date = order.end_date
+    
+    # Encrypt the email 
+    key = Fernet.generate_key()
+    fernet =  Fernet(key)
+    email = renter_object.email
+    enc_email = fernet.encrypt(email.encode())
+    
+    # Load the email template
+    html_content = render_to_string('order_receipt_renter.html', {
+        'owner': owner,
+        'renter': renter,
+        'item_name': item_name,
+        'start_date': start_date,
+        'end_date': end_date
+    })
+    
+    # Load the text content
+    text_content = render_to_string('order_receipt_renter.txt', {
+        'owner': owner,
+        'renter': renter,
+        'item_name': item_name,
+        'start_date': start_date,
+        'end_date': end_date
+    })
+    
+    # Create EmailMultiAlternatives object to include both versions
+    subject = "Order Receipt"
+    from_email = "noreply@dybedahlserver.net"
+    to_email = fernet.decrypt(enc_email).decode()
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+    msg.attach_alternative(html_content, "text/html")
+    
+    # Send the email
+    msg.send()
