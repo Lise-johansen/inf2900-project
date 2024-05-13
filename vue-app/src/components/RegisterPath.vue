@@ -74,6 +74,10 @@ export default {
           password2: this.password2,
         })
         .then(response => {
+          // send email verification
+          axios.post('send-email-verification/', {
+            email: this.email
+          })
           this.$router.push('dashboard/');
           console.log(response);
         })
