@@ -829,19 +829,20 @@ def get_conversations(request):
         
         # Check if the receiver and sender is verified
         receiver_verified = conversation.user2.is_verified if conversation.user2 != user else conversation.user1.is_verified
-        sender_verified = conversation.user1.is_verified if conversation.user1 != user else conversation.user2.is_verified
+        sender_verified = conversation.user1.is_verified if conversation.user1 == user else conversation.user2.is_verified
         
         # Assign the correct username to the receiver and sender
         receiver_username = conversation.user2.username if conversation.user2 != user else conversation.user1.username
-        sender_username = conversation.user1.username if conversation.user1 != user else conversation.user2.username
+        sender_username = conversation.user1.username if conversation.user1 == user else conversation.user2.username
         
         # Assign the correct id to the receiver and sender
         receiver_id = conversation.user2.id if conversation.user2 != user else conversation.user1.id
-        sender_id = conversation.user1.id if conversation.user1 != user else conversation.user2.id
+        sender_id = conversation.user1.id if conversation.user1 == user else conversation.user2.id
         
         # Get the latest message in the conversation
         latest_message = Message.objects.filter(conversation=conversation).order_by('-created_at').first()
         
+        print("User IDS: ", sender_id, receiver_id)
         # Prepare conversation data
         conversation_data = {
             'id': conversation.id,
@@ -927,20 +928,28 @@ def get_messages(request):
         data = []
         for message in messages:
             # Get the sender and receiver names
-            sender_name = 'You' if message.sender == user else f"{message.sender.first_name} {message.sender.last_name}"
-            receiver_name = 'You' if message.receiver == user else f"{message.receiver.first_name} {message.receiver.last_name}"
+            sender_name = 'You' if message.sender == user else f"{message.sender.first_name}"
+            receiver_name = 'You' if message.receiver == user else f"{message.receiver.first_name}"
+            
+            # Set the correct receiver and sender id
+            receiver_id = message.receiver.id if message.receiver != user else message.sender.id
+            sender_id = message.sender.id if message.sender == user else message.receiver.id
+            
+            # Set the correct receiver and sender username
+            receiver_username = message.receiver.username if message.receiver != user else message.sender.username
+            sender_username = message.sender.username if message.sender == user else message.receiver.username
             
             # Prepare message data
             message_data = {
                 'id': message.id,
                 'sender': {
-                    'id': message.sender.id,
-                    'username': message.sender.username,
+                    'id': sender_id,
+                    'username': sender_username,
                     'name': sender_name
                 },
                 'receiver': {
-                    'id': message.receiver.id,
-                    'username': message.receiver.username,
+                    'id': receiver_id,
+                    'username': receiver_username,
                     'profile_picture': message.receiver.profile_picture_url,
                     'name': receiver_name
                 },
@@ -1024,7 +1033,7 @@ def send_messages(request):
         conversation = Conversation.objects.create(user1=sender, user2=receiver, item=item)
         
     # Create a new message
-    message = Message.objects.create(conversation=conversation, sender=sender, receiver=receiver, message=message_text, image=message_image)
+    message = Message.objects.create(conversation=conversation, sender=sender, receiver=receiver, message=message_text)
     
     # Upload the image to the S3 bucket if there is one
     if message_image:
