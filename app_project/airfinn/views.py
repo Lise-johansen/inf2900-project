@@ -12,7 +12,7 @@ from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
 import os, json, jwt, random, base64, boto3, uuid
-from airfinn.utils import get_user_by_id, email_checks, password_checks, get_reserved_items, is_item_available
+from airfinn.utils import get_user_by_id, email_checks, password_checks, get_reserved_items, is_item_available, send_order_email_notification, send_order_email_receipt
 from botocore.exceptions import ClientError
 from django.db.models import Q
 from dotenv import load_dotenv
@@ -1671,6 +1671,12 @@ def order_listing(request, listing):
 
     # Create a new order
     order = Order.objects.create(item=item, renter_id=user_id, start_date=start_date, end_date=end_date)
+    
+    # Send an email notification to the owner that a new order has been placed
+    send_order_email_notification(order)
+    
+    # Send an email receipt to the renter that the order has been placed
+    send_order_email_receipt(order)
     
     # Return a success response
     return JsonResponse({'message': 'Order created successfully'}, status=201)
