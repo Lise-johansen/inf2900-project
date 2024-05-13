@@ -16,9 +16,16 @@
       
       <input placeholder="Your phone number *" id="phone" v-model="phone" autocomplete="off" required>
       
-      <input type="password" placeholder="Your password *" id="password" v-model="password1" autocomplete="off" required>
+      <span class="password-toggle" @mousedown="showPassword = true" @mouseup="showPassword = false"  @mouseleave="showPassword = false">
+
+        <font-awesome-icon v-if="showPassword" icon="fa-solid fa-eye-slash"/>
+        <font-awesome-icon v-else icon="fa-solid fa-eye"/>
+
+      </span>
+
+      <input placeholder="Your password *" id="password" v-model="password1" autocomplete="off" required :type="showPassword ? 'text' : 'password'">
       
-      <input type="password" placeholder="Repeat your password" id="password-confirm" v-model="password2" autocomplete="off">
+      <input placeholder="Repeat your password" id="password-confirm" v-model="password2" autocomplete="off" :type="showPassword ? 'text' : 'password'">
 
       <label class="required-fields"><span>Required fields *</span></label>
       
@@ -53,7 +60,8 @@ export default {
         showPassword2: false,
         errorMessage: '',
         showPopup: false,
-        isEmailValid: true
+        isEmailValid: true,
+        showPassword: false
       };
   },
 
@@ -216,6 +224,19 @@ export default {
     margin-top: 5px;
     font-size: 14px;
     font-weight: 300;
+  }
+
+  #password {
+    /* stop the password from overlaying with the show password icon */
+    padding-right: 32px;
+  }
+
+  .password-toggle {
+    position: absolute;
+    top: 363px;
+    right: 45px;
+    transform: translateY(-50%);
+    cursor: pointer;
   }
 
   ::placeholder {
