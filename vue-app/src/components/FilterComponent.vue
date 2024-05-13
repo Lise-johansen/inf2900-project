@@ -1,19 +1,12 @@
 <template>
   <div class="filter-box">
-    <div 
-      class="filter-option" 
-      v-for="(filter, index) in filters" 
-      :key="filter.label" 
-      :class="{ 'active': filter.active }" 
-      @click="toggleFilter(index), filterRoute(filter.label)" 
-    >
-      <!-- Display the icon associated with the filter -->
-      <font-awesome-icon :icon="['fas', filter.icon]" />
+    <div class="filter-option" v-for="(filter, index) in filters" :key="filter.label" :class="{ 'active': filter.active }" @click="toggleFilter(index), filterRoute(filter.label)">
+      <!-- Apply the fa-icon class to the icon -->
+      <font-awesome-icon class="fa-icon" :icon="['fas', filter.icon]" />
       {{ filter.label }}
     </div>
   </div>
 </template>
-
 <script>
   export default {
       name: 'ItemFilters',
@@ -94,6 +87,10 @@
     user-select: none; /* prevent text selection */
     cursor: pointer; /* change mouse cursor on hover */
     margin: 0 auto; /* Center the container horizontally */
+  }
+
+  .fa-icon {
+    margin-right: 5px; /* adjust spacing between icon and text */
   }
 
   .filter-option.active {
