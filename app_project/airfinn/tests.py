@@ -164,7 +164,7 @@ class EditListingTestCase(TestCase):
         self.noOwner = User.objects.create_user(**self.user2)
         
         # Set up test data
-        self.item = Item.objects.create(name='Test Item', description='Test Description', price_per_day=10, location='Test Location', category='Test Category', owner=self.owner)
+        self.item = Item.objects.create(name='Test Item', description='Test Description', price_per_day=10, location='Test Location', postal_code='9020', category='Test Category', condition='Used', owner=self.owner)
 
         self.url = reverse('edit_listing', args=[self.item.id])
         self.client = Client()
@@ -184,6 +184,10 @@ class EditListingTestCase(TestCase):
 
         # Get token
         token = response.json().get('token') 
+        
+        # Simulate image file data
+        image_data = b'fake image data'
+        base64_image = base64.b64encode(image_data).decode('utf-8')
 
         # update request data
         updated_data = {
@@ -191,7 +195,10 @@ class EditListingTestCase(TestCase):
         'description': 'This is an updated item',
         'price_per_day': 10.00,
         'location': 'Updated Location',
+        'postal_code': '0910',
         'category': 'Updated Category',
+        'condition': 'New',
+        'image': f'data:image/jpeg;base64,{base64_image}'
         }
 
         # Send PUT request
@@ -204,7 +211,9 @@ class EditListingTestCase(TestCase):
         self.assertEqual(Item.objects.get(id=self.item.id).description, updated_data['description'])
         self.assertEqual(Item.objects.get(id=self.item.id).price_per_day, updated_data['price_per_day'])
         self.assertEqual(Item.objects.get(id=self.item.id).location, updated_data['location'])
+        self.assertEqual(Item.objects.get(id=self.item.id).postal_code, updated_data['postal_code'])
         self.assertEqual(Item.objects.get(id=self.item.id).category, updated_data['category'])
+        self.assertEqual(Item.objects.get(id=self.item.id).condition, updated_data['condition'])
 
     def test_no_owner(self):
         login_data = {
@@ -331,11 +340,16 @@ class EditListingTestCase(TestCase):
 
         # Get token
         token = response.json().get('token') 
+        
+        # Simulate image file data
+        image_data = b'fake image data'
+        base64_image = base64.b64encode(image_data).decode('utf-8')
 
         # update request data
         updated_data = {
         'name': 'Updated Item',
         'description': 'This is an updated item',
+        'image': f'data:image/jpeg;base64,{base64_image}'
         }
 
         # Send PUT request
@@ -348,7 +362,9 @@ class EditListingTestCase(TestCase):
         self.assertEqual(Item.objects.get(id=self.item.id).description, updated_data['description'])
         self.assertEqual(Item.objects.get(id=self.item.id).price_per_day, 10)
         self.assertEqual(Item.objects.get(id=self.item.id).location, 'Test Location')
+        self.assertEqual(Item.objects.get(id=self.item.id).postal_code, '9020')
         self.assertEqual(Item.objects.get(id=self.item.id).category, 'Test Category')
+        self.assertEqual(Item.objects.get(id=self.item.id).condition, 'Used')
 
 
 class DeleteListingTestCase(TestCase):
