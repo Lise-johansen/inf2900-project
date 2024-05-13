@@ -214,7 +214,6 @@ def register(request):
     if User.objects.filter(email=data.get('email')).exists():
         return JsonResponse({'error': 'Email already exists'}, status=400)
     
-    username = fernet.decrypt(enc_email).decode()
     # Create a new user
     user = User.objects.create_user(username= fernet.decrypt(enc_email).decode(), 
                                     email= fernet.decrypt(enc_email).decode(), 
@@ -230,34 +229,10 @@ def register(request):
         # Authentication successful
         # Generate an access token
         token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256')
-
-        # Set the token as a cookie in the response
-        response = JsonResponse({'token': token})
-        response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
-        
-        verification_token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256')
-        
-        verification_link = f"{settings.FRONTEND_URL}/dashboard?token={verification_token}"
-        
-        # Load HTML content from template
-        html_content = render_to_string('verification_email.html', {'verification_link': verification_link, 'username': username})
-    
-        # Load plain text content from template
-        text_content = render_to_string('verification_email.txt', {'verification_link': verification_link, 'username': username})
-
-        # Create EmailMultiAlternatives object to include both versions
-        subject = "Verify Your Email"
-        from_email = "noreply@dybedahlserver.net"
-        to_email = fernet.decrypt(enc_email).decode()
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-        msg.attach_alternative(html_content, "text/html")
         
         # Set the token as a cookie in the response
         response = JsonResponse({'token': token, 'auth_user': True, 'verification_sent': True})
         response.set_cookie('token', token, httponly=False, secure=False, samesite=False)
-        
-        # Send the email
-        msg.send()
         
         return response
     else:
@@ -362,7 +337,52 @@ def verify_email(request):
         return JsonResponse({'message': 'Verification link has expired'}, status=400)
     except jwt.DecodeError:
         return JsonResponse({'message': 'Invalid verification token'}, status=400)
- 
+    
+def send_verification_email(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+    
+    # Get the user ID from the token
+    user_id = get_user_id_for_token_auth(request)
+    
+    # Get the user object from the database
+    user = get_user_by_id(user_id)
+    
+    if user is None:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    
+    # Encrypt the email 
+    key = Fernet.generate_key()
+    fernet =  Fernet(key)
+    
+    # Encrypt the email
+    enc_email = fernet.encrypt(user.email.encode())
+    
+    # Send the verification email
+    username = fernet.decrypt(enc_email).decode()
+    
+    verification_token = jwt.encode({'user_id': user.id}, settings.SECRET_KEY, algorithm='HS256')
+        
+    verification_link = f"{settings.FRONTEND_URL}/dashboard?token={verification_token}"
+    
+    # Load HTML content from template
+    html_content = render_to_string('verification_email.html', {'verification_link': verification_link, 'username': username})
+
+    # Load plain text content from template
+    text_content = render_to_string('verification_email.txt', {'verification_link': verification_link, 'username': username})
+
+    # Create EmailMultiAlternatives object to include both versions
+    subject = "Verify Your Email"
+    from_email = "noreply@dybedahlserver.net"
+    to_email = fernet.decrypt(enc_email).decode()
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+    msg.attach_alternative(html_content, "text/html")
+    
+    # Send the email
+    msg.send()
+    
+    # Return a success response
+    return JsonResponse({'message': 'Verification email sent'}, status=200)
  
 def search_items(request):
     category = request.GET.get('category', '')

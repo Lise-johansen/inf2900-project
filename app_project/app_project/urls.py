@@ -35,6 +35,7 @@ urlpatterns = [
     path('api/logout/', views.logout, name='logout'),
     path('api/upload-profile-picture/', utils.upload_profile_picture, name='upload_profile_picture'),
     path('api/verify-email/', views.verify_email, name='verify_email'),
+    path('api/send-email-verification/', views.send_verification_email, name='send_verification_email'),
     path('api/edit_listing/<int:item_id>/', views.edit_listing, name='edit_listing'),
     path('api/delete_item/<int:item_id>', views.delete_listing, name='delete_listing'),
     path('api/contact_us_message/', views.contact_us_message, name='contact_us_message'),

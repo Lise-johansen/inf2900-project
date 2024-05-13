@@ -61,9 +61,22 @@ export default {
     },
     retryVerification() {
       // Reset states and retry verification
-      this.isLoading = true;
-      this.verificationError = null;
-      this.verifyEmail();
+      axios.post('send-email-verification/', {
+        email: this.email
+      })
+      .then(response => {
+        // email sent popup
+        alert('Verification email sent successfully!');
+        console.log(response);
+        this.isLoading = true;
+        this.verificationError = null;
+        this.verifyEmail();
+      })
+      .catch(error => {
+        console.error(error);
+        this.isLoading = false;
+        this.verificationError = 'Error sending verification email. Please try again.'
+      });
     },
     dismissBanner() {
       // Dismiss the banner and store the state in local storage
