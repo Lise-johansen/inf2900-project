@@ -4,20 +4,22 @@
             <h1 class="category-header">{{this.category}}</h1>
             <Button class= "refresh-button" icon="pi pi-refresh" rounded outlined @click="refreshListings"/>
         </div>
-            <Carousel :value="listings" :orientation="horizontal" :circular="true" :numVisible="4" :numScroll="2" :responsiveOptions="responsiveOptions" v-model:page="page">
-                <template #item="slotProps">
-                    <router-link :to="'/listing/' + slotProps.data.id" class="carousel-item">
-                        <div class="carousel-details">
-                            <div class="item-name">{{ slotProps.data.name }}</div>
+        <Carousel :value="listings" :orientation="horizontal" :circular="true" :numVisible="4" :numScroll="2" :responsiveOptions="responsiveOptions" v-model:page="page" >
+            <template #item="slotProps">
+                <router-link :to="'/listing/' + slotProps.data.id" class="carousel-item">
+                    <div class="carousel-details">
+                        <div class="item-name">{{ slotProps.data.name }}</div>
+                        <div class="image-container">
                             <img :src="slotProps.data.image" style="max-width: 100%;" :alt="slotProps.data.name"/>
-                            <div class ="item-data">
-                                <div class="item-price">{{ slotProps.data.price_per_day}} kr/day</div>
-                                <div class="item-location">{{ slotProps.data.location}}</div>
-                            </div>
                         </div>
-                    </router-link>
-                </template>
-            </Carousel>
+                        <div class ="item-data">
+                            <div class="item-price">{{ slotProps.data.price_per_day}} kr/day</div>
+                            <div class="item-location">{{ slotProps.data.location}}</div>
+                        </div>
+                    </div>
+                </router-link>
+            </template>
+        </Carousel>
     </div>
 </template>
 
@@ -138,34 +140,49 @@ export default {
         font-family: 'louis_george_cafe', sans-serif;
         color: var(--primary-color);
         cursor: pointer;
-        display:flex;
+        display: flex;
         align-items: center;
         justify-content: center;
-        margin: 8px;
         padding: 10px;
         border: 3px solid grey;
         border-radius: 25px;
         transition: transform 250ms ease, color 250ms ease, border 250ms ease; 
-        max-width: 300px; /* or whatever width you want */
-        min-width: 300px;
-        min-height: 300px;
-        max-height: 300px;
+        height: 270px;
+        width: 320px;
+        margin: 8px;
         text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* optional, for a subtle shadow */
     }
     .item-data{
+        margin: 10px;
+        width: 270px;
+        align-items: center;
         text-align: left;
         display:flex;
         justify-content: space-between;
     }
 
-    img{
+    .carousel-details {
+        width: auto;
+        text-align: left;
+    }
+
+    .image-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    img {
+        align-items: center;
         border-radius: 25px;
+        max-width: 220px;
+        max-height: 150px;
         padding-top: 5px;
         padding-bottom: 5px;
     }
 
     .item-name{
-        text-align: left;
+        text-align: left;;
         font-size: 20px;
         font-weight: bold;
     }
