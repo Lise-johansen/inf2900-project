@@ -1,0 +1,8 @@
+You placed an order for {{ item_name }} from {{ start_date }} to {{ end_date }}.
+
+We've notified {{ owner }} about your reservation.
+
+If you have any questions please contact us or the seller!
+
+Sincerely,
+The Rentopia Team
