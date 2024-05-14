@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="page-title">Listings</h1>
+        <h1 class="page-title">My Listings</h1>
         <div class="listings-container">
         <div v-for="(listing, index) in displayedListings" :key="index" class="card" :style="{ marginRight: (index + 1) % 5 === 0 ? '0' : '10px' }">
             <router-link :to="'/listing/' + listing.id" class="card-content">
