@@ -278,7 +278,8 @@ export default {
         margin: 0 auto;
         padding-top: 30px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        margin-top: 10px;
+        margin-top: 15px;
+        margin-bottom: 20px; 
         border-radius: 15px;
     }
 
