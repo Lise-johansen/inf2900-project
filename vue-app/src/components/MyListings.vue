@@ -6,10 +6,12 @@
             <router-link :to="'/listing/' + listing.id" class="card-content">
             <div class="card-details">
                 <div class="item-name">{{ listing.name }}</div>
-                <img :src="listing.image[0]" style="max-width: 100%;" :alt="listing.name" />
+                <div class="image-container">
+                    <img :src="listing.image[0]" style="max-width: 100%;" :alt="listing.name" />
+                </div>
                 <div class="card-footer">
-                <div class="item-price">{{ listing.price_per_day }} kr/day</div>
-                <div class="item-location">{{ listing.location }}</div>
+                    <div class="item-price">{{ listing.price_per_day }} kr/day</div>
+                    <div class="item-location">{{ listing.location }}</div>
                 </div>
             </div>
             </router-link>
@@ -212,14 +214,24 @@
         text-align: left;
     }
 
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px;
+        width: 80%;
+    }
+
+    .image-container {
+        display: flex;
+        justify-content: center;
+    }
+
     img {
         border-radius: 25px;
+        max-width: 300px;
+        max-height: 220px;
         padding-top: 5px;
         padding-bottom: 5px;
-        max-width: 300px;
-        max-height: 150px;
-        min-height: 150px;
-        min-width: 150px;
     }
 
     .item-name {
