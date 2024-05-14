@@ -1,4 +1,5 @@
 <template>
+  <div class="reserved-listing">
   <div class="card">
     <router-link :to="'/listing/' + listing.id" class="card-content">
       <!-- You should use `listing.id` if that's what's being passed, or `listing.pk` if that's what's named in the prop -->
@@ -16,6 +17,7 @@
   </div>
   <div class="item-dates"> Renting Period: </div>
   <div class="item-dates"> From {{ formatDate(listing.start_date) }}   To   {{ formatDate(listing.end_date) }}</div>
+  </div>
 </template>
 
 <script>
@@ -107,6 +109,12 @@ export default {
     margin-top: 7px;
     font-size: 16px;
     font-weight: bold;
+  }
+
+  .reserved-listing:hover{
+    color: var(--secondary-color);
+    scale: 1.03;
+    border: none;
   }
 
   .card:hover {
