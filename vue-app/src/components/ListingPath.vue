@@ -13,14 +13,15 @@
                     </div>
                 </div>
                 
-                <div class="btn-wrapper">
-                    <button v-if="user" :disabled="isInFavourites(listing.id)" @click="addToFavourites" class="favorite-btn">
+                <div class="btn-wrapper" v-if="listing.owner !== user.username">
+                    <button :disabled="isInFavourites(listing.id)" @click="addToFavourites" class="favorite-btn">
                         <span v-if="!isInFavourites(listing.id)">Add to Favourites</span>
                         <span v-else>Already in Favourites</span>
-                    </button>
-                    <div v-if="listing.owner === this.user.username">
-                        <button @click="redirectToEditPage" class="edit-btn">Edit Listing</button>
-                    </div>
+                    </button>    
+                </div>
+                
+                <div class="btn-wrapper" v-if="listing.owner === this.user.username">
+                    <button @click="redirectToEditPage" class="edit-btn">Edit Listing</button>
                 </div>
 
                 <div class="divider"></div>
@@ -43,8 +44,9 @@
                                 <p>{{ formatDate(selectedDates) }}</p>
                             </div>
                         </div>
-                        
-                        <button @click="orderListing" class="order-btn" :disabled="!selectedDates">Order Listing</button>
+                        <div v-if="listing.owner !== this.user.username">
+                            <button @click="orderListing" class="order-btn" :disabled="!selectedDates">Order Listing</button>
+                        </div>
                     </div>
                 </div>
 
@@ -53,8 +55,9 @@
                         <img :src="this.profilepicture" alt="Profile picture" class="profile-picture">
                     </div>
                     <p class="firstname"> Rent from: {{ listing.firstname }} </p>
-
-                    <button class="profile-btn" @click="sendMessage">Send message</button>
+                    <div v-if="listing.owner !== this.user.username">
+                        <button class="profile-btn" @click="sendMessage">Send message</button>
+                    </div>
                 </div>
             </div>
             <div class="divider"></div>
@@ -276,7 +279,7 @@ export default {
         padding-top: 30px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         margin-top: 15px;
-        margin-bottom: 20px;
+        margin-bottom: 20px; 
         border-radius: 15px;
     }
 
@@ -438,6 +441,7 @@ export default {
     .divider {
         background: linear-gradient(to right, transparent, #ff5733, #ffa500, #4169e1, transparent);
     }
+    
     .reverse-divider {
         background: linear-gradient(to left, transparent, #ff5733, #ffa500, #4169e1, transparent);
     }
