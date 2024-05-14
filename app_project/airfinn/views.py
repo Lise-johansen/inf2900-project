@@ -12,7 +12,7 @@ from django.core.serializers import serialize
 from django.conf import settings # Import settings to get the frontend URL
 from fernet import Fernet
 import os, json, jwt, random, base64, boto3, uuid
-from airfinn.utils import get_user_by_id, email_checks, password_checks, get_reserved_items, is_item_available, send_order_email_notification, send_order_email_receipt
+from airfinn.utils import get_user_by_id, email_checks, password_checks, get_reserved_items, is_item_available, send_order_email_notification, send_order_email_receipt, get_user_orders
 from botocore.exceptions import ClientError
 from django.db.models import Q
 from dotenv import load_dotenv
@@ -1461,7 +1461,9 @@ def reserved_listings(request):
 
     listings = []
 
+    reservations = get_user_orders(user_id)
 
+    x=0
     for listing in listing_id:
         item = get_object_or_404(Item, id=listing['pk'])
 
@@ -1481,7 +1483,13 @@ def reserved_listings(request):
             "image": images,
             "rating": item.rating,
         }
+        dates ={ 
+            "start_date": reservations[x].get('start_date'),
+            "end_date": reservations[x].get('end_date')
+        }
+        listing.update(dates)
         listings.append(listing)
+        x +=1
         
     return JsonResponse(listings, safe=False)
 
@@ -1615,11 +1623,14 @@ def get_reserved_dates(request, listing):
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
     
     # Get the item object
+    print("listing", listing)
     item = get_object_or_404(Item, id=listing)
 
     # Get all the reservations for the item
+    print("item", item)
     reservations = Order.objects.filter(item=item)
 
+    print("reservations", reservations)
     # Prepare the data to return
     data = []
     for reservation in reservations:

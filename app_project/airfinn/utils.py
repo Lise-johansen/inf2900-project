@@ -82,6 +82,23 @@ def get_reserved_items(user):
 
     return data
 
+def get_user_orders(user):
+    # Get all the orders for the given user
+    orders = Order.objects.filter(renter_id=user)
+    data = serialize('json', orders)
+
+    reservation_data = []
+    for order in orders:
+        item = Item.objects.get(id=order.item_id)
+        reservation_data.append({
+            'id': item.id,
+            'name': item.name,
+            'start_date': order.start_date,
+            'end_date': order.end_date,
+        })
+
+    return reservation_data
+
 def is_item_available(item, start_date, end_date):
     # Ensure input dates are datetime objects
     if isinstance(start_date, str):
