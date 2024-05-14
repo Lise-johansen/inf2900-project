@@ -4,13 +4,18 @@
       <!-- You should use `listing.id` if that's what's being passed, or `listing.pk` if that's what's named in the prop -->
       <div class="card-details">
         <div class="item-name">{{ listing.name }}</div>
-        <!-- Make sure `listing.image` has the correct data -->
-        <img :src="listing.image[0]" style="max-width: 100%;" :alt="listing.name"/>
-          <div class="item-price">{{ listing.price_per_day }} kr/day</div>
-          <div class="item-location">{{ listing.location }}</div>
+        <div class="image-container">
+            <img :src="listing.image" style="max-width: 100%;" :alt="listing.name"/>
+        </div>
+        <div class ="item-data">
+            <div class="item-price">{{ listing.price_per_day}} kr/day</div>
+            <div class="item-location">{{ listing.location}}</div>
+        </div>
       </div>
     </router-link>
   </div>
+  <div class="item-dates"> Renting Period: </div>
+  <div class="item-dates"> From {{ formatDate(listing.start_date) }}   To   {{ formatDate(listing.end_date) }}</div>
 </template>
 
 <script>
@@ -20,6 +25,11 @@ export default {
     listing: {
       type: Object,
       required: true,
+    }
+  },
+  methods: {
+    formatDate(date) {
+      return new Date(date).toLocaleDateString('en-GB');
     }
   },
 }
@@ -51,7 +61,14 @@ export default {
     margin: 0 auto; /* to center the card */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* optional, for a subtle shadow */
   }
-  
+  .item-data{
+    margin: 10px;
+    width: 250px;
+    align-items: center;
+    text-align: left;
+    display:flex;
+    justify-content: space-between;
+  }
   .card-content {
     color: var(--primary-color);
     display: flex;
@@ -82,7 +99,16 @@ export default {
     font-size: 20px;
     font-weight: bold;
   }
-  
+
+  .item-dates {
+    background: linear-gradient(to right, #ff5733, #ffa500, #4169e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-top: 7px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
   .card:hover {
     color: var(--secondary-color);
     scale: 1.03;
