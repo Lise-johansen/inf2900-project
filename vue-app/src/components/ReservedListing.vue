@@ -88,13 +88,18 @@ export default {
     text-align: left;
   }
   
-  img {
-    border-radius: 25px;
-    max-width: 300px;
-    max-height: 220px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-  }
+  .image-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    img {
+        border-radius: 25px;
+        max-width: 300px;
+        max-height: 220px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
   
   .item-name {
     text-align: left;

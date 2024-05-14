@@ -5,7 +5,9 @@
             <router-link :to="'/listing/' + favourite.id" class="card-content">
                 <div class="card-details">
                     <div class="item-name">{{ favourite.name }}</div>
+                    <div class="image-container">
                     <img :src="favourite.image" style="max-width: 100%;" :alt="favourite.name" />
+                </div>
                     <div class="card-footer">
                         <div class="item-price">{{ favourite.price_per_day }} kr/day</div>
                         <div class="item-location">{{ favourite.location }}</div>
@@ -146,11 +148,17 @@ export default {
         text-align: left;
     }
 
+    .image-container {
+        display: flex;
+        justify-content: center;
+    }
+
     img {
         border-radius: 25px;
+        max-width: 300px;
+        max-height: 220px;
         padding-top: 5px;
         padding-bottom: 5px;
-        max-width: 100%;
     }
 
     .item-name {
