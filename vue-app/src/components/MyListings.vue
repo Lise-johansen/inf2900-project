@@ -222,8 +222,12 @@
     }
 
     .image-container {
+        width: 100%; /* Allows image container to take full width */
+        height: 220px; /* Height control for the image container */
         display: flex;
         justify-content: center;
+        align-items: center; /* Centering the image vertically and horizontally */
+        overflow: hidden; /* Ensures images do not overflow their div */
     }
 
     img {

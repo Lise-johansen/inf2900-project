@@ -601,14 +601,12 @@ def remove_image_from_listing(listing_id, image_id):
     if image.item != listing:
         return JsonResponse({'error': 'Image does not belong to the listing'}, status=400)
     
-    print(image.image_url)
 
     # Extract the filename from the URL with the folder name
     previous_image_filename = image.image_url.split('/')[-1]
 
     # Add the folder name to the filename
     previous_image_filename = f'listing/{listing_id}/{previous_image_filename}'
-    print(previous_image_filename)
     
     # Delete the previous image from the S3 bucket
     delete_image(previous_image_filename)
@@ -862,7 +860,6 @@ def get_conversations(request):
         # Get the latest message in the conversation
         latest_message = Message.objects.filter(conversation=conversation).order_by('-created_at').first()
         
-        print("User IDS: ", sender_id, receiver_id)
         # Prepare conversation data
         conversation_data = {
             'id': conversation.id,
@@ -1430,9 +1427,8 @@ def delete_image(filename):
     try:
         # Delete the previous image from the specified bucket
         s3.delete_object(Bucket=bucket_name, Key=filename)
-        print(f"Previous image {filename} deleted successfully")
     except ClientError as e:
-        print(f"Error deleting previous image: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 
@@ -1623,14 +1619,11 @@ def get_reserved_dates(request, listing):
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
     
     # Get the item object
-    print("listing", listing)
     item = get_object_or_404(Item, id=listing)
 
     # Get all the reservations for the item
-    print("item", item)
     reservations = Order.objects.filter(item=item)
 
-    print("reservations", reservations)
     # Prepare the data to return
     data = []
     for reservation in reservations:
