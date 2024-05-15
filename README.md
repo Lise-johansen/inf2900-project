@@ -1,32 +1,67 @@
-[![Django CI](https://github.com/uit-inf-2900/Team11/actions/workflows/django.yml/badge.svg)](https://github.com/uit-inf-2900/Team11/actions/workflows/django.yml)[![VUE App CI](https://github.com/uit-inf-2900/Team11/actions/workflows/node.js.yml/badge.svg)](https://github.com/uit-inf-2900/Team11/actions/workflows/node.js.yml)
-# Step-by-step instruction for how to setup virtual env and start.
+[![Django CI](https://github.com/uit-inf-2900/Team11/actions/workflows/django.yml/badge.svg)](https://github.com/uit-inf-2900/Team11/actions/workflows/django.yml) [![VUE App CI](https://github.com/uit-inf-2900/Team11/actions/workflows/node.js.yml/badge.svg)](https://github.com/uit-inf-2900/Team11/actions/workflows/node.js.yml)
 
+# Rentopia: Own less, Explore more
 
-# 1. Create virtual environment (if not created)
-    -$ python3 -m venv environment-name
+## File structure
+The repo contains folders for Django backend and Vue Frontend.
+The files necessary for the project are these:
+    
+### Django Structure
+- app_project/   
+    - airfinn/  
+        - templates/    
+        - \_\_init\_\_.py   
+        - admin.py  
+        - apps.py   
+        - models.py     
+        - test.py   
+        - utils.py      
+        - views.py  
+    - app_project/
+        - .env  
+        - \_\_init\_\_.py
+        - asgi.py
+        - authenticat.py
+        - settings.py
+        - settings_test.py
+        - urls.py
+        - wsgi.py
+    - manage.py
+    
+### Vue.js Structure
+- vue_app/
+    - dist/
+        - `generated with npm run build`
+    - node_modules/
+        - `all node packages`
+    - public/
+        - `public files from npm run build`
+    - src/
+        - assets/
+            - `static images`
+        - components/
+            - `all vue components`
+        - App.vue
+        - main.js
+        - router.js
+    - babel.config.js
+    - jsconfig.json
+    - package.json    `all packages used for our project`
+    - package-lock.json
+    - vue.config.js
 
-# 2. Start virtual environment
-    -$ source environment-name/bin/activate
+## Requirements
+Start a virtual environment with `python -m venv "environment name"`    
+Install requirements.txt in root folder `pip install -r requirements.txt`    
 
-# 2.1 How to stop virtual environment
-    -$ deactivate environment-name
+Then install the requirements for Vue.js    
+Inside the vue-app folder run `npm install`    
+## Compiling
+When all the requirements are installed, you can run and host the website.    
+First build the Vue front-end with `npm run build`    
+Then host the wsgi/asgi file `app_project/app_project/wsgi.py | app_project/app_project/asgi.py` with your chosen host.
 
-# 3. Install requirements
-    -$ pip3 install -r requirements.txt
-
-# 4. Start django app locally, be in the inner app_project folder
-    -$ python3 manage.py runserver
-
-# 4.1 Start django on server (if not running) !! HAS TO BE IN VIRTUAL ENVIRONMENT and in the project folder
-    -$ python3 manage.py runserver 10.0.0.194:8000
-
-# 5. Download vue-cli
-    -$ npm install -g @vue/cli
-    -$ npm install crypto-js
-    -$ npm install axios
-
-# 5.1 Start vue server (MUST be done inside vue-app folder) also use a different window for this as you need to run both simultaniously
-    -$ npm run serve
-
-# 5.2 Build app for development
-    -$ npm run build
+## Development hosting
+Alternative to compiling the project it can be hosted for development.    
+Django: `python manage.py runserver`    
+Vue: `npm run serve`
