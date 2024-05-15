@@ -6,7 +6,7 @@
       <div class="card-details">
         <div class="item-name">{{ listing.name }}</div>
         <div class="image-container">
-            <img :src="listing.image" style="max-width: 100%;" :alt="listing.name"/>
+            <img :src="listing.image[0]" style="max-width: 100%;" :alt="listing.name"/>
         </div>
         <div class ="item-data">
             <div class="item-price">{{ listing.price_per_day}} kr/day</div>
