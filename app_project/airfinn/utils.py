@@ -1,7 +1,5 @@
 from .models import Item, User, Order
-from django.http import JsonResponse, HttpResponseNotAllowed
 from django.core.serializers import serialize
-from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from django.core.serializers import serialize
 from django.shortcuts import get_object_or_404
@@ -61,9 +59,7 @@ def password_checks(password):
     return True
 
 def upload_profile_picture(request):
-    print('upload_profile_picture')
     if request.method == 'POST' :
-        print('in if')
         profile_picture = request.FILES['profilePicture']
             
         # Process the uploaded image here
@@ -71,7 +67,6 @@ def upload_profile_picture(request):
             
         return JsonResponse({'message': 'Profile picture uploaded successfully'})
     else:
-         print('in else')
          return JsonResponse({'error': 'Failed to upload profile picture'}, status=400)
 
 
