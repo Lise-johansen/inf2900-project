@@ -96,9 +96,9 @@ export default {
             uploadedFileCount: 0,
             maxFiles: 5,
             // Change size if needed
-            maxSizeInBytes: 2 * 1024 * 1024, // 2MB
+            maxSizeInBytes: 5 * 1024 * 1024, // 5MB
             // Define the available categories
-            categories: ['Summer', 'Winter', 'Tools', 'Electronics', 'Clothing', 'Furniture', 'Sports Equipment', 'Books', 'Other'],
+            categories: ['Sports Equipment', 'Books', 'Electronics', 'Clothing', 'Furniture', 'Tools', 'Toys', 'Instruments', 'Town Square', 'Winter', 'Summer'],
             conditions: ['New', 'Used', 'Refurbished'],
             maxTextLength: 2000,
             maxTitleLength: 100,
@@ -158,6 +158,8 @@ export default {
                 .catch(error => {
                     // Handle error
                     console.error('Error creating item:', error);
+                    this.showPopup = true;
+                    this.popupMessage = 'Error creating listing. Please try again.';
                 });
         },
         redirectIfLoggedIn() {
@@ -200,7 +202,7 @@ export default {
     
                     if (file.size > this.maxSizeInBytes) {
                         this.showPopup = true; // Display the popup
-                        this.popupMessage = 'File size exceeds the limit (2MB). Please choose a smaller file.';
+                        this.popupMessage = 'File size exceeds the limit (5MB). Please choose a smaller file.';
                         // Clear the file input to allow the user to select a different file
                         event.target.value = '';
                         return;

@@ -76,7 +76,7 @@ export default {
             postal_code: "",
             category: "",
             condition: "",
-            categories: ['Summer', 'Winter', 'Tools', 'Electronics', 'Clothing', 'Furniture', 'Sports Equipment', 'Books', 'Other'],
+            categories: ['Sports Equipment', 'Books', 'Electronics', 'Clothing', 'Furniture', 'Tools', 'Toys', 'Instruments', 'Town Square', 'Winter', 'Summer'],
             conditions: ['New', 'Used', 'Refurbished'],
             inputNumber: "",
             image: [],
@@ -84,7 +84,7 @@ export default {
             imagePreview: null,
             imagePreviews: [],
             maxFiles: 5,
-            maxSizeInBytes: 2 * 1024 * 1024, // 2MB
+            maxSizeInBytes: 5 * 1024 * 1024, // 5MB
             maxPostalLength: 4,
             maxTitleLength: 50,
             userLoggedIn: false,
@@ -271,7 +271,7 @@ export default {
     
                     if (file.size > this.maxSizeInBytes) {
                         this.showPopup = true; // Display the popup
-                        this.popupMessage = 'File size exceeds the limit (2MB). Please choose a smaller file.';
+                        this.popupMessage = 'File size exceeds the limit (5MB). Please choose a smaller file.';
                         // Clear the file input to allow the user to select a different file
                         event.target.value = '';
                         return;
