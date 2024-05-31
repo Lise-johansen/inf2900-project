@@ -19,6 +19,7 @@
             <button @click="showConfirmationPopup(listing.id)" class="btn delete-btn">Delete Listing</button>
             <button @click="redirectToEditPage(listing.id)" class="btn edit-btn">Edit Listing</button>
             </div>
+            <div class="padding"></div>
         </div>
         </div>
 
@@ -176,6 +177,8 @@
         max-width: 1800px; /* Maximum width of the container */
         margin: 0 auto; /* Center the container */
         min-height: 50vh; /* Set a minimum height equal to the viewport height */
+        padding: 40px; /* Add padding to the container */
+        gap: 40px; /* Add gap between cards */
     }
 
     .card {
@@ -187,7 +190,7 @@
         align-items: center;
         margin-top: 20px; /* Adjust spacing between rows */
         margin-left: 10px; /* Adjust spacing between cards */
-        width: calc(20% - 20px); /* Set width for each card, considering margins */
+        width: calc(20% - 20px); /* Set width for each card, considering gap */
         height: fit-content;
         padding: 10px;
         border: 3px solid grey;
@@ -253,7 +256,6 @@
     .button-container {
         display: flex;
         justify-content: space-between; /* Distribute space evenly between the buttons */
-        margin-top: 10px;
         width: 100%;
     }
 
