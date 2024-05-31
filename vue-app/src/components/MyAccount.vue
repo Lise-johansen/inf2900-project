@@ -105,9 +105,13 @@
                   .then(response => {
                       console.log('Image uploaded:', response);
                       this.profilePicture = response.data.image_url;
+                      this.showPopup = true;
+                      this.errorMessage = 'Image uploaded successfully!';
                   })
                   .catch(error => {
                       console.error('Error uploading image:', error);
+                      this.showPopup = true;
+                      this.errorMessage = 'Error uploading image. Please try again.';
                   });
               };
               reader.readAsDataURL(file);
