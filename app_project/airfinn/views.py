@@ -1246,8 +1246,8 @@ def create_item(request):
             image_binary = base64.b64decode(base64_data)
             
             # Check if the image size exceeds the limit (2MB)
-            if len(image_binary) > 2 * 1024 * 1024:
-                return JsonResponse({'error': 'Image size exceeds the limit of 2MB'}, status=400)
+            if len(image_binary) > 5 * 1024 * 1024:
+                return JsonResponse({'error': 'Image size exceeds the limit of 5MB'}, status=400)
 
             # Get correct file extension
             if uploaded_image.startswith('data:image/png'):
